@@ -28,7 +28,7 @@ local function skyChoice(e)
     else
         debugLog("Using vanilla texture.")
     end
-    tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(7)
+    tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
 end
 
 local function intTrans()
