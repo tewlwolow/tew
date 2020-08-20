@@ -1,0 +1,327 @@
+local climates = require("tew\\AURA\\Ambient\\Outdoor\\outdoorClimates")
+local config = require("tew\\AURA\\config")
+local modversion = require("tew\\AURA\\version")
+local common=require("tew\\AURA\\common")
+
+local moduleAmbientOutdoor=config.moduleAmbientOutdoor
+local playTransSounds=config.playTransSounds
+local playSplash=config.playSplash
+local debugLogOn = config.debugLogOn
+local calmChance=config.calmChance/100
+local vol = config.vol/200
+local playWindy=config.playWindy
+local playInteriorAmbient=config.playInteriorAmbient
+local version = modversion.version
+local wTC=tes3.getWorldController().weatherController
+
+local AURAdir = "Data Files\\Sound\\tew\\AURA"
+local climDir = "\\Climates\\"
+local comDir = "\\Common\\"
+
+local pathLast, pathNow, tSound = "", "", ""
+local climateLast, weatherLast, timeLast, cellLast
+local climateNow, weatherNow, timeNow
+
+local windoors, interiorTimer
+local rArray, qArray, wArray, cArray = {},{},{},{}
+local tArray=common.tArray
+
+local function debugLog(string)
+   if debugLogOn then
+      mwse.log("[AURA "..version.."] OA: "..string.format("%s", string))
+   end
+end
+
+-- Building clear paths array --
+debugLog("Building clear weather regular array.")
+for climate in lfs.dir(AURAdir..climDir) do
+   if climate ~= ".." and climate ~= "." then
+      rArray[climate]={}
+      for time in lfs.dir(AURAdir..climDir..climate) do
+         if time ~= ".." and time ~= "." then
+            rArray[climate][time]={}
+            for rSoundfile in lfs.dir(AURAdir..climDir..climate.."\\"..time) do
+               if rSoundfile ~= ".." and rSoundfile ~= "." then
+                  if string.endswith(rSoundfile, ".wav") then
+                     table.insert(rArray[climate][time], rSoundfile)
+                     debugLog("Adding file: "..rSoundfile)
+                  end
+               end
+            end
+         end
+      end
+   end
+end
+
+-- Bulding quiet paths array --
+debugLog("Building clear weather quiet array.")
+for qSoundfile in lfs.dir(AURAdir..comDir.."Quiet") do
+   if string.endswith(qSoundfile, ".wav") then
+      table.insert(qArray, qSoundfile)
+      debugLog("Adding file: "..qSoundfile)
+   end
+end
+
+-- Building warm wind paths array --
+debugLog("Building warm wind array.")
+for wSoundfile in lfs.dir(AURAdir..comDir.."Warm") do
+   if string.endswith(wSoundfile, ".wav") then
+      table.insert(wArray, wSoundfile)
+      debugLog("Adding file: "..wSoundfile)
+   end
+end
+
+-- Building cold wind paths array --
+debugLog("Building cold wind array.")
+for cSoundfile in lfs.dir(AURAdir..comDir.."Cold") do
+   if string.endswith(cSoundfile, ".wav") then
+      table.insert(cArray, cSoundfile)
+      debugLog("Adding file: "..cSoundfile)
+   end
+end
+
+-- Fetching randomised soundpath from a pre-build clear weather array --
+local function getPathClear()
+   if calmChance<math.random() then
+      debugLog("Getting regular weather soundpath.")
+      local soundPaths=rArray[climateNow][timeNow]
+      pathNow="tew\\AURA"..climDir..climateNow.."\\"..timeNow.."\\"..soundPaths[math.random(1, #soundPaths)]
+   else
+      debugLog("Getting quiet weather soundpath.")
+      pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
+   end
+end
+
+
+-- Fetching randomised soundpath from a pre-build foggy weather array --
+local function getPathFog()
+   debugLog("Getting foggy weather soundpath.")
+   pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
+end
+
+
+-- Fetching randomised soundpath from a pre-build windy weather array --
+local function getPathWindy()
+   debugLog("Getting windy weather soundpath.")
+   if weatherNow == 3 or weatherNow == 4 then
+      debugLog("Found warm weather, using warm wind loops.")
+      pathNow="tew\\AURA"..comDir.."Warm\\"..wArray[math.random(1, #wArray)]
+   elseif weatherNow == 8 or weatherNow == 5 then
+      debugLog("Found cold weather, using cold wind loops.")
+      pathNow="tew\\AURA"..comDir.."Cold\\"..cArray[math.random(1, #cArray)]
+   end
+end
+
+local function playExterior(cell)
+   debugLog("Playing exterior loop. File: "..pathNow)
+   tes3.playSound{soundPath=pathNow, volume=1.0*vol, loop=true, reference=cell}
+end
+
+local function playTrans(cell)
+   if cell.isInterior and not cell.behavesAsExterior then
+      return
+   else
+   tes3.playSound{sound=tSound, volume=0.3*vol, pitch=0.7, reference=tes3.player}
+   debugLog("Playing transition rustle. Sound: "..tSound)
+   end
+ end
+
+local function playInteriorBig(windoor)
+   if windoor==nil then
+      return
+   elseif cellLast and pathLast and not cellLast.isInterior then
+      debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
+      tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+   else
+      debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
+      tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+   end
+end
+
+local function updateInteriorBig()
+   debugLog("Updating interior doors and windows.")
+   local playerPos=tes3.player.position
+   for _, windoor in ipairs(windoors) do
+      if common.getDistance(playerPos, windoor.position) > 2000
+      and windoor~=nil then
+         playInteriorBig(windoor)
+      end
+   end
+end
+
+local function playInteriorSmall(cell)
+   if cellLast and pathLast and not cellLast.isInterior then
+      debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
+      tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+   else
+      debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
+      tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+   end
+end
+
+local function cellCheck()
+   debugLog("Cell changed or time check triggered. Running cell check.")
+
+   -- Getting rid of timers on cell check --
+   if not interiorTimer then
+      interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
+      interiorTimer:pause()
+   else
+      interiorTimer:pause()
+   end
+
+   if not tes3.getRegion() then return end
+
+   local region=tes3.getRegion().name
+   local cell=tes3.getPlayerCell()
+
+   -- Checking climate --
+   for kRegion, vClimate in pairs(climates.regions) do
+      if kRegion==region then
+         climateNow=vClimate
+      end
+   end
+   debugLog("Climate: "..climateNow)
+
+   -- Checking time --
+   local gameHour=tes3.worldController.hour.value
+   if gameHour >= 5 and gameHour <= 8 then
+      timeNow="Dawn"
+   elseif gameHour >= 18 and gameHour <= 21  then
+      timeNow="Dusk"
+   elseif gameHour > 8 and gameHour < 18 then
+      timeNow="Day"
+   elseif gameHour < 5 or gameHour > 21 then
+      timeNow="Night"
+   end
+   debugLog("Time: "..timeNow)
+
+   -- Checking current weather --
+   weatherNow=wTC.currentWeather.index
+   debugLog("Weather: "..weatherNow)
+
+   -- Transition filter chunk --
+   if timeNow==timeLast
+   and climateNow==climateLast
+   and weatherNow==weatherLast
+   and common.checkCellDiff(cell, cellLast)==false then
+      debugLog("Same conditions detected. Returning.")
+      return
+   elseif timeNow~=timeLast and weatherNow==weatherLast then
+      if (weatherNow >= 3 and weatherNow < 6) or (weatherNow == 8) then
+         debugLog("Same conditions detected. Returning.")
+         return
+      end
+   end
+
+   debugLog("Different conditions detected. Resetting sounds.")
+   tes3.removeSound{reference=cell}
+
+
+   -- Getting appropriate paths per conditions detected --
+   if pathLast and cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
+   and weatherNow==weatherLast and climateNow==climateLast then
+      pathNow=pathLast
+         -- New in 2.0.1; using same soundpath when entering int/ext in same area; time/weather change will randomise path again --
+      debugLog("Cells changed, but conditions are the same. Using last path: "..pathNow)
+   else
+      if weatherNow == 0 or weatherNow == 1 then
+         debugLog("Clear weather detected.")
+         getPathClear()
+      elseif weatherNow == 2 then
+         debugLog("Foggy weather detected.")
+         getPathFog()
+      elseif (weatherNow >= 3 and weatherNow < 6) or (weatherNow == 8) then
+         if playWindy then
+            debugLog("Bad weather detected and windy option on.")
+            getPathWindy()
+         else
+            debugLog("Bad weather detected and no windy option on. Removing sounds")
+            return
+         end
+      elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
+         debugLog("Extreme weather detected.")
+         return
+      end
+      debugLog("Done getting sound. Current path: "..pathNow)
+   end
+
+
+   if playTransSounds then
+      tSound=tArray[math.random(1, #tArray)]
+      debugLog ("Transition sound: "..tSound)
+      playTrans(cell)
+   end
+
+   if not cell.isInterior
+   or (cell.isInterior and cell.behavesAsExterior) then
+      debugLog("Found exterior cell.")
+      playExterior(cell)
+   elseif cell.isInterior then
+      if not playInteriorAmbient then
+         debugLog("Found interior cell. Removing sounds.")
+      else
+         if common.getCellType(cell, common.cellTypesSmall)==true
+         or common.getCellType(cell, common.cellTypesTent)==true then
+            playInteriorSmall(cell, weatherNow)
+            debugLog("Found small interior cell. Playing interior weather.")
+         else
+            windoors=nil
+            windoors=common.getWindoors(cell)
+            for _, windoor in ipairs(windoors) do
+               playInteriorBig(windoor)
+            end
+           interiorTimer:resume()
+           debugLog("Found big interior cell. Playing interior weather.")
+        end
+      end
+   end
+
+   timeLast=timeNow
+   climateLast=climateNow
+   weatherLast=weatherNow
+   cellLast=cell
+   pathLast=pathNow
+end
+
+local function positionCheck(e)
+   local cell=tes3.getPlayerCell()
+   local element=e.element
+   if cell.isInterior and not cell.behavesAsExterior then
+      return
+   else
+      debugLog("Player underwater. Stopping AURA sounds.")
+      tes3.removeSound{reference=cell}
+      tes3.playSound{soundPath=pathLast, volume=0.4*vol, pitch=0.5, reference=cell, loop=true}
+      if playSplash and moduleAmbientOutdoor then
+         tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5, pitch=0.6}
+      end
+      element:register("destroy", function()
+         debugLog("Player above water level. Resetting AURA sounds.")
+         tes3.removeSound{reference=cell}
+         tes3.playSound{soundPath=pathLast, volume=1.0*vol, reference=cell, loop=true}
+         timer.start({duration=5, callback=cellCheck, type=timer.real})
+         if playSplash and moduleAmbientOutdoor then
+            tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5, pitch=0.8}
+         end
+      end)
+   end
+end
+local function runResetter()
+   pathLast, pathNow, tSound = "", "", ""
+   climateLast, weatherLast, timeLast = nil, nil, nil
+   climateNow, weatherNow, timeNow = nil, nil, nil
+   windoors = {}
+end
+
+local function runHourTimer()
+   timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
+end
+
+debugLog("Outdoor Ambient Sounds module initialised.")
+event.register("loaded", runHourTimer, {priority=100})
+event.register("load", runResetter, {priority=100})
+event.register("cellChanged", cellCheck, {priority=100})
+event.register("weatherTransitionFinished", cellCheck, {priority=100})
+event.register("weatherChangedImmediate", cellCheck, {priority=100})
+event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
