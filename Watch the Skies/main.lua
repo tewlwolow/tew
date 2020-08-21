@@ -5,6 +5,7 @@ local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
 local alterChanges=config.alterChanges
 local version = "1.0.0"
+local WtC, intWeatherTimer
 
 local function debugLog(string)
     if debugLogOn then
@@ -31,18 +32,42 @@ local function skyChoice(e)
     end
 
     if alterChanges then
-        tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
+        WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 end
 
-local function intTrans()
-    local cell=tes3.getPlayerCell()
-    if (cell.isInterior and not cell.behavesAsExterior and tes3.getWorldController().weatherController.lastActiveRegion) then
-        tes3.getWorldController().weatherController:switchTransition(tes3.getWorldController().weatherController.lastActiveRegion.weather.index)
+local function changeInteriorWeather()
+    debugLog("Weather before randomisation: "..WtC.currentWeather.index)
+    WtC:switchImmediate(math.random(-1,8))
+    WtC:updateVisuals()
+    debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
+    if alterChanges then
+        WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
+    debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
+end
+
+
+local function onCellChanged(e)
+    local cell=e.cell
+    debugLog("Current cell: "..cell.name)
+
+    if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+        intWeatherTimer:pause()
+        debugLog("Player in exterior. Pausing interior timer.")
+    elseif (cell.isInterior) and not (cell.behavesAsExterior) then
+        intWeatherTimer:resume()
+        debugLog("Player in interior. Resuming interior timer.")
+    end
+end
+
+local function initTimer()
+    intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
+    intWeatherTimer:pause()
 end
 
 local function init()
+    WtC=tes3.getWorldController().weatherController
     print("Watch the Skies version "..version.." initialised.")
     for weather, index in pairs(tes3.weather) do
         debugLog("Weather: "..weather)
@@ -54,7 +79,7 @@ local function init()
             end
         end
     end
-    for _, weather in pairs(tes3.getWorldController().weatherController.weathers) do
+    for _, weather in pairs(WtC.weathers) do
         for index, _ in pairs(weathers) do
             if weather.index==index then
                 local texPath
@@ -72,13 +97,13 @@ local function init()
     end
 
     if alterChanges then
-        tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
+        WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
+    event.register("loaded", initTimer)
     event.register("weatherChangedImmediate", skyChoice, {priority=-100})
     event.register("weatherTransitionFinished", skyChoice, {priority=-100})
-    event.register("weatherCycled", intTrans)
-    event.register("weatherTransitionStarted", intTrans)
+    event.register("cellChanged", onCellChanged, {priority=-146})
 end
 
 event.register("initialized", init)
