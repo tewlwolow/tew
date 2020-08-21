@@ -4,7 +4,8 @@ local debugLogOn=config.debugLogOn
 local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
 local alterChanges=config.alterChanges
-local version = "1.0.0"
+local interiorTransitions=config.interiorTransitions
+local version = "1.0.1"
 local WtC, intWeatherTimer
 
 local function debugLog(string)
@@ -36,34 +37,33 @@ local function skyChoice(e)
     end
 end
 
-local function changeInteriorWeather()
-    debugLog("Weather before randomisation: "..WtC.currentWeather.index)
-    WtC:switchImmediate(math.random(-1,8))
-    WtC:updateVisuals()
-    debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
-    if alterChanges then
-        WtC.hoursBetweenWeatherChanges=math.random(3,12)
+if interiorTransitions then
+    local function changeInteriorWeather()
+        debugLog("Weather before randomisation: "..WtC.currentWeather.index)
+        WtC:switchImmediate(math.random(-1,8))
+        WtC:updateVisuals()
+        debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
+        if alterChanges then
+            WtC.hoursBetweenWeatherChanges=math.random(3,12)
+        end
+        debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
     end
-    debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
-end
+    local function onCellChanged(e)
+        local cell=e.cell
+        debugLog("Current cell: "..cell.name)
 
-
-local function onCellChanged(e)
-    local cell=e.cell
-    debugLog("Current cell: "..cell.name)
-
-    if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+        if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+            intWeatherTimer:pause()
+            debugLog("Player in exterior. Pausing interior timer.")
+        elseif (cell.isInterior) and not (cell.behavesAsExterior) then
+            intWeatherTimer:resume()
+            debugLog("Player in interior. Resuming interior timer.")
+        end
+    end
+    local function initTimer()
+        intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
         intWeatherTimer:pause()
-        debugLog("Player in exterior. Pausing interior timer.")
-    elseif (cell.isInterior) and not (cell.behavesAsExterior) then
-        intWeatherTimer:resume()
-        debugLog("Player in interior. Resuming interior timer.")
     end
-end
-
-local function initTimer()
-    intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
-    intWeatherTimer:pause()
 end
 
 local function init()
@@ -100,10 +100,13 @@ local function init()
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
-    event.register("loaded", initTimer)
     event.register("weatherChangedImmediate", skyChoice, {priority=-100})
     event.register("weatherTransitionFinished", skyChoice, {priority=-100})
     event.register("cellChanged", onCellChanged, {priority=-146})
+
+    if interiorTransitions then
+        event.register("loaded", initTimer)
+    end
 end
 
 event.register("initialized", init)

@@ -32,6 +32,12 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+    page:createYesNoButton{
+        label = "New game behaviour: enable weather changes in interiors?",
+        variable = registerVariable("interiorTransitions"),
+        restartRequired=true
+    }
+
     page:createSlider{
         label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nChance %",
         min = 0,
