@@ -11,7 +11,7 @@ local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 
 local IWLoop, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
-local wTC=tes3.getWorldController().weatherController
+local WtC=tes3.getWorldController().weatherController
 
 local thunArray=common.thunArray
 
@@ -29,7 +29,7 @@ end
 
 local function updateThunderBig()
     if transState==false
-    or transState==true and wTC.transitionScalar>=0.5 then
+    or transState==true and WtC.transitionScalar>=0.5 then
         debugLog("Updating interior doors for thunders.")
         local playerPos=tes3.player.position
         for _, windoor in ipairs(windoors) do
@@ -74,7 +74,7 @@ end
 
 local function updateInteriorBig()
     if transState==false
-    or transState==true and wTC.transitionScalar>=0.4 then
+    or transState==true and WtC.transitionScalar>=0.4 then
         local playerPos=tes3.player.position
         for _, windoor in ipairs(windoors) do
             if common.getDistance(playerPos, windoor.position) > 2000 then
@@ -111,9 +111,9 @@ local function cellCheck()
         tes3.removeSound{reference=cell}
     end
 
-    local IWweather=wTC.currentWeather.index
+    local IWweather=WtC.currentWeather.index
     IWLoop=nil
-    if not wTC.nextWeather then
+    if not WtC.nextWeather then
         if not (IWweather >=4 and IWweather <= 7) and not IWweather==9 then
             debugLog("Uneligible weather detected. Returning.")
             return
@@ -132,8 +132,8 @@ local function cellCheck()
         transState=false
     end
 
-    if wTC.nextWeather then
-        local IWweatherNext=wTC.nextWeather.index
+    if WtC.nextWeather then
+        local IWweatherNext=WtC.nextWeather.index
         if not (IWweatherNext >=4 and IWweatherNext <= 7) and not IWweatherNext==9 then
             debugLog("Uneligible weather detected. Returning.")
             return
