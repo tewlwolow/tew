@@ -3,6 +3,7 @@ local config=require("tew\\Watch the Skies\\config")
 local debugLogOn=config.debugLogOn
 local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
+local alterChanges=config.alterChanges
 local version = "1.0.0"
 
 local function debugLog(string)
@@ -28,7 +29,10 @@ local function skyChoice(e)
     else
         debugLog("Using vanilla texture.")
     end
-    tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
+
+    if alterChanges then
+        tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
+    end
 end
 
 local function intTrans()
@@ -65,6 +69,10 @@ local function init()
                 end
             end
         end
+    end
+
+    if alterChanges then
+        tes3.getWorldController().weatherController.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
     event.register("weatherChangedImmediate", skyChoice, {priority=-100})

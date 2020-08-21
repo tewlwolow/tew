@@ -25,8 +25,15 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+
+    page:createYesNoButton{
+        label = "Enable randomised hours between weather changes?",
+        variable = registerVariable("alterChanges"),
+        restartRequired=true
+    }
+
     page:createSlider{
-        label = "Changes % chance for a vanilla cloud texture to show up instead.\nChance %",
+        label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nChance %",
         min = 0,
         max = 100,
         step = 1,
