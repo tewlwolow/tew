@@ -5,10 +5,12 @@ local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
 local alterChanges=config.alterChanges
 local interiorTransitions=config.interiorTransitions
-local version = "1.0.1"
+local randomiseParticles=config.randomiseParticles
+local version = "1.0.2"
 local WtC, intWeatherTimer
 
-local interiorWeathers={0,1,2,3,8}
+
+local interiorWeathers={0,1,2,3}
 
 local function debugLog(string)
     if debugLogOn then
@@ -38,6 +40,12 @@ local function skyChoiceInterior()
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
         debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
     end
+
+    if randomiseParticles then
+        WtC.weathers[4].maxParticles=math.random(200,1200)
+        WtC.weathers[5].maxParticles=math.random(600,1500)
+        WtC.weathers[8].maxParticles=math.random(150,1200)
+    end
 end
 
 local function skyChoice(e)
@@ -61,6 +69,12 @@ local function skyChoice(e)
     if alterChanges then
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
         debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
+    end
+
+    if randomiseParticles then
+        WtC.weathers[4].maxParticles=math.random(200,1200)
+        WtC.weathers[5].maxParticles=math.random(600,1500)
+        WtC.weathers[8].maxParticles=math.random(150,1200)
     end
 
     WtC:updateVisuals()
@@ -131,6 +145,13 @@ local function init()
     if interiorTransitions then
         event.register("loaded", initTimer, {priority=-165})
         event.register("cellChanged", onCellChanged, {priority=-165})
+    end
+
+
+    if randomiseParticles then
+        WtC.weathers[4].maxParticles=math.random(200,1200)
+        WtC.weathers[5].maxParticles=math.random(600,1500)
+        WtC.weathers[8].maxParticles=math.random(150,1200)
     end
 end
 

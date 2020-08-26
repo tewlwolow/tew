@@ -37,6 +37,11 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("interiorTransitions"),
         restartRequired=true
     }
+    page:createYesNoButton{
+        label = "Randomise max particles amount for more variety?",
+        variable = registerVariable("randomiseParticles"),
+        restartRequired=true
+    }
 
     page:createSlider{
         label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nChance %",
