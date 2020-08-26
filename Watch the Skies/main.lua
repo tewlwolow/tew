@@ -42,9 +42,9 @@ local function skyChoiceInterior()
     end
 
     if randomiseParticles then
-        WtC.weathers[4].maxParticles=math.random(200,1200)
-        WtC.weathers[5].maxParticles=math.random(600,1500)
-        WtC.weathers[8].maxParticles=math.random(150,1200)
+        WtC.weathers[5].maxParticles=math.random(200,1200)
+        WtC.weathers[6].maxParticles=math.random(600,1500)
+        WtC.weathers[9].maxParticles=math.random(150,1200)
     end
 end
 
@@ -72,9 +72,9 @@ local function skyChoice(e)
     end
 
     if randomiseParticles then
-        WtC.weathers[4].maxParticles=math.random(200,1200)
-        WtC.weathers[5].maxParticles=math.random(600,1500)
-        WtC.weathers[8].maxParticles=math.random(150,1200)
+        WtC.weathers[5].maxParticles=math.random(200,1200)
+        WtC.weathers[6].maxParticles=math.random(600,1500)
+        WtC.weathers[9].maxParticles=math.random(150,1200)
     end
 
     WtC:updateVisuals()
@@ -149,9 +149,9 @@ local function init()
 
 
     if randomiseParticles then
-        WtC.weathers[4].maxParticles=math.random(200,1200)
-        WtC.weathers[5].maxParticles=math.random(600,1500)
-        WtC.weathers[8].maxParticles=math.random(150,1200)
+        WtC.weathers[5].maxParticles=math.random(200,1200)
+        WtC.weathers[6].maxParticles=math.random(600,1500)
+        WtC.weathers[9].maxParticles=math.random(150,1200)
     end
 end
 
