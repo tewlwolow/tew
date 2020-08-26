@@ -9,7 +9,7 @@ local vol = config.intVol/200
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 
-local IWLoop, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
+local IWLoop, IWLoopLast, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, weatherInteriorTimer
 
 local WtC=tes3.getWorldController().weatherController
 
@@ -29,7 +29,7 @@ end
 
 local function updateThunderBig()
     if transState==false
-    or transState==true and WtC.transitionScalar>=0.5 then
+    or transState==true and WtC.transitionScalar>=0.2 then
         debugLog("Updating interior doors for thunders.")
         local playerPos=tes3.player.position
         for _, windoor in ipairs(windoors) do
@@ -68,7 +68,7 @@ local function playInteriorBig(windoor)
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
-        tes3.playSound{sound=IWLoop, volume=0.3*vol, pitch=0.5, loop=true, reference=windoor}
+        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=windoor}
     end
 end
 
@@ -85,6 +85,14 @@ local function updateInteriorBig()
 end
 
 local function cellCheck()
+
+    local cell=tes3.getPlayerCell()
+    if not cell.isInterior
+    or (cell.isInterior and cell.behavesAsExterior) then
+        debugLog("Found exterior cell. Returning.")
+        weatherInteriorTimer:pause()
+        return
+    end
 
     if not interiorTimer then
         interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
@@ -104,8 +112,6 @@ local function cellCheck()
     else
         thunderTimerSmall:pause()
     end
-
-    local cell=tes3.getPlayerCell()
 
     if not moduleAmbientOutdoor then
         tes3.removeSound{reference=cell}
@@ -152,21 +158,17 @@ local function cellCheck()
         transState=true
     end
 
-    if not cell.isInterior
-    or (cell.isInterior and cell.behavesAsExterior) then
-        debugLog("Found exterior cell. Returning.")
-        return
-    elseif IWLoop~=nil then
-        debugLog("Found interior cell.")
-        if common.getCellType(cell, common.cellTypesSmall)==true then
-            interiorType="Small"
-            playInteriorSmall(cell, interiorType)
-            debugLog("Playing small interior sounds.")
-            if IWLoop=="rain heavy" then
-                thunRef=cell
-                thunderTimerSmall:resume()
-            end
-        elseif common.getCellType(cell, common.cellTypesTent)==true then
+    debugLog("Found interior cell.")
+    weatherInteriorTimer:resume()
+    if common.getCellType(cell, common.cellTypesSmall)==true then
+        interiorType="Small"
+        playInteriorSmall(cell, interiorType)
+        debugLog("Playing small interior sounds.")
+        if IWLoop=="rain heavy" then
+            thunRef=cell
+            thunderTimerSmall:resume()
+        end
+    elseif common.getCellType(cell, common.cellTypesTent)==true then
         interiorType="Tent"
         playInteriorSmall(cell, interiorType)
         debugLog("Playing tent interior sounds.")
@@ -174,22 +176,43 @@ local function cellCheck()
             thunRef=cell
             thunderTimerSmall:resume()
         end
+    else
+        thunRef=nil
+        windoors={}
+        windoors=common.getWindoors(cell)
+        if IWLoopLast==IWLoop then
+            debugLog("Same weather detected. Returning")
+            return
         else
-            thunRef=nil
-            windoors={}
-            windoors=common.getWindoors(cell)
-            for _, windoor in ipairs(windoors) do
-                playInteriorBig(windoor)
+            if IWLoop==nil then
+                for _, windoor in ipairs(windoors) do
+                    tes3.removeSound{reference=windoor}
+                end
+                return
+            else
+                for _, windoor in ipairs(windoors) do
+                    tes3.removeSound{reference=windoor}
+                    playInteriorBig(windoor)
+                end
+                if IWLoop=="rain heavy" then
+                    debugLog("Stopping thunder loop.")
+                    thunderTimerBig:pause()
+                end
             end
-            interiorTimer:resume()
-            debugLog("Playing big interior sound.")
         end
+        interiorTimer:resume()
+        debugLog("Playing big interior sound.")
+        IWLoopLast=IWLoop
     end
+end
+
+local function runTimer()
+    weatherInteriorTimer = timer.start({duration=0.5, iterations=-1, callback=cellCheck, type=timer.game})
 end
 
 debugLog("Interior Weather module initialised.")
 
-
+event.register("loaded", runTimer)
 event.register("cellChanged", cellCheck, { priority = -150 })
 event.register("weatherTransitionStarted", cellCheck,  { priority = -150 })
 event.register("weatherChangedImmediate", cellCheck,  { priority = -150 })
