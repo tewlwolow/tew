@@ -8,9 +8,35 @@ local interiorTransitions=config.interiorTransitions
 local version = "1.0.1"
 local WtC, intWeatherTimer
 
+local interiorWeathers={0,1,2,3,8}
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Watch the Skies "..version.."] "..string)
+    end
+end
+
+local function skyChoiceInterior()
+    debugLog("Starting interior cloud texture randomisation.")
+    if vanChance<math.random() then
+        local sArray=weathers[WtC.currentWeather.index]
+        local texPath
+        for weather, index in pairs(tes3.weather) do
+            if WtC.currentWeather.index==index then
+                texPath=weather
+            end
+        end
+        if texPath~=nil and sArray[1]~=nil then
+            WtC.currentWeather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+            debugLog("Cloud texture path set to: "..WtC.currentWeather.cloudTexture)
+        end
+    else
+        debugLog("Using vanilla texture.")
+    end
+
+    if alterChanges then
+        WtC.hoursBetweenWeatherChanges=math.random(3,12)
+        debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
     end
 end
 
@@ -34,36 +60,35 @@ local function skyChoice(e)
 
     if alterChanges then
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
+        debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
+    end
+
+    WtC:updateVisuals()
+end
+
+local function changeInteriorWeather()
+    debugLog("Weather before randomisation: "..WtC.currentWeather.index)
+    WtC:switchTransition(interiorWeathers[math.random(1, #interiorWeathers)])
+    debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
+    skyChoiceInterior()
+end
+
+local function onCellChanged(e)
+    local cell=e.cell
+    debugLog("Current cell: "..cell.name)
+
+    if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+        intWeatherTimer:pause()
+        debugLog("Player in exterior. Pausing interior timer.")
+    elseif (cell.isInterior) and not (cell.behavesAsExterior) then
+        intWeatherTimer:resume()
+        debugLog("Player in interior. Resuming interior timer. Time to weather change: "..WtC.hoursBetweenWeatherChanges)
     end
 end
 
-if interiorTransitions then
-    local function changeInteriorWeather()
-        debugLog("Weather before randomisation: "..WtC.currentWeather.index)
-        WtC:switchImmediate(math.random(-1,8))
-        WtC:updateVisuals()
-        debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
-        if alterChanges then
-            WtC.hoursBetweenWeatherChanges=math.random(3,12)
-        end
-        debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
-    end
-    local function onCellChanged(e)
-        local cell=e.cell
-        debugLog("Current cell: "..cell.name)
-
-        if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
-            intWeatherTimer:pause()
-            debugLog("Player in exterior. Pausing interior timer.")
-        elseif (cell.isInterior) and not (cell.behavesAsExterior) then
-            intWeatherTimer:resume()
-            debugLog("Player in interior. Resuming interior timer.")
-        end
-    end
-    local function initTimer()
-        intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
-        intWeatherTimer:pause()
-    end
+local function initTimer()
+    intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
+    intWeatherTimer:pause()
 end
 
 local function init()
@@ -100,12 +125,12 @@ local function init()
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
-    event.register("weatherChangedImmediate", skyChoice, {priority=-100})
-    event.register("weatherTransitionFinished", skyChoice, {priority=-100})
-    event.register("cellChanged", onCellChanged, {priority=-146})
+    event.register("weatherChangedImmediate", skyChoice, {priority=-165})
+    event.register("weatherTransitionFinished", skyChoice, {priority=-165})
 
     if interiorTransitions then
-        event.register("loaded", initTimer)
+        event.register("loaded", initTimer, {priority=-165})
+        event.register("cellChanged", onCellChanged, {priority=-165})
     end
 end
 
