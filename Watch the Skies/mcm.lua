@@ -33,7 +33,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createYesNoButton{
-        label = "New game behaviour: enable weather changes in interiors?",
+        label = "Enable weather changes in interiors?",
         variable = registerVariable("interiorTransitions"),
         restartRequired=true
     }
