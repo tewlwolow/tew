@@ -264,7 +264,7 @@ local function cellCheck()
          if common.getCellType(cell, common.cellTypesSmall)==true
          or common.getCellType(cell, common.cellTypesTent)==true then
             playInteriorSmall(cell, weatherNow)
-            debugLog("Found small interior cell. Playing interior weather.")
+            debugLog("Found small interior cell. Playing interior loops.")
          else
             windoors=nil
             windoors=common.getWindoors(cell)
@@ -272,7 +272,7 @@ local function cellCheck()
                playInteriorBig(windoor)
             end
            interiorTimer:resume()
-           debugLog("Found big interior cell. Playing interior weather.")
+           debugLog("Found big interior cell. Playing interior loops.")
         end
       end
    end
@@ -321,7 +321,7 @@ end
 debugLog("Outdoor Ambient Sounds module initialised.")
 event.register("loaded", runHourTimer, {priority=100})
 event.register("load", runResetter, {priority=100})
-event.register("cellChanged", cellCheck, {priority=100})
+event.register("cellChanged", cellCheck, {priority=-170})
 event.register("weatherTransitionFinished", cellCheck, {priority=100})
 event.register("weatherChangedImmediate", cellCheck, {priority=100})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})

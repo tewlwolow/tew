@@ -9,7 +9,7 @@ local vol = config.intVol/200
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 
-local IWLoop, IWLoopLast, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, weatherInteriorTimer
+local IWLoop, IWLoopLast, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
 local WtC=tes3.getWorldController().weatherController
 
@@ -90,7 +90,6 @@ local function cellCheck()
     if not cell.isInterior
     or (cell.isInterior and cell.behavesAsExterior) then
         debugLog("Found exterior cell. Returning.")
-        weatherInteriorTimer:pause()
         return
     end
 
@@ -159,7 +158,6 @@ local function cellCheck()
     end
 
     debugLog("Found interior cell.")
-    weatherInteriorTimer:resume()
     if common.getCellType(cell, common.cellTypesSmall)==true then
         interiorType="Small"
         playInteriorSmall(cell, interiorType)
@@ -206,13 +204,9 @@ local function cellCheck()
     end
 end
 
-local function runTimer()
-    weatherInteriorTimer = timer.start({duration=0.5, iterations=-1, callback=cellCheck, type=timer.game})
-end
 
 debugLog("Interior Weather module initialised.")
 
-event.register("loaded", runTimer)
 event.register("cellChanged", cellCheck, { priority = -150 })
 event.register("weatherTransitionStarted", cellCheck,  { priority = -150 })
 event.register("weatherChangedImmediate", cellCheck,  { priority = -150 })
