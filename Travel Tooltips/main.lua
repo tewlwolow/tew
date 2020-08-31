@@ -224,6 +224,11 @@ local function init()
     event.register("uiActivated", createTravelMap, {filter="MenuDialog"})
     event.register("uiActivated", createTooltip, {filter="MenuServiceTravel"})
     mwse.log("[Travel Tooltips] Version "..version.." initialised.")
+
+    -- Old version deleter --
+    if lfs.dir("Data Files/MWSE/mods/Travel Tooltips/") then
+        lfs.rmdir("Data Files/MWSE/mods/Travel Tooltips/", true)
+    end
 end
 
 event.register("initialized", init)
