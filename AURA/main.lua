@@ -3,7 +3,7 @@ local version = modversion.version
 
 local function init()
 
-    print("[AURA] Version "..version.." initialised.")
+    mwse.log("[AURA] Version "..version.." initialised.")
 
     local config=require("tew.AURA.config")
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
@@ -12,24 +12,30 @@ local function init()
     local moduleMisc = config.moduleMisc
 
     if moduleAmbientOutdoor then
-        print("[AURA "..version.."] Loading file: outdoorMain.lua.")
+        mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Outdoor\\outdoorMain.lua")
     end
 
     if moduleInteriorWeather then
-        print("[AURA "..version.."] Loading file: interiorWeatherMain.lua.")
+        mwse.log("[AURA "..version.."] Loading file: interiorWeatherMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Interior Weather\\interiorWeatherMain.lua")
     end
 
     if moduleServiceVoices then
-        print("[AURA "..version.."] Loading file: serviceVoicesMain.lua.")
+        mwse.log("[AURA "..version.."] Loading file: serviceVoicesMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Service Voices\\serviceVoicesMain.lua")
     end
 
     if moduleMisc then
-        print("[AURA "..version.."] Loading file: miscMain.lua.")
+        mwse.log("[AURA "..version.."] Loading file: miscMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\miscMain.lua")
     end
+
+        -- Old version deleter --
+        if lfs.dir("Data Files/MWSE/mods/AURA/") then
+            lfs.rmdir("Data Files/MWSE/mods/AURA/", true)
+            mwse.log("Old version found and deleted.")
+        end
 end
 
 -- Registers MCM menu --

@@ -228,6 +228,7 @@ local function init()
     -- Old version deleter --
     if lfs.dir("Data Files/MWSE/mods/Travel Tooltips/") then
         lfs.rmdir("Data Files/MWSE/mods/Travel Tooltips/", true)
+        mwse.log("Old version found and deleted.")
     end
 end
 
