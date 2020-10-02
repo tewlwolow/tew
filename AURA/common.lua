@@ -1,15 +1,5 @@
 local this={}
 
-this.banners={
-    "_ban_",
-    "banner"
-}
-
-this.overhangs={
-    "overhang",
-    "awning"
-}
-
 this.tArray={
     "howl1",
     "howl2",
@@ -109,6 +99,7 @@ function this.getWindoors(cell)
     end
     return windoors
 end
+
 --[[
 function this.getObjects(cell, objectType, stringArray)
     local objectArray={}
@@ -122,6 +113,7 @@ function this.getObjects(cell, objectType, stringArray)
     return objectArray
 end
 --]]
+
 function this.getDistance(v0, v1)
     local dx=v1.x-v0.x
     local dy=v1.y-v0.y

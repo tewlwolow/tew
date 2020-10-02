@@ -7,8 +7,6 @@ local function init()
     local playSplash = config.playSplash
     local travelFee = config.travelFee
     local playYurtFlap = config.playYurtFlap
-    local playBanners = config.playBanners
-    local playOverhang = config.playOverhang
 
     if playSplash and not moduleAmbientOutdoor then
         print("[AURA "..version.."] Loading file: waterSplash.lua")
