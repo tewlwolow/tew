@@ -9,7 +9,7 @@ local vol = config.intVol/200
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 
-local IWLoop, IWLoopLast, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
+local IWLoop, transState, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
 local WtC=tes3.getWorldController().weatherController
 
@@ -29,7 +29,7 @@ end
 
 local function updateThunderBig()
     if transState==false
-    or transState==true and WtC.transitionScalar>=0.2 then
+    or transState==true and WtC.transitionScalar>=0.4 then
         debugLog("Updating interior doors for thunders.")
         local playerPos=tes3.player.position
         for _, windoor in ipairs(windoors) do
@@ -60,6 +60,7 @@ local function playInteriorSmall(cell)
 end
 
 local function playInteriorBig(windoor)
+    if windoor==nil then debugLog("Dodging an empty ref.") return end
     if IWLoop=="Rain" then
         tes3.playSound{sound="Sound Test", volume=0.7*vol, pitch=0.8, loop=true, reference=windoor}
         debugLog("Playing big interior rain loop.")
@@ -178,29 +179,23 @@ local function cellCheck()
         thunRef=nil
         windoors={}
         windoors=common.getWindoors(cell)
-        if IWLoopLast==IWLoop then
-            debugLog("Same weather detected. Returning")
+        if IWLoop==nil then
+            for _, windoor in ipairs(windoors) do
+                tes3.removeSound{reference=windoor}
+            end
             return
         else
-            if IWLoop==nil then
-                for _, windoor in ipairs(windoors) do
-                    tes3.removeSound{reference=windoor}
-                end
-                return
-            else
-                for _, windoor in ipairs(windoors) do
-                    tes3.removeSound{reference=windoor}
-                    playInteriorBig(windoor)
-                end
-                if IWLoop=="rain heavy" then
-                    debugLog("Stopping thunder loop.")
-                    thunderTimerBig:pause()
-                end
+            for _, windoor in ipairs(windoors) do
+                tes3.removeSound{reference=windoor}
+                playInteriorBig(windoor)
+            end
+            if IWLoop=="rain heavy" then
+                debugLog("Stopping thunder loop.")
+                thunderTimerBig:pause()
             end
         end
         interiorTimer:resume()
         debugLog("Playing big interior sound.")
-        IWLoopLast=IWLoop
     end
 end
 
@@ -208,5 +203,5 @@ end
 debugLog("Interior Weather module initialised.")
 
 event.register("cellChanged", cellCheck, { priority = -150 })
-event.register("weatherTransitionStarted", cellCheck,  { priority = -150 })
-event.register("weatherChangedImmediate", cellCheck,  { priority = -150 })
+event.register("weatherTransitionStarted", cellCheck, { priority = -150 })
+event.register("weatherChangedImmediate", cellCheck, { priority = -150 })
