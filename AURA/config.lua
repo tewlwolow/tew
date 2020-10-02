@@ -11,8 +11,6 @@ return mwse.loadConfig("AURA", {
     playInteriorWeather=true,
     playTransSounds=true,
     playYurtFlap=true,
-    playBanners=true,
-    playOverhang=true,
     travelFee=true,
     debugLogOn=false,
     calmChance=30,

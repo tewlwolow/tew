@@ -150,14 +150,6 @@ local template = mwse.mcm.createTemplate{
         label = "Enable yurt door sound?",
         variable = registerVariable("playYurtFlap"),
     }
-    pageMisc:createYesNoButton{
-        label = "Enable banner flap sounds?",
-        variable = registerVariable("playBanners"),
-    }
-    pageMisc:createYesNoButton{
-        label = "Enable rain-on-canvas sounds on overhangs?",
-        variable = registerVariable("playOverhang"),
-    }
 
 template:saveOnClose(configPath, config)
 mwse.mcm.register(template)

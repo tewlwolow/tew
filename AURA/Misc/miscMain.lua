@@ -29,18 +29,6 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\yurtFlap.lua")
     end
 
-    if playBanners then
-        print("[AURA "..version.."] Loading file: bannerFlap.lua")
-        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\bannerFlap.lua")
-    end
-
-    if playOverhang then
-        print("[AURA "..version.."] Loading file: overhangRain.lua")
-        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\overhangRain.lua")
-    end
-
-
-
 end
 
 print("[AURA "..version.."] Miscellaneous module initialised.")
