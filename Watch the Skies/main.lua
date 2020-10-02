@@ -10,45 +10,16 @@ local version = "1.0.2"
 local WtC, intWeatherTimer
 
 
-local interiorWeathers={0,1,2,3,4,5,6,7}
+local interiorWeathers={0,1,2,3}
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[Watch the Skies "..version.."] "..string)
-    end
-end
-
-local function skyChoiceInterior()
-    debugLog("Starting interior cloud texture randomisation.")
-    if vanChance<math.random() then
-        local sArray=weathers[WtC.currentWeather.index]
-        local texPath
-        for weather, index in pairs(tes3.weather) do
-            if WtC.currentWeather.index==index then
-                texPath=weather
-            end
-        end
-        if texPath~=nil and sArray[1]~=nil then
-            WtC.currentWeather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-            debugLog("Cloud texture path set to: "..WtC.currentWeather.cloudTexture)
-        end
-    else
-        debugLog("Using vanilla texture.")
-    end
-
-    if alterChanges then
-        WtC.hoursBetweenWeatherChanges=math.random(3,12)
-        debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
-    end
-
-    if randomiseParticles then
-        WtC.weathers[5].maxParticles=math.random(200,1200)
-        WtC.weathers[6].maxParticles=math.random(600,1500)
-        WtC.weathers[9].maxParticles=math.random(150,1200)
+       mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
     end
 end
 
 local function skyChoice(e)
+    if not e then return end
     debugLog("Starting cloud texture randomisation.")
     if vanChance<math.random() then
         local sArray=weathers[e.to.index]
@@ -81,10 +52,17 @@ local function skyChoice(e)
 end
 
 local function changeInteriorWeather()
-    debugLog("Weather before randomisation: "..WtC.currentWeather.index)
-    WtC:switchTransition(interiorWeathers[math.random(1, #interiorWeathers)])
-    debugLog("Weather randomised. New weather: "..WtC.currentWeather.index)
-    skyChoiceInterior()
+    local currentWeather=WtC.currentWeather.index
+    debugLog("Weather before randomisation: "..currentWeather)
+    local newWeather=interiorWeathers[math.random(1, #interiorWeathers)]
+
+    while newWeather==currentWeather do
+        newWeather=interiorWeathers[math.random(1, #interiorWeathers)]
+    end
+
+    WtC:switchTransition(newWeather)
+
+    debugLog("Weather randomised. New weather: "..WtC.nextWeather.index)
 end
 
 local function onCellChanged(e)
@@ -92,17 +70,16 @@ local function onCellChanged(e)
     debugLog("Current cell: "..cell.name)
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+        if intWeatherTimer then
         intWeatherTimer:pause()
-        debugLog("Player in exterior. Pausing interior timer.")
+        debugLog("Player in exterior. Pausing interior timer.") end
     elseif (cell.isInterior) and not (cell.behavesAsExterior) then
-        intWeatherTimer:resume()
+        if intWeatherTimer then
+        intWeatherTimer:cancel()
+        intWeatherTimer=nil end
+        intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1, type=timer.game}
         debugLog("Player in interior. Resuming interior timer. Time to weather change: "..WtC.hoursBetweenWeatherChanges)
     end
-end
-
-local function initTimer()
-    intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1}
-    intWeatherTimer:pause()
 end
 
 local function init()
@@ -139,14 +116,12 @@ local function init()
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
-    event.register("weatherChangedImmediate", skyChoice, {priority=-165})
-    event.register("weatherTransitionFinished", skyChoice, {priority=-165})
+    event.register("weatherChangedImmediate", skyChoice, {priority=-149})
+    event.register("weatherTransitionFinished", skyChoice, {priority=-149})
 
     if interiorTransitions then
-        event.register("loaded", initTimer, {priority=-165})
-        event.register("cellChanged", onCellChanged, {priority=-165})
+        event.register("cellChanged", onCellChanged, {priority=-149})
     end
-
 
     if randomiseParticles then
         WtC.weathers[5].maxParticles=math.random(200,1200)
