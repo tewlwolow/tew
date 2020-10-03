@@ -89,6 +89,7 @@ end
 
 local function onCellChanged(e)
     local cell=e.cell
+    debugLog('Current cell: '..cell.name)
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
         if intWeatherTimer then
@@ -109,10 +110,12 @@ local function init()
     for weather, index in pairs(tes3.weather) do
         debugLog("Weather: "..weather)
         for sky in lfs.dir(WtSdir..weather) do
-            debugLog("Found file: "..sky)
-            if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
-                table.insert(weathers[index], sky)
-                debugLog("Adding file: "..sky)
+            if sky ~= ".." and sky ~= "." then
+                debugLog("Found file: "..sky)
+                if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
+                    table.insert(weathers[index], sky)
+                    debugLog("Adding file: "..sky)
+                end
             end
         end
     end
