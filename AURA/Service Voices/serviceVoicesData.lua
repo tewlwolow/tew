@@ -169,6 +169,16 @@ this.commonVoices={
     },
     ["i"]={
         ["f"]={
+            "Hlo_IF060",
+            "Hlo_IF061",
+            "Hlo_IF062",
+            "Hlo_IF063",
+            "Hlo_IF064",
+            "Hlo_IF065",
+            "Hlo_IF073",
+            "Hlo_IF079",
+            "Hlo_IF087",
+            "Hlo_IF088",
             "Srv_IF002",
             "Srv_IF005",
             "Srv_IF008",
@@ -176,13 +186,44 @@ this.commonVoices={
             "Srv_IF011",
             "Srv_IF013",
             "Srv_IF014",
-
-
-
+            "Srv_IF016",
+            "Srv_IF017",
+            "Srv_IF019",
+            "Srv_IF020",
+            "tHlo_IF085",
+            "tHlo_IF086",
+            "tHlo_IF087",
+            "tHlo_IF089",
+            "tHlo_IF092",
+            "tHlo_IF093",
+            "tHlo_IF094",
+            "tHlo_IF096",
+            "tHlo_IF099",
+            "tHlo_IF100",
+            "tHlo_IF101",
+            "tHlo_IF102",
+            "tHlo_IF103",
+            "tHlo_IF104",
+            "tHlo_IF109",
+            "tHlo_IF110",
         },
         ["m"]={
-
-
+            "Srv_IM004",
+            "Srv_IM005",
+            "Srv_IM010",
+            "Srv_IM014",
+            "Srv_IM016",
+            "Srv_IM017",
+            "Srv_IM020",
+            "Srv_IM022",
+            "Srv_IM028",
+            "Srv_IM029",
+            "Srv_IM032",
+            "Srv_IM033",
+            "Srv_IM034",
+            "tHlo_IM093",
+            "tHlo_IM099",
+            "tHlo_IM100",
         },
     },
     ["k"]={
@@ -223,42 +264,62 @@ this.commonVoices={
     },
     ["o"]={
         ["f"]={
-
-
+            "Srv_OF001",
+            "Srv_OF002",
+            "Hlo_OF057",
+            "Hlo_OF058",
+            "Hlo_OF059",
+            "Hlo_OF060",
+            "Hlo_OF090",
         },
         ["m"]={
-
-
+            "Srv_OM001",
+            "Srv_OM007",
+            "Srv_OM008",
+            "Srv_OM010",
         },
     },
     ["n"]={
         ["f"]={
-
-
+            "Srv_NF001",
+            "Srv_NF002",
         },
         ["m"]={
-
-
+            "Srv_NM001",
+            "Srv_NM004",
+            "Srv_NM005",
+            "Hlo_NM136",
         },
     },
     ["r"]={
         ["f"]={
-
-
+            "Srv_RF001",
+            "Srv_RF002",
+            "Srv_RF004",
+            "Srv_RF005",
         },
         ["m"]={
-
-
+            "Srv_RM001",
+            "Srv_RM002",
+            "Srv_RM004",
+            "Srv_RM007",
+            "Srv_RM008",
+            "Srv_RM010",
+            "Srv_RM011",
         },
     },
     ["w"]={
         ["f"]={
-
-
+            "Srv_WF005",
+            "Srv_WF007",
+            "Srv_WF008",
         },
         ["m"]={
-
-
+            "Srv_WM002",
+            "Hlo_WM087",
+            "Hlo_WM088",
+            "Hlo_WM090",
+            "Hlo_WM077",
         },
     }
 }
@@ -276,7 +337,6 @@ this.travelVoices={
         ["f"]={
             "Srv_BF010",
             "Srv_BF011",
-
         },
         ["m"]={
 
@@ -319,12 +379,15 @@ this.travelVoices={
         ["f"]={
             "Srv_IF013",
             "Srv_IF014",
-
-
+            "Hlo_IF087",
+            "Hlo_IF088",
         },
         ["m"]={
-
-
+            "Srv_IM010",
+            "Srv_IM016",
+            "Srv_IM017",
+            "Srv_IM025",
+            "Srv_IM031",
         },
     },
     ["k"]={
@@ -339,8 +402,7 @@ this.travelVoices={
     },
     ["o"]={
         ["f"]={
-
-
+            "Hlo_OF057",
         },
         ["m"]={
 
@@ -349,8 +411,8 @@ this.travelVoices={
     },
     ["n"]={
         ["f"]={
-
-
+            "Srv_NF004",
+            "Srv_NF005",
         },
         ["m"]={
 
@@ -429,12 +491,20 @@ this.spellVoices={
             "Srv_IF004",
             "Srv_IF013",
             "Srv_IF014",
-
-
+            "Hlo_IF087",
+            "Hlo_IF088",
         },
         ["m"]={
-
-
+            "Srv_IM004",
+            "Srv_IM010",
+            "Srv_IM011",
+            "Srv_IM014",
+            "Srv_IM016",
+            "Srv_IM017",
+            "Srv_IM028",
+            "Srv_IM029",
+            "Srv_IM033",
+            "Srv_IM034",
         },
     },
     ["k"]={
@@ -449,8 +519,12 @@ this.spellVoices={
     },
     ["o"]={
         ["f"]={
-
-
+            "Srv_OF001",
+            "Srv_OF002",
+            "Hlo_OF057",
+            "Hlo_OF058",
+            "Hlo_OF059",
+            "Hlo_OF060"
         },
         ["m"]={
 
@@ -479,8 +553,8 @@ this.spellVoices={
     },
     ["w"]={
         ["f"]={
-
-
+            "Srv_WF004",
+            "Srv_WF005",
         },
         ["m"]={
 
@@ -526,8 +600,8 @@ this.trainingVoices={
     },
     ["h"]={
         ["f"]={
-        "Srv_HF001",
-        "Srv_HF005",
+            "Srv_HF001",
+            "Srv_HF005",
         },
         ["m"]={
             "Srv_HM020",
@@ -538,12 +612,17 @@ this.trainingVoices={
         ["f"]={
             "Srv_IF013",
             "Srv_IF014",
-
-
+            "Srv_IF020",
         },
         ["m"]={
-
-
+            "Srv_IM007",
+            "Srv_IM008",
+            "Srv_IM010",
+            "Srv_IM016",
+            "Srv_IM017",
+            "Srv_IM023",
+            "Srv_IM026",
+            "Srv_IM034",
         },
     },
     ["k"]={
@@ -558,12 +637,19 @@ this.trainingVoices={
     },
     ["o"]={
         ["f"]={
-
-
+            "Srv_OF002",
+            "Hlo_OF057",
+            "Hlo_OF058",
+            "Hlo_OF059",
+            "Hlo_OF060",
+            "Hlo_OF084",
+            "Hlo_OF089",
         },
         ["m"]={
-
-
+            "Srv_OM002",
+            "Srv_OM004",
+            "Srv_OM005",
+            "Srv_OM011",
         },
     },
     ["n"]={
@@ -572,7 +658,7 @@ this.trainingVoices={
 
         },
         ["m"]={
-
+            "Hlo_NM136",
 
         },
     },
@@ -582,7 +668,7 @@ this.trainingVoices={
 
         },
         ["m"]={
-
+            "Srv_RF005",
 
         },
     },
@@ -592,8 +678,8 @@ this.trainingVoices={
 
         },
         ["m"]={
-
-
+            "Srv_WM004",
+            "Srv_WM005",
         },
     }
 
