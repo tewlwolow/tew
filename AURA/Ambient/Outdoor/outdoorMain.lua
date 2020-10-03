@@ -32,6 +32,17 @@ local function debugLog(string)
    end
 end
 
+-- Getting region on loaded save in interior. Taken from Provincial Music --
+local function getInteriorRegion (cell)
+   for ref in cell:iterateReferences(tes3.objectType.door) do
+      if (ref.destination) then
+         if (ref.destination.cell.region) then
+            return ref.destination.cell.region.name
+         end
+      end
+   end
+end
+
 -- Building clear paths array --
 debugLog("Building clear weather regular array.")
 for climate in lfs.dir(AURAdir..climDir) do
@@ -88,15 +99,15 @@ local function getPathClear()
       pathNow="tew\\AURA"..climDir..climateNow.."\\"..timeNow.."\\"..soundPaths[math.random(1, #soundPaths)]
    else
       debugLog("Getting quiet weather soundpath.")
-      pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
+      local quietType=math.random(3)
+      if quietType == 1 then
+         pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
+      elseif quietType == 2 then
+         pathNow="tew\\AURA"..comDir.."Cold\\"..cArray[math.random(1, #qArray)]
+      else
+         pathNow="tew\\AURA"..comDir.."Warm\\"..wArray[math.random(1, #qArray)]
+      end
    end
-end
-
-
--- Fetching randomised soundpath from a pre-build foggy weather array --
-local function getPathFog()
-   debugLog("Getting foggy weather soundpath.")
-   pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
 end
 
 
@@ -170,10 +181,9 @@ local function cellCheck()
       interiorTimer:pause()
    end
 
-   if not tes3.getRegion() then return end
-
-   local region=tes3.getRegion().name
    local cell=tes3.getPlayerCell()
+   local region=tes3.getRegion().name or getInteriorRegion(cell)
+   if not region then return end
 
    -- Checking climate --
    for kRegion, vClimate in pairs(climates.regions) do
@@ -208,7 +218,7 @@ local function cellCheck()
       debugLog("Same conditions detected. Returning.")
       return
    elseif timeNow~=timeLast and weatherNow==weatherLast then
-      if (weatherNow >= 3 and weatherNow < 6) or (weatherNow == 8) then
+      if (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
          debugLog("Same conditions detected. Returning.")
          return
       end
@@ -225,13 +235,10 @@ local function cellCheck()
          -- New in 2.0.1; using same soundpath when entering int/ext in same area; time/weather change will randomise path again --
       debugLog("Cells changed, but conditions are the same. Using last path: "..pathNow)
    else
-      if weatherNow == 0 or weatherNow == 1 then
+      if weatherNow >= 0 and weatherNow <4 then
          debugLog("Clear weather detected.")
          getPathClear()
-      elseif weatherNow == 2 then
-         debugLog("Foggy weather detected.")
-         getPathFog()
-      elseif (weatherNow >= 3 and weatherNow < 6) or (weatherNow == 8) then
+      elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
          if playWindy then
             debugLog("Bad weather detected and windy option on.")
             getPathWindy()
@@ -322,6 +329,6 @@ debugLog("Outdoor Ambient Sounds module initialised.")
 event.register("loaded", runHourTimer, {priority=-151})
 event.register("load", runResetter, {priority=-151})
 event.register("cellChanged", cellCheck, {priority=-151})
-event.register("weatherTransitionFinished", cellCheck, {priority=-151})
-event.register("weatherChangedImmediate", cellCheck, {priority=-151})
+event.register("weatherTransitionFinished", cellCheck, {priority=-153})
+event.register("weatherChangedImmediate", cellCheck, {priority=-153})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})

@@ -26,7 +26,6 @@ local function init()
         print("[AURA "..version.."] Loading file: yurtFlap.lua")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\yurtFlap.lua")
     end
-
 end
 
 print("[AURA "..version.."] Miscellaneous module initialised.")

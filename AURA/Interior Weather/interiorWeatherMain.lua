@@ -158,6 +158,16 @@ local function cellCheck()
         transState=true
     end
 
+    windoors={}
+    windoors=common.getWindoors(cell)
+
+    if IWLoop==nil then
+        thunRef=nil
+        for _, windoor in ipairs(windoors) do
+            tes3.removeSound{reference=windoor}
+        end
+    end
+
     debugLog("Found interior cell.")
     if common.getCellType(cell, common.cellTypesSmall)==true then
         interiorType="Small"
@@ -176,32 +186,22 @@ local function cellCheck()
             thunderTimerSmall:resume()
         end
     else
-        thunRef=nil
-        windoors={}
-        windoors=common.getWindoors(cell)
-        if IWLoop==nil then
-            for _, windoor in ipairs(windoors) do
-                tes3.removeSound{reference=windoor}
-            end
-            return
-        else
-            for _, windoor in ipairs(windoors) do
-                tes3.removeSound{reference=windoor}
-                playInteriorBig(windoor)
-            end
-            if IWLoop=="rain heavy" then
-                debugLog("Stopping thunder loop.")
-                thunderTimerBig:pause()
-            end
+        for _, windoor in ipairs(windoors) do
+            tes3.removeSound{reference=windoor}
+            playInteriorBig(windoor)
         end
         interiorTimer:resume()
         debugLog("Playing big interior sound.")
+        if IWLoop=="rain heavy" then
+            updateThunderBig()
+            thunderTimerBig:resume()
+        end
     end
 end
 
 
 debugLog("Interior Weather module initialised.")
 
-event.register("cellChanged", cellCheck, { priority = -150 })
-event.register("weatherTransitionStarted", cellCheck, { priority = -150 })
-event.register("weatherChangedImmediate", cellCheck, { priority = -150 })
+event.register("cellChanged", cellCheck, { priority = -152 })
+event.register("weatherTransitionStarted", cellCheck, { priority = -152 })
+event.register("weatherChangedImmediate", cellCheck, { priority = -152 })
