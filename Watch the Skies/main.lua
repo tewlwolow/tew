@@ -6,7 +6,8 @@ local vanChance=config.vanChance/100
 local alterChanges=config.alterChanges
 local interiorTransitions=config.interiorTransitions
 local randomiseParticles=config.randomiseParticles
-local version = "1.0.2"
+local randomiseCloudsSpeed=config.randomiseCloudsSpeed
+local version = "2.0.0"
 local WtC, intWeatherTimer
 
 
@@ -16,6 +17,25 @@ local function debugLog(string)
     if debugLogOn then
        mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
     end
+end
+
+local function changeMaxParticles()
+    WtC.weathers[5].maxParticles=math.random(200,1200)
+    WtC.weathers[6].maxParticles=math.random(600,1500)
+    WtC.weathers[9].maxParticles=math.random(150,1200)
+end
+
+local function changeCloudsSpeed()
+    WtC.weathers[1].cloudsSpeed=math.random(100,200)/100
+    WtC.weathers[2].cloudsSpeed=math.random(100,300)/100
+    WtC.weathers[3].cloudsSpeed=math.random(50,150)/100
+    WtC.weathers[4].cloudsSpeed=math.random(100,300)/100
+    WtC.weathers[5].cloudsSpeed=math.random(150,350)/100
+    WtC.weathers[6].cloudsSpeed=math.random(200,450)/100
+    WtC.weathers[7].cloudsSpeed=math.random(600,1000)/100
+    WtC.weathers[8].cloudsSpeed=math.random(800,1500)/100
+    WtC.weathers[9].cloudsSpeed=math.random(100,200)/100
+    WtC.weathers[10].cloudsSpeed=math.random(600,1200)/100
 end
 
 local function skyChoice(e)
@@ -43,9 +63,11 @@ local function skyChoice(e)
     end
 
     if randomiseParticles then
-        WtC.weathers[5].maxParticles=math.random(200,1200)
-        WtC.weathers[6].maxParticles=math.random(600,1500)
-        WtC.weathers[9].maxParticles=math.random(150,1200)
+        changeMaxParticles()
+    end
+
+    if randomiseCloudsSpeed then
+        changeCloudsSpeed()
     end
 
     WtC:updateVisuals()
@@ -67,7 +89,6 @@ end
 
 local function onCellChanged(e)
     local cell=e.cell
-    debugLog("Current cell: "..cell.name)
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
         if intWeatherTimer then
@@ -124,9 +145,11 @@ local function init()
     end
 
     if randomiseParticles then
-        WtC.weathers[5].maxParticles=math.random(200,1200)
-        WtC.weathers[6].maxParticles=math.random(600,1500)
-        WtC.weathers[9].maxParticles=math.random(150,1200)
+        changeMaxParticles()
+    end
+
+    if randomiseCloudsSpeed then
+        changeCloudsSpeed()
     end
 end
 

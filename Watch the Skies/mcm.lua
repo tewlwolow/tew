@@ -38,8 +38,13 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
-        label = "Randomise max particles amount for more variety?",
+        label = "Randomise max particles?",
         variable = registerVariable("randomiseParticles"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
+        label = "Randomise clouds speed?",
+        variable = registerVariable("randomiseCloudsSpeed"),
         restartRequired=true
     }
 

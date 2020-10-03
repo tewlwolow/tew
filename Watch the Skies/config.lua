@@ -3,5 +3,6 @@ return mwse.loadConfig("Watch the Skies", {
     debugLogOn=false,
     alterChanges=true,
     interiorTransitions=true,
-    randomiseParticles=true
+    randomiseParticles=true,
+    randomiseCloudsSpeed=true
 })
