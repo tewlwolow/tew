@@ -108,8 +108,6 @@ this.commonVoices={
             "Hlo_DM112",
             "Hlo_DM119",
             "Hlo_DM123",
-            "Hlo_DM131",
-            "Hlo_DM132",
             "Hlo_DM145",
             "Hlo_DM146",
             "Hlo_DM147",
