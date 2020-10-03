@@ -89,7 +89,6 @@ end
 
 local function onCellChanged(e)
     local cell=e.cell
-    debugLog('Current cell: '..cell.name)
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
         if intWeatherTimer then
