@@ -5,7 +5,7 @@ local function onSpellPurchaseMenu(e)
     for _, spellClick in pairs(element.children) do
         if string.find(spellClick.text, "gp") then
             spellClick:register("mouseDown", function()
-            tes3.playSound{soundPath="FX\\item\\spelcreate.wav", reference=tes3.player, volume=0.8, pitch=0.6}
+            tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.8}
             end)
         end
     end
