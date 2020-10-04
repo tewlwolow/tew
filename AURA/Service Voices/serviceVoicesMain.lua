@@ -59,6 +59,7 @@ local function serviceGreet(e)
 
    if serviceFeed[1] then
       tes3.say{
+      volume=1.0,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
       }
@@ -101,6 +102,7 @@ local function repairGreet(e)
 
       if serviceFeed[1] then
          tes3.say{
+         volume=1.0,
          soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
          serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
          }
@@ -149,6 +151,7 @@ local function travelGreet(e)
 
    if serviceFeed[1] then
       tes3.say{
+      volume=1.0,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
       }
@@ -195,6 +198,7 @@ local function spellGreet(e)
 
       if serviceFeed[1] then
          tes3.say{
+         volume=1.0,
          soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
          serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
          }
@@ -245,6 +249,7 @@ local function trainingGreet(e)
 
    if serviceFeed[1] then
       tes3.say{
+      volume=1.0,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
       }
