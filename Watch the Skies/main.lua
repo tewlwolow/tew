@@ -11,7 +11,7 @@ local version = "2.0.0"
 local WtC, intWeatherTimer
 
 
-local interiorWeathers={0,1,2,3}
+local interiorWeathers={0,1,2,3,4,5}
 
 local function debugLog(string)
     if debugLogOn then
@@ -69,8 +69,6 @@ local function skyChoice(e)
     if randomiseCloudsSpeed then
         changeCloudsSpeed()
     end
-
-    WtC:updateVisuals()
 end
 
 local function changeInteriorWeather()
