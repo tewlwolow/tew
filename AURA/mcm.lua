@@ -150,6 +150,10 @@ local template = mwse.mcm.createTemplate{
         label = "Enable yurt door sound?",
         variable = registerVariable("playYurtFlap"),
     }
+    pageMisc:createYesNoButton{
+        label = "Enable eating sound for consuming ingredients?",
+        variable = registerVariable("playEating"),
+    }
 
 template:saveOnClose(configPath, config)
 mwse.mcm.register(template)
