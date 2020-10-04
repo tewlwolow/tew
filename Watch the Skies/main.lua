@@ -97,7 +97,11 @@ local function onCellChanged(e)
         if intWeatherTimer then
         intWeatherTimer:cancel()
         intWeatherTimer=nil end
-        intWeatherTimer=timer.start{duration=WtC.hoursBetweenWeatherChanges, callback=changeInteriorWeather, iterations=-1, type=timer.game}
+        intWeatherTimer=timer.start{
+        duration=WtC.hoursBetweenWeatherChanges,
+        callback=changeInteriorWeather,
+        type=timer.game
+        }
         debugLog("Player in interior. Resuming interior timer. Time to weather change: "..WtC.hoursBetweenWeatherChanges)
     end
 end
