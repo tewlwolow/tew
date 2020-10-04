@@ -29,16 +29,19 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("moduleAmbientOutdoor"),
         restartRequired=true
     }
-
     page:createYesNoButton{
         label = "Enable Interior Weather module?",
         variable = registerVariable("moduleInteriorWeather"),
         restartRequired=true
     }
-
     page:createYesNoButton{
         label = "Enable Service Voices module?",
         variable = registerVariable("moduleServiceVoices"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
+        label = "Enable training sounds module?",
+        variable = registerVariable("moduleTraining"),
         restartRequired=true
     }
     page:createYesNoButton{

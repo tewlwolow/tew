@@ -9,6 +9,7 @@ local function init()
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
     local moduleInteriorWeather = config.moduleInteriorWeather
     local moduleServiceVoices = config.moduleServiceVoices
+    local moduleTraining = config.moduleTraining
     local moduleMisc = config.moduleMisc
 
     if moduleAmbientOutdoor then
@@ -31,11 +32,16 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\miscMain.lua")
     end
 
-        -- Old version deleter --
-        if lfs.dir("Data Files/MWSE/mods/AURA/") then
-            lfs.rmdir("Data Files/MWSE/mods/AURA/", true)
-            mwse.log("Old version found and deleted.")
-        end
+    if moduleTraining then
+        mwse.log("[AURA "..version.."] Loading file: trainingMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Training\\trainingMain.lua")
+    end
+
+    -- Old version deleter --
+    if lfs.dir("Data Files/MWSE/mods/AURA/") then
+        lfs.rmdir("Data Files/MWSE/mods/AURA/", true)
+        mwse.log("Old version found and deleted.")
+    end
 end
 
 -- Registers MCM menu --

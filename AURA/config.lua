@@ -4,6 +4,7 @@ return mwse.loadConfig("AURA", {
     moduleAmbientOutdoor=true,
     moduleInteriorWeather=true,
     moduleServiceVoices=true,
+    moduleTraining=true,
     moduleMisc=true,
     playSplash=true,
     playWindy=true,
