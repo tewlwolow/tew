@@ -1,5 +1,5 @@
-local serviceVoicesData=require("tew\\AURA\\Service Voices\\serviceVoicesData")
-local config=require("tew\\AURA\\config")
+local serviceVoicesData = require("tew\\AURA\\Service Voices\\serviceVoicesData")
+local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
@@ -17,6 +17,8 @@ local serviceSpellmaking=config.serviceSpellmaking
 local serviceEnchantment=config.serviceEnchantment
 local serviceTravel=config.serviceTravel
 local serviceBarter=config.serviceBarter
+
+local trainingFlag = 0
 
 local function debugLog(string)
    if debugLogOn then
@@ -68,99 +70,152 @@ local function serviceGreet(e)
 end
 
 local function spell_repairGreet(e)
-
-   local function saySpell()
-      local npcId=tes3ui.getServiceActor(e)
-      local raceId=npcId.object.race.id
-      local raceLet, sexLet
-      local serviceFeed={}
-
-      if npcId.object.female then
-         debugLog("Female NPC found.")
-         sexLet="f"
-      else
-         sexLet="m"
-         debugLog("Male NPC found.")
-      end
-
-      for k, v in pairs(raceNames) do
-         if raceId==k then
-            raceLet=v
-         end
-      end
-
-      for kRace, _ in pairs(spellVoices) do
-         if kRace==raceLet then
-            for kSex, _ in pairs(spellVoices[kRace]) do
-               if kSex==sexLet then
-                  for _, voice in pairs(spellVoices[kRace][kSex]) do
-                     table.insert(serviceFeed, voice)
-                  end
-               end
-            end
-         end
-      end
-
-      if serviceFeed[1] then
-         tes3.say{
-         volume=1.0,
-         soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-         serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
-         }
-         debugLog("NPC says a spell vendor/spellmaker comment.")
-      end
-   end
-
    local element=e.element
-   local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spells"))
 
-   spellsButton:register("mouseDown", saySpell)
+   if serviceSpellmaking then
+      local function saySpell()
+         local npcId=tes3ui.getServiceActor(e)
+         local raceId=npcId.object.race.id
+         local raceLet, sexLet
+         local serviceFeed={}
 
-   local function sayRepair()
-      local npcId=tes3ui.getServiceActor(e)
-      local raceId=npcId.object.race.id
-      local raceLet, sexLet
-      local serviceFeed={}
-
-      if npcId.object.female then
-         debugLog("Female NPC found.")
-         sexLet="f"
-      else
-         sexLet="m"
-         debugLog("Male NPC found.")
-      end
-
-      for k, v in pairs(raceNames) do
-         if raceId==k then
-            raceLet=v
+         if npcId.object.female then
+            debugLog("Female NPC found.")
+            sexLet="f"
+         else
+            sexLet="m"
+            debugLog("Male NPC found.")
          end
-      end
 
-      for kRace, _ in pairs(commonVoices) do
-         if kRace==raceLet then
-            for kSex, _ in pairs(commonVoices[kRace]) do
-               if kSex==sexLet then
-                  for _, voice in pairs(commonVoices[kRace][kSex]) do
-                     table.insert(serviceFeed, voice)
+         for k, v in pairs(raceNames) do
+            if raceId==k then
+               raceLet=v
+            end
+         end
+
+         for kRace, _ in pairs(spellVoices) do
+            if kRace==raceLet then
+               for kSex, _ in pairs(spellVoices[kRace]) do
+                  if kSex==sexLet then
+                     for _, voice in pairs(spellVoices[kRace][kSex]) do
+                        table.insert(serviceFeed, voice)
+                     end
                   end
                end
             end
          end
+
+         if serviceFeed[1] then
+            tes3.say{
+            volume=1.0,
+            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            }
+            debugLog("NPC says a spellmaker comment.")
+         end
       end
 
-      if serviceFeed[1] then
-         tes3.say{
-         volume=1.0,
-         soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-         serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
-         }
-         debugLog("NPC says a service comment.")
-      end
+      local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spellmaking"))
+
+      spellsButton:register("mouseDown", saySpell)
    end
 
-   local repairButton=element:findChild(tes3ui.registerID("MenuDialog_service_repair"))
 
-   repairButton:register("mouseDown", sayRepair)
+   if serviceSpells then
+      local function saySpell()
+         local npcId=tes3ui.getServiceActor(e)
+         local raceId=npcId.object.race.id
+         local raceLet, sexLet
+         local serviceFeed={}
+
+         if npcId.object.female then
+            debugLog("Female NPC found.")
+            sexLet="f"
+         else
+            sexLet="m"
+            debugLog("Male NPC found.")
+         end
+
+         for k, v in pairs(raceNames) do
+            if raceId==k then
+               raceLet=v
+            end
+         end
+
+         for kRace, _ in pairs(spellVoices) do
+            if kRace==raceLet then
+               for kSex, _ in pairs(spellVoices[kRace]) do
+                  if kSex==sexLet then
+                     for _, voice in pairs(spellVoices[kRace][kSex]) do
+                        table.insert(serviceFeed, voice)
+                     end
+                  end
+               end
+            end
+         end
+
+         if serviceFeed[1] then
+            tes3.say{
+            volume=1.0,
+            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            }
+            debugLog("NPC says a spell vendor comment.")
+         end
+      end
+
+      local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spells"))
+
+      spellsButton:register("mouseDown", saySpell)
+   end
+
+   if serviceRepair then
+      local function sayRepair()
+         local npcId=tes3ui.getServiceActor(e)
+         local raceId=npcId.object.race.id
+         local raceLet, sexLet
+         local serviceFeed={}
+
+         if npcId.object.female then
+            debugLog("Female NPC found.")
+            sexLet="f"
+         else
+            sexLet="m"
+            debugLog("Male NPC found.")
+         end
+
+         for k, v in pairs(raceNames) do
+            if raceId==k then
+               raceLet=v
+            end
+         end
+
+         for kRace, _ in pairs(commonVoices) do
+            if kRace==raceLet then
+               for kSex, _ in pairs(commonVoices[kRace]) do
+                  if kSex==sexLet then
+                     for _, voice in pairs(commonVoices[kRace][kSex]) do
+                        table.insert(serviceFeed, voice)
+                     end
+                  end
+               end
+            end
+         end
+
+         if serviceFeed[1] then
+            tes3.say{
+            volume=1.0,
+            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            }
+            debugLog("NPC says a repair comment.")
+         end
+      end
+
+      local repairButton=element:findChild(tes3ui.registerID("MenuDialog_service_repair"))
+
+      repairButton:register("mouseDown", sayRepair)
+   end
 end
 
 local function travelGreet(e)
@@ -212,6 +267,13 @@ end
 
 local function trainingGreet(e)
 
+   local closeButton=e.element:findChild(tes3ui.registerID("MenuServiceTraining_Okbutton"))
+   closeButton:register("mouseDown", function()
+      trainingFlag=0
+   end)
+
+   if trainingFlag==1 then return end
+
    local npcId=tes3ui.getServiceActor(e)
    local raceId=npcId.object.race.id
    local raceLet, sexLet
@@ -253,14 +315,15 @@ local function trainingGreet(e)
    else
       serviceGreet()
    end
+   trainingFlag=1
 
 end
 
 debugLog("[AURA] Service voices module initialised.")
+
+event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"})
+
 if serviceTravel then event.register("uiActivated", travelGreet, {filter="MenuServiceTravel"}) end
-if serviceRepair then event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"}) end
 if serviceBarter then event.register("uiActivated", serviceGreet, {filter="MenuBarter"}) end
-if serviceSpells then event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"}) end
 if serviceTraining then event.register("uiActivated", trainingGreet, {filter="MenuServiceTraining"}) end
-if serviceSpellmaking then event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"}) end
 if serviceEnchantment then event.register("uiActivated", serviceGreet, {filter="MenuEnchantment"}) end
