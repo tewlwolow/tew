@@ -2,7 +2,7 @@ local configPath = "Watch the Skies"
 local config = require("tew.Watch the Skies.config")
 mwse.loadConfig("Watch the Skies")
 local modversion = require("tew\\Watch the Skies\\version")
-local version = modversion
+local version = modversion.version
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{

@@ -8,7 +8,7 @@ local interiorTransitions=config.interiorTransitions
 local randomiseParticles=config.randomiseParticles
 local randomiseCloudsSpeed=config.randomiseCloudsSpeed
 local modversion = require("tew\\Watch the Skies\\version")
-local version = modversion
+local version = modversion.version
 local WtC, intWeatherTimer
 
 
