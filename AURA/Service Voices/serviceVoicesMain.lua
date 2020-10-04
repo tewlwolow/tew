@@ -305,16 +305,13 @@ local function trainingGreet(e)
       end
    end
 
-   if serviceFeed[1] then
-      tes3.say{
-      volume=1.0,
-      soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-      serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
-      }
-      debugLog("NPC says a trainer comment.")
-   else
-      serviceGreet()
-   end
+   tes3.say{
+   volume=1.0,
+   soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+   serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+   }
+   debugLog("NPC says a trainer comment.")
+
    trainingFlag=1
 
 end

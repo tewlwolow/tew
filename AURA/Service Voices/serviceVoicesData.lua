@@ -311,6 +311,12 @@ this.commonVoices={
             "Srv_WF005",
             "Srv_WF007",
             "Srv_WF008",
+            "Hlo_WF083",
+            "Hlo_WF084",
+            "Hlo_WF085",
+            "Hlo_WF087",
+            "Hlo_WF088",
+            "Hlo_WF091",
         },
         ["m"]={
             "Srv_WM002",
@@ -566,10 +572,12 @@ this.spellVoices={
 this.trainingVoices={
     ["a"]={
         ["f"]={
-
+            "Srv_AF001",
+            "Srv_AF009",
         },
         ["m"]={
-
+            "Srv_AM001",
+            "Srv_AM010",
         },
     },
     ["b"]={
@@ -588,12 +596,16 @@ this.trainingVoices={
     },
     ["d"]={
         ["f"]={
-
-
+            "Srv_DF002",
+            "Srv_DF016",
+            "Srv_DF017",
+            "Srv_DF020",
         },
         ["m"]={
-
-
+            "Srv_DM002",
+            "Srv_DM013",
+            "Srv_DM014",
+            "Srv_DM020",
         },
     },
     ["h"]={
@@ -625,12 +637,15 @@ this.trainingVoices={
     },
     ["k"]={
         ["f"]={
-
-
+            "Srv_KF004",
+            "Srv_KF005",
+            "Srv_KF008",
         },
         ["m"]={
-
-
+            "Srv_KM005",
+            "Hlo_KM109",
+            "Hlo_KM115",
+            "Hlo_KM120",
         },
     },
     ["o"]={
@@ -652,32 +667,51 @@ this.trainingVoices={
     },
     ["n"]={
         ["f"]={
-
-
+            "Srv_NF001",
+            "Hlo_NF114",
+            "Hlo_NF136",
+            "Hlo_NF085",
+            "Hlo_NF082",
         },
         ["m"]={
             "Hlo_NM136",
-
+            "Hlo_NM111",
+            "Hlo_NM110",
+            "Hlo_NM117",
+            "Hlo_NM082",
+            "Hlo_NM083",
+            "Hlo_NM084",
+            "Hlo_NM085",
         },
     },
     ["r"]={
         ["f"]={
-
-
+            "Hlo_RF086",
+            "Hlo_RF087",
+            "Hlo_RF088",
         },
         ["m"]={
-            "Srv_RF005",
-
+            "Srv_RM001",
+            "Srv_RM002",
+            "Srv_RM004",
+            "Srv_RM005",
         },
     },
     ["w"]={
         ["f"]={
-
-
+            "Srv_WF005",
+            "Srv_WF008",
+            "Hlo_WF083",
+            "Hlo_WF084",
+            "Hlo_WF085",
+            "Hlo_WF087",
+            "Hlo_WF088",
+            "Hlo_WF091",
         },
         ["m"]={
             "Srv_WM004",
             "Srv_WM005",
+            "Hlo_WM091",
         },
     }
 
