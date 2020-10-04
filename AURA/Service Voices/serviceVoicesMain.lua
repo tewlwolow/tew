@@ -19,8 +19,7 @@ local serviceTravel=config.serviceTravel
 local serviceBarter=config.serviceBarter
 
 local trainingFlag = 0
-
-local newVoice, lastVoice
+local newVoice, lastVoice = "init", "init"
 
 local function debugLog(string)
    if debugLogOn then
@@ -61,11 +60,11 @@ local function serviceGreet(e)
       end
    end
 
-   while lastVoice == newVoice do
-      newVoice=serviceFeed[math.random(1, #serviceFeed)]
-   end
-
    if serviceFeed[1] then
+      while newVoice == lastVoice or newVoice == nil do
+         newVoice=serviceFeed[math.random(1, #serviceFeed)]
+      end
+      tes3.removeSound{reference=npcId}
       tes3.say{
       volume=0.9,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -74,6 +73,7 @@ local function serviceGreet(e)
       lastVoice=newVoice
       debugLog("NPC says a service comment.")
    end
+
 end
 
 local function spell_repairGreet(e)
@@ -112,11 +112,11 @@ local function spell_repairGreet(e)
             end
          end
 
-         while lastVoice == newVoice do
-            newVoice=serviceFeed[math.random(1, #serviceFeed)]
-         end
-
          if serviceFeed[1] then
+            while newVoice == lastVoice or newVoice == nil do
+               newVoice=serviceFeed[math.random(1, #serviceFeed)]
+            end
+            tes3.removeSound{reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -124,6 +124,8 @@ local function spell_repairGreet(e)
             }
             lastVoice=newVoice
             debugLog("NPC says a spellmaker comment.")
+         else
+            serviceGreet(e)
          end
       end
 
@@ -166,11 +168,11 @@ local function spell_repairGreet(e)
             end
          end
 
-         while lastVoice == newVoice do
-            newVoice=serviceFeed[math.random(1, #serviceFeed)]
-         end
-
          if serviceFeed[1] then
+            while newVoice == lastVoice or newVoice == nil do
+               newVoice=serviceFeed[math.random(1, #serviceFeed)]
+            end
+            tes3.removeSound{reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -178,6 +180,8 @@ local function spell_repairGreet(e)
             }
             lastVoice=newVoice
             debugLog("NPC says a spell vendor comment.")
+         else
+            serviceGreet(e)
          end
       end
 
@@ -219,11 +223,11 @@ local function spell_repairGreet(e)
             end
          end
 
-         while lastVoice == newVoice do
-            newVoice=serviceFeed[math.random(1, #serviceFeed)]
-         end
-
          if serviceFeed[1] then
+            while newVoice == lastVoice or newVoice == nil do
+               newVoice=serviceFeed[math.random(1, #serviceFeed)]
+            end
+            tes3.removeSound{reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -231,6 +235,8 @@ local function spell_repairGreet(e)
             }
             lastVoice=newVoice
             debugLog("NPC says a repair comment.")
+         else
+            serviceGreet(e)
          end
       end
 
@@ -273,11 +279,11 @@ local function travelGreet(e)
       end
    end
 
-   while lastVoice == newVoice do
-      newVoice=serviceFeed[math.random(1, #serviceFeed)]
-   end
-
    if serviceFeed[1] then
+      while newVoice == lastVoice or newVoice == nil do
+         newVoice=serviceFeed[math.random(1, #serviceFeed)]
+      end
+      tes3.removeSound{reference=npcId}
       tes3.say{
       volume=0.9,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -285,8 +291,6 @@ local function travelGreet(e)
       }
       lastVoice=newVoice
       debugLog("NPC says a travel comment.")
-   else
-      serviceGreet()
    end
 
 end
@@ -332,19 +336,20 @@ local function trainingGreet(e)
       end
    end
 
-   while lastVoice == newVoice do
-      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   if serviceFeed[1] then
+      while newVoice == lastVoice or newVoice == nil do
+         newVoice=serviceFeed[math.random(1, #serviceFeed)]
+      end
+      tes3.removeSound{reference=npcId}
+      tes3.say{
+      volume=0.9,
+      soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+      newVoice..".mp3", reference=npcId
+      }
+      lastVoice=newVoice
+      debugLog("NPC says a trainer comment.")
+      trainingFlag=1
    end
-
-   tes3.say{
-   volume=0.9,
-   soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-   newVoice..".mp3", reference=npcId
-   }
-   lastVoice=newVoice
-   debugLog("NPC says a trainer comment.")
-
-   trainingFlag=1
 
 end
 
