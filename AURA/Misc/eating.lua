@@ -4,27 +4,24 @@ local version = modversion.version
 
 local function eating(e)
 
+    tes3.getSound("Swallow").volume = 0
+
     if e.item.objectType == tes3.objectType.ingredient then
-        tes3.removeSound{sound="Swallow"}
         tes3.playSound{reference=e.reference, soundPath="Fx\\eating.wav"}
-        --[[timer.start{
+        timer.start{
             type=timer.real,
-            duration=1.2,
+            duration=1.3,
             callback=function()
-            tes3.playSound{reference=e.reference, sound="swallow"}
-        end}--]]
+            tes3.playSound{reference=e.reference, sound="Swallow"}
+        end}
     end
 
     if e.item.objectType == tes3.objectType.potion then
-        tes3.removeSound{sound="Swallow"}
         tes3.playSound{soundPath="Fx\\item\\drink.wav"}
-        --[[timer.start{
-            type=timer.real,
-            duration=1.2,
-            callback=function()
-            tes3.playSound{reference=e.reference, sound="swallow"}
-        end}--]]
     end
+
+    --tes3.getSound("Swallow").volume = 1.0
+
 end
 
 print("[AURA "..version.."] Eating sound initialised.")
