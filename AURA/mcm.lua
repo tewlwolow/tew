@@ -154,8 +154,12 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("playYurtFlap"),
     }
     pageMisc:createYesNoButton{
-        label = "Enable eating sound for consuming ingredients?",
+        label = "Enable eating sound for ingredients?",
         variable = registerVariable("playEating"),
+    }
+    pageMisc:createYesNoButton{
+        label = "Enable additional magic sound on spell purchase?",
+        variable = registerVariable("playSpellPurchase"),
     }
 
 template:saveOnClose(configPath, config)

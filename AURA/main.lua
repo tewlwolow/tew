@@ -40,7 +40,7 @@ local function init()
     -- Old version deleter --
     if lfs.dir("Data Files/MWSE/mods/AURA/") then
         lfs.rmdir("Data Files/MWSE/mods/AURA/", true)
-        mwse.log("Old version found and deleted.")
+        mwse.log("[AURA "..version.."]: Old version found and deleted.")
     end
 end
 

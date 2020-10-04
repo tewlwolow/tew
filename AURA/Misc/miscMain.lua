@@ -8,6 +8,7 @@ local function init()
     local travelFee = config.travelFee
     local playYurtFlap = config.playYurtFlap
     local playEating = config.playEating
+    local playSpellPurchase = config.playSpellPurchase
 
     if playSplash and not moduleAmbientOutdoor then
         print("[AURA "..version.."] Loading file: waterSplash.lua")
@@ -31,6 +32,11 @@ local function init()
     if playEating then
         print("[AURA "..version.."] Loading file: eating.lua")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\eating.lua")
+    end
+
+    if playSpellPurchase then
+        print("[AURA "..version.."] Loading file: spellPurchase.lua")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\spellPurchase.lua")
     end
 end
 

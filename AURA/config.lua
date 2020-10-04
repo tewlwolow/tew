@@ -13,6 +13,7 @@ return mwse.loadConfig("AURA", {
     playTransSounds=true,
     playYurtFlap=true,
     playEating=true,
+    playSpellPurchase=true,
     travelFee=true,
     debugLogOn=false,
     calmChance=30,
