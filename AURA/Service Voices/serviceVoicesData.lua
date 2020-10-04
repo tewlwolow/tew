@@ -332,9 +332,13 @@ this.travelVoices={
     ["a"]={
         ["f"]={
             "Flw_AF001",
+            "Srv_AF001",
+            "Srv_AF001"
         },
         ["m"]={
             "Flw_AM001",
+            "Srv_AM001",
+            "Srv_AM001"
         },
     },
     ["b"]={
@@ -343,8 +347,9 @@ this.travelVoices={
             "Srv_BF011",
         },
         ["m"]={
-
-
+            "Srv_BM010",
+            "Srv_BM013",
+            "Srv_BM014",
         },
     },
     ["d"]={
@@ -371,12 +376,14 @@ this.travelVoices={
     },
     ["h"]={
         ["f"]={
-
-
+            "Srv_HF001",
+            "Srv_HF014",
+            "Hlo_HF089",
         },
         ["m"]={
-
-
+            "Srv_HM005",
+            "Srv_HM017",
+            "Hlo_HM089",
         },
     },
     ["i"]={
@@ -396,21 +403,39 @@ this.travelVoices={
     },
     ["k"]={
         ["f"]={
-
-
+            "Srv_KF008",
+            "Srv_KF010",
+            "Hlo_KF085",
+            "Hlo_KF088",
+            "Hlo_KF089"
         },
         ["m"]={
-
-
+            "Srv_KM007",
+            "Srv_KM005",
+            "Hlo_KM085",
+            "Hlo_KM086",
+            "Hlo_KM088",
+            "Hlo_KM089",
+            "Hlo_KM090",
+            "Hlo_KM091",
         },
     },
     ["o"]={
         ["f"]={
             "Hlo_OF057",
+            "Srv_OF002",
+            "Hlo_OF085",
+            "Hlo_OF086",
+            "Hlo_OF060",
+            "Hlo_OF061",
+            "Hlo_OF062",
         },
         ["m"]={
-
-
+            "Hlo_OM085",
+            "Hlo_OM086",
+            "Hlo_OM090",
+            "Hlo_OM091",
+            "Hlo_OM092"
         },
     },
     ["n"]={
@@ -459,6 +484,17 @@ this.spellVoices={
         ["f"]={
             "Srv_BF010",
             "Srv_BF019",
+            "Srv_BF002",
+            "Srv_BF004",
+            "Srv_BF005",
+            "Srv_BF007",
+            "Srv_BF008",
+            "Srv_BF011",
+            "Srv_BF019",
+            "Srv_BF020",
+            "Srv_BF023",
+            "Srv_BF025",
+            "Srv_BF026",
         },
         ["m"]={
 
@@ -657,6 +693,7 @@ this.trainingVoices={
             "Hlo_OF060",
             "Hlo_OF084",
             "Hlo_OF089",
+            "Hlo_OF088",
         },
         ["m"]={
             "Srv_OM002",

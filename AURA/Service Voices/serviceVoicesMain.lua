@@ -20,6 +20,8 @@ local serviceBarter=config.serviceBarter
 
 local trainingFlag = 0
 
+local newVoice, lastVoice
+
 local function debugLog(string)
    if debugLogOn then
       mwse.log("[AURA "..version.."] SV: "..string)
@@ -59,12 +61,17 @@ local function serviceGreet(e)
       end
    end
 
+   while lastVoice == newVoice do
+      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   end
+
    if serviceFeed[1] then
       tes3.say{
-      volume=1.0,
+      volume=0.9,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-      serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+      newVoice..".mp3", reference=npcId
       }
+      lastVoice=newVoice
       debugLog("NPC says a service comment.")
    end
 end
@@ -105,12 +112,17 @@ local function spell_repairGreet(e)
             end
          end
 
+         while lastVoice == newVoice do
+            newVoice=serviceFeed[math.random(1, #serviceFeed)]
+         end
+
          if serviceFeed[1] then
             tes3.say{
-            volume=1.0,
+            volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            newVoice..".mp3", reference=npcId
             }
+            lastVoice=newVoice
             debugLog("NPC says a spellmaker comment.")
          end
       end
@@ -154,12 +166,17 @@ local function spell_repairGreet(e)
             end
          end
 
+         while lastVoice == newVoice do
+            newVoice=serviceFeed[math.random(1, #serviceFeed)]
+         end
+
          if serviceFeed[1] then
             tes3.say{
-            volume=1.0,
+            volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            newVoice..".mp3", reference=npcId
             }
+            lastVoice=newVoice
             debugLog("NPC says a spell vendor comment.")
          end
       end
@@ -202,12 +219,17 @@ local function spell_repairGreet(e)
             end
          end
 
+         while lastVoice == newVoice do
+            newVoice=serviceFeed[math.random(1, #serviceFeed)]
+         end
+
          if serviceFeed[1] then
             tes3.say{
-            volume=1.0,
+            volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+            newVoice..".mp3", reference=npcId
             }
+            lastVoice=newVoice
             debugLog("NPC says a repair comment.")
          end
       end
@@ -251,12 +273,17 @@ local function travelGreet(e)
       end
    end
 
+   while lastVoice == newVoice do
+      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   end
+
    if serviceFeed[1] then
       tes3.say{
-      volume=1.0,
+      volume=0.9,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-      serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+      newVoice..".mp3", reference=npcId
       }
+      lastVoice=newVoice
       debugLog("NPC says a travel comment.")
    else
       serviceGreet()
@@ -305,11 +332,16 @@ local function trainingGreet(e)
       end
    end
 
+   while lastVoice == newVoice do
+      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   end
+
    tes3.say{
-   volume=1.0,
+   volume=0.9,
    soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-   serviceFeed[math.random(1, #serviceFeed)]..".mp3", reference=npcId
+   newVoice..".mp3", reference=npcId
    }
+   lastVoice=newVoice
    debugLog("NPC says a trainer comment.")
 
    trainingFlag=1
