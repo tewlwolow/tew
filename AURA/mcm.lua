@@ -40,8 +40,13 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
-        label = "Enable training sounds module?",
-        variable = registerVariable("moduleTraining"),
+        label = "Enable UI sounds module?",
+        variable = registerVariable("moduleUI"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
+        label = "Enable containers sounds module?",
+        variable = registerVariable("moduleContainers"),
         restartRequired=true
     }
     page:createYesNoButton{
@@ -99,42 +104,65 @@ local template = mwse.mcm.createTemplate{
 
     local pageSV = template:createPage{label="Service Voices"}
     pageSV:createCategory{
-        label = "Plays appropriate voice comments on service usage.\nCurrently only travel services available.\n\nSettings:"
+        label = "Plays appropriate voice comments on service usage.\n\nSettings:"
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on repair service?",
         variable = registerVariable("serviceRepair"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on spells vendor service?",
         variable = registerVariable("serviceSpells"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on training service?",
         variable = registerVariable("serviceTraining"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on spellmaking service?",
         variable = registerVariable("serviceSpellmaking"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on enchanting service?",
         variable = registerVariable("serviceEnchantment"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on travel service?",
         variable = registerVariable("serviceTravel"),
     }
-
     pageSV:createYesNoButton{
         label = "Enable voice comments on barter service?",
         variable = registerVariable("serviceBarter"),
+    }
+
+    local pageContainers = template:createPage{label="Containers"}
+    pageContainers:createCategory{
+        label = "Plays container sound on open/close.\n\nSettings:"
+    }
+
+    local pageUI = template:createPage{label="UI"}
+    pageUI:createCategory{
+        label = "Additional immersive UI sounds.\n\nSettings:"
+    }
+    pageUI:createYesNoButton{
+        label = "Enable training menu sounds?",
+        variable = registerVariable("UITraining"),
+    }
+    pageUI:createYesNoButton{
+        label = "Enable travel menu sounds?",
+        variable = registerVariable("UITravel"),
+    }
+    pageUI:createYesNoButton{
+        label = "Enable spell menu sounds?",
+        variable = registerVariable("UISpells"),
+    }
+    pageUI:createYesNoButton{
+        label = "Enable barter menu sounds?",
+        variable = registerVariable("UIBarter"),
+    }
+    pageUI:createYesNoButton{
+        label = "Enable eating sound for ingredients in inventory menu?",
+        variable = registerVariable("UIEating"),
     }
 
     local pageMisc = template:createPage{label="Misc", noScroll=true}
@@ -146,20 +174,8 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("playSplash"),
     }
     pageMisc:createYesNoButton{
-        label = "Enable travel sounds?",
-        variable = registerVariable("travelFee"),
-    }
-    pageMisc:createYesNoButton{
         label = "Enable yurt door sound?",
         variable = registerVariable("playYurtFlap"),
-    }
-    pageMisc:createYesNoButton{
-        label = "Enable eating sound for ingredients?",
-        variable = registerVariable("playEating"),
-    }
-    pageMisc:createYesNoButton{
-        label = "Enable additional magic sound on spell purchase?",
-        variable = registerVariable("playSpellPurchase"),
     }
 
 template:saveOnClose(configPath, config)

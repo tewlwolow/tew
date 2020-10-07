@@ -117,6 +117,8 @@ local function spell_repairGreet(e)
                newVoice=serviceFeed[math.random(1, #serviceFeed)]
             end
             tes3.removeSound{reference=npcId}
+            tes3.playSound{sound="Menu Click", reference=npcId}
+            tes3.playSound{sound="spellmake success", reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -228,6 +230,7 @@ local function spell_repairGreet(e)
                newVoice=serviceFeed[math.random(1, #serviceFeed)]
             end
             tes3.removeSound{reference=npcId}
+            tes3.playSound{sound="Menu Click", reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -300,6 +303,7 @@ local function trainingGreet(e)
 
    local closeButton=e.element:findChild(tes3ui.registerID("MenuServiceTraining_Okbutton"))
    closeButton:register("mouseDown", function()
+      tes3.playSound{sound="Menu Click"}
       trainingFlag=0
    end)
 
@@ -353,7 +357,7 @@ local function trainingGreet(e)
 
 end
 
-debugLog("[AURA] Service voices module initialised.")
+debugLog("Service voices module initialised.")
 
 event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"})
 

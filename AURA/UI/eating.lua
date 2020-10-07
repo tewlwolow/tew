@@ -9,5 +9,5 @@ local function eating(e)
     end
 end
 
-print("[AURA "..version.."] Eating sound initialised.")
+print("[AURA "..version.."] UI: Eating sound initialised.")
 event.register("equip", eating)

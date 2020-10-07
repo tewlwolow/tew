@@ -1,4 +1,16 @@
-local trainingData = require("tew\\AURA\\Training\\trainingData")
+local trainingData = require("tew\\AURA\\UI\\trainingData")
+local modversion = require("tew\\AURA\\version")
+local version = modversion.version
+
+--[[
+local config = require("tew\\AURA\\config")
+local debugLogOn=config.debugLogOn
+
+local function debugLog(string)
+    if debugLogOn then
+       mwse.log("[AURA "..version.."] Training: "..string)
+    end
+end--]]
 
 local function onTrainingMenu(e)
 
@@ -22,4 +34,6 @@ local function onTrainingMenu(e)
     end
 end
 
+
+print("[AURA "..version.."] UI: Training sounds initialised.")
 event.register("uiActivated", onTrainingMenu, {filter="MenuServiceTraining"})

@@ -5,7 +5,7 @@ local debugLogOn=config.debugLogOn
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[AURA "..version.."] Misc (Travel Fee): "..string)
+       mwse.log("[AURA "..version.."] UI : "..string)
     end
 end
 
@@ -50,5 +50,5 @@ local function travelFee(e)
 
 end
 
-print("[AURA "..version.."] Travel fee sounds initialised.")
+print("[AURA "..version.."] UI: Travel menu sounds initialised.")
 event.register("uiActivated", travelFee, {filter="MenuServiceTravel"})

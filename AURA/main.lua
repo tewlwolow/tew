@@ -10,15 +10,20 @@ local function volumeAdjust()
     callback=function()
     tes3.game.volumeMaster=250
     tes3.game.volumeEffect=250
-    print(tes3.game.volumeMaster)
-    print(tes3.game.volumeEffect)
     end}
     tes3.game.volumeMaster=250
     tes3.game.volumeEffect=250
 
 end
 
+local function warning()
+    tes3.messageBox("[AURA]: Do NOT adjust MASTER or EFFECTS slider! Do NOT change the 3D audio setting!")
+end
+
 local function init()
+
+    event.register("uiActivated", warning, {filter="MenuAudio"})
+    event.register("cellChanged", volumeAdjust, {priority=-160})
 
     mwse.log("[AURA] Version "..version.." initialised.")
 
@@ -26,7 +31,8 @@ local function init()
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
     local moduleInteriorWeather = config.moduleInteriorWeather
     local moduleServiceVoices = config.moduleServiceVoices
-    local moduleTraining = config.moduleTraining
+    local moduleContainers = config.moduleContainers
+    local moduleUI = config.moduleUI
     local moduleMisc = config.moduleMisc
 
     if moduleAmbientOutdoor then
@@ -49,9 +55,14 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\miscMain.lua")
     end
 
-    if moduleTraining then
-        mwse.log("[AURA "..version.."] Loading file: trainingMain.lua.")
-        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Training\\trainingMain.lua")
+    if moduleUI then
+        mwse.log("[AURA "..version.."] Loading file: UIMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\UI\\UIMain.lua")
+    end
+
+    if moduleContainers then
+        mwse.log("[AURA "..version.."] Loading file: containersMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Containers\\containersMain.lua")
     end
 
     -- Old version deleter --
@@ -64,7 +75,6 @@ end
 -- Registers MCM menu --
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\AURA\\mcm.lua")
- end)
+end)
 
 event.register("initialized", init)
-event.register("cellChanged", volumeAdjust, {priority=-160})
