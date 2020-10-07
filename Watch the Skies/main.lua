@@ -21,9 +21,9 @@ local function debugLog(string)
 end
 
 local function changeMaxParticles()
-    WtC.weathers[5].maxParticles=math.random(200,1200)
-    WtC.weathers[6].maxParticles=math.random(600,1500)
-    WtC.weathers[9].maxParticles=math.random(150,1200)
+    WtC.weathers[5].maxParticles=math.random(100,1200)
+    WtC.weathers[6].maxParticles=math.random(400,1500)
+    WtC.weathers[9].maxParticles=math.random(100,1200)
     debugLog("Particles amount randomised.")
     debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
     debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
@@ -147,7 +147,7 @@ local function init()
     end
 
     if alterChanges then
-        WtC.hoursBetweenWeatherChanges=math.random(3,12)
+        WtC.hoursBetweenWeatherChanges=math.random(3,10)
     end
 
     event.register("weatherChangedImmediate", skyChoice, {priority=-150})
