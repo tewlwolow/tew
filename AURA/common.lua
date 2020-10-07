@@ -57,6 +57,7 @@ this.windows={
     "cwin",
     "wincover",
     "swin",
+    "palacewin"
 }
 
 function this.checkCellDiff(cell, cellLast)
@@ -74,7 +75,7 @@ function this.getCellType(cell, celltype)
     end
     for stat in cell:iterateReferences(tes3.objectType.static) do
         for _, pattern in pairs(celltype) do
-            if string.find(stat.object.id, pattern) then
+            if string.find(stat.object.id:lower(), pattern) then
                 return true
             end
         end
@@ -85,7 +86,7 @@ function this.getWindoors(cell)
     local windoors={}
     for stat in cell:iterateReferences(tes3.objectType.static) do
         for _, window in pairs(this.windows) do
-            if string.find(stat.object.id, window) then
+            if string.find(stat.object.id:lower(), window) then
                 table.insert(windoors, stat)
             end
         end

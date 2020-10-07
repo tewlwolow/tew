@@ -62,14 +62,14 @@ end
 local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
     if IWLoop=="Rain" then
-        tes3.playSound{sound="Sound Test", volume=0.7*vol, pitch=0.8, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=0.9*vol, pitch=0.8, loop=true, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif IWLoop=="rain heavy" then
-        tes3.playSound{sound="Sound Test", volume=0.8*vol, pitch=0.8, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=1.0*vol, pitch=1.2, loop=true, reference=windoor}
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
-        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=windoor}
+        tes3.playSound{sound=IWLoop, volume=0.5*vol, pitch=0.5, loop=true, reference=windoor}
     end
 end
 

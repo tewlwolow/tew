@@ -1,6 +1,23 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 
+local function volumeAdjust()
+
+    tes3.game.soundQuality=2
+    tes3.game.volumeMaster=244
+    tes3.game.volumeEffect=244
+    timer.delayOneFrame{
+    callback=function()
+    tes3.game.volumeMaster=250
+    tes3.game.volumeEffect=250
+    print(tes3.game.volumeMaster)
+    print(tes3.game.volumeEffect)
+    end}
+    tes3.game.volumeMaster=250
+    tes3.game.volumeEffect=250
+
+end
+
 local function init()
 
     mwse.log("[AURA] Version "..version.." initialised.")
@@ -50,3 +67,4 @@ event.register("modConfigReady", function()
  end)
 
 event.register("initialized", init)
+event.register("cellChanged", volumeAdjust, {priority=-160})
