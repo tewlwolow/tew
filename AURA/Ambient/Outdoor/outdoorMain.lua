@@ -4,6 +4,7 @@ local modversion = require("tew\\AURA\\version")
 local common=require("tew\\AURA\\common")
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
+local moduleInteriorWeather=config.moduleInteriorWeather
 local playTransSounds=config.playTransSounds
 local playSplash=config.playSplash
 local debugLogOn = config.debugLogOn
@@ -227,6 +228,11 @@ local function cellCheck()
    debugLog("Different conditions detected. Resetting sounds.")
    tes3.removeSound{reference=cell}
 
+   if moduleInteriorWeather and windoors~={} and weatherNow<4 or weatherNow==8 then
+      for _, windoor in ipairs(windoors) do
+         tes3.removeSound{reference=windoor}
+     end
+   end
 
    -- Getting appropriate paths per conditions detected --
    if pathLast and cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast

@@ -158,15 +158,15 @@ local function cellCheck()
         transState=true
     end
 
-    windoors={}
-    windoors=common.getWindoors(cell)
-
-    if IWLoop==nil then
-        thunRef=nil
+    if IWLoop==nil and windoors~={} and not moduleAmbientOutdoor then
         for _, windoor in ipairs(windoors) do
             tes3.removeSound{reference=windoor}
         end
+        return
     end
+
+    windoors={}
+    windoors=common.getWindoors(cell)
 
     debugLog("Found interior cell.")
     if common.getCellType(cell, common.cellTypesSmall)==true then
