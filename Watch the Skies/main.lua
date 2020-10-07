@@ -24,6 +24,10 @@ local function changeMaxParticles()
     WtC.weathers[5].maxParticles=math.random(200,1200)
     WtC.weathers[6].maxParticles=math.random(600,1500)
     WtC.weathers[9].maxParticles=math.random(150,1200)
+    debugLog("Particles amount randomised.")
+    debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
+    debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
+    debugLog("Snow particles: "..WtC.weathers[9].maxParticles)
 end
 
 local function changeCloudsSpeed()
@@ -37,6 +41,7 @@ local function changeCloudsSpeed()
     WtC.weathers[8].cloudsSpeed=math.random(800,1500)/100
     WtC.weathers[9].cloudsSpeed=math.random(100,200)/100
     WtC.weathers[10].cloudsSpeed=math.random(600,1200)/100
+    debugLog("Clouds speed randomised.")
 end
 
 local function skyChoice(e)
@@ -87,6 +92,7 @@ local function changeInteriorWeather()
 end
 
 local function onCellChanged(e)
+    debugLog("Cell changed.")
     local cell=e.cell
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
@@ -95,12 +101,14 @@ local function onCellChanged(e)
         debugLog("Player in exterior. Pausing interior timer.") end
     elseif (cell.isInterior) and not (cell.behavesAsExterior) then
         if intWeatherTimer then
-        intWeatherTimer:cancel()
-        intWeatherTimer=nil end
+            intWeatherTimer:cancel()
+            intWeatherTimer=nil
+        end
         intWeatherTimer=timer.start{
-        duration=WtC.hoursBetweenWeatherChanges,
-        callback=changeInteriorWeather,
-        type=timer.game
+            duration=WtC.hoursBetweenWeatherChanges,
+            callback=changeInteriorWeather,
+            type=timer.game,
+            iterations=-1
         }
         debugLog("Player in interior. Resuming interior timer. Time to weather change: "..WtC.hoursBetweenWeatherChanges)
     end
@@ -142,11 +150,11 @@ local function init()
         WtC.hoursBetweenWeatherChanges=math.random(3,12)
     end
 
-    event.register("weatherChangedImmediate", skyChoice, {priority=-149})
-    event.register("weatherTransitionFinished", skyChoice, {priority=-149})
+    event.register("weatherChangedImmediate", skyChoice, {priority=-150})
+    event.register("weatherTransitionFinished", skyChoice, {priority=-150})
 
     if interiorTransitions then
-        event.register("cellChanged", onCellChanged, {priority=-149})
+        event.register("cellChanged", onCellChanged, {priority=-150})
     end
 
     if randomiseParticles then

@@ -104,9 +104,9 @@ local function getPathClear()
       if quietType == 1 then
          pathNow="tew\\AURA"..comDir.."Quiet\\"..qArray[math.random(1, #qArray)]
       elseif quietType == 2 then
-         pathNow="tew\\AURA"..comDir.."Cold\\"..cArray[math.random(1, #qArray)]
+         pathNow="tew\\AURA"..comDir.."Cold\\"..cArray[math.random(1, #cArray)]
       else
-         pathNow="tew\\AURA"..comDir.."Warm\\"..wArray[math.random(1, #qArray)]
+         pathNow="tew\\AURA"..comDir.."Warm\\"..wArray[math.random(1, #wArray)]
       end
    end
 end
@@ -154,7 +154,7 @@ local function updateInteriorBig()
    debugLog("Updating interior doors and windows.")
    local playerPos=tes3.player.position
    for _, windoor in ipairs(windoors) do
-      if common.getDistance(playerPos, windoor.position) > 2000
+      if common.getDistance(playerPos, windoor.position) > 2048
       and windoor~=nil then
          playInteriorBig(windoor)
       end
@@ -228,10 +228,11 @@ local function cellCheck()
    debugLog("Different conditions detected. Resetting sounds.")
    tes3.removeSound{reference=cell}
 
-   if moduleInteriorWeather and windoors~={} and weatherNow<4 or weatherNow==8 then
+   if not moduleInteriorWeather and windoors~={} and weatherNow<4 or weatherNow==8 then
       for _, windoor in ipairs(windoors) do
          tes3.removeSound{reference=windoor}
      end
+     debugLog("Clearing windoors.")
    end
 
    -- Getting appropriate paths per conditions detected --
@@ -332,9 +333,9 @@ local function runHourTimer()
 end
 
 debugLog("Outdoor Ambient Sounds module initialised.")
-event.register("loaded", runHourTimer, {priority=-151})
-event.register("load", runResetter, {priority=-151})
-event.register("cellChanged", cellCheck, {priority=-140})
-event.register("weatherTransitionFinished", cellCheck, {priority=-140})
-event.register("weatherChangedImmediate", cellCheck, {priority=-140})
+event.register("loaded", runHourTimer, {priority=-160})
+event.register("load", runResetter, {priority=-160})
+event.register("cellChanged", cellCheck, {priority=-160})
+event.register("weatherTransitionFinished", cellCheck, {priority=-160})
+event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
