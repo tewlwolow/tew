@@ -82,10 +82,6 @@ local function changeInteriorWeather()
     debugLog("Weather before randomisation: "..currentWeather)
     local newWeather=interiorWeathers[math.random(1, #interiorWeathers)]
 
-    while newWeather==currentWeather do
-        newWeather=interiorWeathers[math.random(1, #interiorWeathers)]
-    end
-
     WtC:switchTransition(newWeather)
 
     debugLog("Weather randomised. New weather: "..WtC.nextWeather.index)
