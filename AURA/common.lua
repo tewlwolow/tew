@@ -60,6 +60,10 @@ this.windows={
     "palacewin"
 }
 
+this.cellTypesCaves={
+    "cave",
+}
+
 function this.checkCellDiff(cell, cellLast)
     if (cell.isInterior and not cellLast.isInterior)
     or (not cell.isInterior and cellLast.isInterior) then
