@@ -81,26 +81,27 @@ end
 local function spell_repairGreet(e)
    local element=e.element
 
+   local npcId=tes3ui.getServiceActor(e)
+   local raceId=npcId.object.race.id
+   local raceLet, sexLet
+   local serviceFeed={}
+
+   if npcId.object.female then
+      debugLog("Female NPC found.")
+      sexLet="f"
+   else
+      sexLet="m"
+      debugLog("Male NPC found.")
+   end
+
+   for k, v in pairs(raceNames) do
+      if raceId==k then
+         raceLet=v
+      end
+   end
+
    if serviceSpellmaking then
       local function saySpell()
-         local npcId=tes3ui.getServiceActor(e)
-         local raceId=npcId.object.race.id
-         local raceLet, sexLet
-         local serviceFeed={}
-
-         if npcId.object.female then
-            debugLog("Female NPC found.")
-            sexLet="f"
-         else
-            sexLet="m"
-            debugLog("Male NPC found.")
-         end
-
-         for k, v in pairs(raceNames) do
-            if raceId==k then
-               raceLet=v
-            end
-         end
 
          for kRace, _ in pairs(spellVoices) do
             if kRace==raceLet then
@@ -146,24 +147,6 @@ local function spell_repairGreet(e)
 
    if serviceSpells then
       local function saySpell()
-         local npcId=tes3ui.getServiceActor(e)
-         local raceId=npcId.object.race.id
-         local raceLet, sexLet
-         local serviceFeed={}
-
-         if npcId.object.female then
-            debugLog("Female NPC found.")
-            sexLet="f"
-         else
-            sexLet="m"
-            debugLog("Male NPC found.")
-         end
-
-         for k, v in pairs(raceNames) do
-            if raceId==k then
-               raceLet=v
-            end
-         end
 
          for kRace, _ in pairs(spellVoices) do
             if kRace==raceLet then
@@ -209,24 +192,6 @@ local function spell_repairGreet(e)
 
    if serviceRepair then
       local function sayRepair()
-         local npcId=tes3ui.getServiceActor(e)
-         local raceId=npcId.object.race.id
-         local raceLet, sexLet
-         local serviceFeed={}
-
-         if npcId.object.female then
-            debugLog("Female NPC found.")
-            sexLet="f"
-         else
-            sexLet="m"
-            debugLog("Male NPC found.")
-         end
-
-         for k, v in pairs(raceNames) do
-            if raceId==k then
-               raceLet=v
-            end
-         end
 
          for kRace, _ in pairs(commonVoices) do
             if kRace==raceLet then
