@@ -64,7 +64,7 @@ local function skyChoice(e)
     end
 
     if alterChanges then
-        WtC.hoursBetweenWeatherChanges=math.random(3,12)
+        WtC.hoursBetweenWeatherChanges=math.random(3,10)
         debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
     end
 
