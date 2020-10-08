@@ -51,4 +51,4 @@ local function travelFee(e)
 end
 
 print("[AURA "..version.."] UI: Travel menu sounds initialised.")
-event.register("uiActivated", travelFee, {filter="MenuServiceTravel"})
+event.register("uiActivated", travelFee, {filter="MenuServiceTravel", priority=-15})

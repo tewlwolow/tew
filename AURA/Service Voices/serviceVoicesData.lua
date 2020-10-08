@@ -90,7 +90,6 @@ this.commonVoices={
             "Hlo_DF180",
             "Hlo_DF183",
             "Hlo_DF194",
-            "Hlo_DF227",
             "tHlo_DF157",
             "tHlo_DF160",
             "tHlo_DF164",
@@ -361,6 +360,7 @@ this.travelVoices={
             "Srv_DF035",
             "Srv_DF046",
             "Srv_DF047",
+            "Hlo_DF227",
         },
         ["m"]={
             "Srv_DM037",

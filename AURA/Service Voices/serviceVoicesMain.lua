@@ -10,6 +10,8 @@ local travelVoices=serviceVoicesData.travelVoices
 local spellVoices=serviceVoicesData.spellVoices
 local trainingVoices=serviceVoicesData.trainingVoices
 
+local UISpells = config.UISpells
+
 local serviceRepair=config.serviceRepair
 local serviceSpells=config.serviceSpells
 local serviceTraining=config.serviceTraining
@@ -117,8 +119,13 @@ local function spell_repairGreet(e)
                newVoice=serviceFeed[math.random(1, #serviceFeed)]
             end
             tes3.removeSound{reference=npcId}
+
+            if UISpells then
+               tes3.playSound{sound="sprigganmagic", volume=0.6, pitch=1.5}
+               debugLog("Opening spell menu sound played.")
+            end
+
             tes3.playSound{sound="Menu Click", reference=npcId}
-            tes3.playSound{sound="spellmake success", reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -174,7 +181,15 @@ local function spell_repairGreet(e)
             while newVoice == lastVoice or newVoice == nil do
                newVoice=serviceFeed[math.random(1, #serviceFeed)]
             end
+
             tes3.removeSound{reference=npcId}
+
+            if UISpells then
+               tes3.playSound{sound="sprigganmagic", volume=0.6, pitch=1.5}
+               debugLog("Opening spell menu sound played.")
+            end
+
+            tes3.playSound{sound="Menu Click", reference=npcId}
             tes3.say{
             volume=0.9,
             soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
@@ -359,9 +374,9 @@ end
 
 debugLog("Service voices module initialised.")
 
-event.register("uiActivated", spell_repairGreet, {filter="MenuDialog"})
+event.register("uiActivated", spell_repairGreet, {filter="MenuDialog", priority=-10})
 
-if serviceTravel then event.register("uiActivated", travelGreet, {filter="MenuServiceTravel"}) end
-if serviceBarter then event.register("uiActivated", serviceGreet, {filter="MenuBarter"}) end
-if serviceTraining then event.register("uiActivated", trainingGreet, {filter="MenuServiceTraining"}) end
-if serviceEnchantment then event.register("uiActivated", serviceGreet, {filter="MenuEnchantment"}) end
+if serviceTravel then event.register("uiActivated", travelGreet, {filter="MenuServiceTravel", priority=-10}) end
+if serviceBarter then event.register("uiActivated", serviceGreet, {filter="MenuBarter", priority=-10}) end
+if serviceTraining then event.register("uiActivated", trainingGreet, {filter="MenuServiceTraining", priority=-10}) end
+if serviceEnchantment then event.register("uiActivated", serviceGreet, {filter="MenuEnchantment", priority=-10}) end

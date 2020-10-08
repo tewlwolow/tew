@@ -9,10 +9,7 @@ local function debugLog(string)
     end
  end
 
-local function onSpellPurchaseMenu(e)
-
-    tes3.playSound{sound="scroll", volume=0.6}
-    debugLog("Opening spell menu sound played.")
+local function onSpellClick(e)
 
     local element=e.element:findChild(-1155)
 
@@ -27,6 +24,19 @@ local function onSpellPurchaseMenu(e)
 
 end
 
+--[[local function onSpellMenu(e)
+    local function spellScroll()
+        tes3.playSound{sound="scroll", volume=0.6}
+        debugLog("Opening spell menu sound played.")
+    end
+
+    local element=e.element
+    local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spells"))
+
+    spellsButton:register("mouseDown", spellScroll)
+end--]]
+
 
 print("[AURA "..version.."] UI: Spell purchase sounds initialised.")
-event.register("uiActivated", onSpellPurchaseMenu, {filter="MenuServiceSpells"})
+event.register("uiActivated", onSpellClick, {filter="MenuServiceSpells", priority=-15})
+--event.register("uiActivated", onSpellMenu, {filter="MenuDialog", priority=-15})
