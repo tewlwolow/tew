@@ -125,8 +125,10 @@ local function getPathWindy()
 end
 
 local function playExterior(cell)
-   debugLog("Playing exterior loop. File: "..pathNow)
-   tes3.playSound{soundPath=pathNow, volume=1.0*vol, loop=true, reference=cell}
+   timer.start{duration=1.5, type=timer.real, callback=function()
+      debugLog("Playing exterior loop. File: "..pathNow)
+      tes3.playSound{soundPath=pathNow, volume=1.0*vol, loop=true, reference=cell}
+   end}
 end
 
 local function playTrans(cell)
@@ -139,15 +141,16 @@ local function playTrans(cell)
  end
 
 local function playInteriorBig(windoor)
-   if windoor==nil then
-      return
-   elseif cellLast and pathLast and not cellLast.isInterior then
-      debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-      tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
-   else
-      debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-      tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
-   end
+   timer.start{duration=1.5, type=timer.real, callback=function()
+      if windoor==nil then debugLog("Dodging an empty ref.") return end
+      if cellLast and pathLast and not cellLast.isInterior then
+         debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
+         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+      else
+         debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
+         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+      end
+   end}
 end
 
 local function updateInteriorBig()
@@ -162,13 +165,15 @@ local function updateInteriorBig()
 end
 
 local function playInteriorSmall(cell)
-   if cellLast and pathLast and not cellLast.isInterior then
-      debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
-      tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
-   else
-      debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
-      tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
-   end
+   timer.start{duration=1.5, type=timer.real, callback=function()
+      if cellLast and pathLast and not cellLast.isInterior then
+         debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
+         tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+      else
+         debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
+         tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+      end
+   end}
 end
 
 local function cellCheck()

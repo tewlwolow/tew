@@ -7,8 +7,6 @@ local version = modversion.version
 local debugLogOn=config.debugLogOn
 local vol = config.intVol/200
 
-local moduleAmbientOutdoor=config.moduleAmbientOutdoor
-
 local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
 local WtC=tes3.getWorldController().weatherController
@@ -66,11 +64,13 @@ local function playInteriorBig(windoor)
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
+        debugLog("Playing big interior loop: "..IWLoop)
         tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=windoor}
     end
 end
 
 local function updateInteriorBig()
+    debugLog("Updating interior doors and windows.")
     local playerPos=tes3.player.position
     for _, windoor in ipairs(windoors) do
         if common.getDistance(playerPos, windoor.position) > 2048 then
@@ -107,9 +107,9 @@ local function cellCheck()
         thunderTimerSmall:pause()
     end
 
-    if not moduleAmbientOutdoor then
-        tes3.removeSound{reference=cell}
-    end
+
+    tes3.removeSound{reference=cell}
+
 
     local IWweather=WtC.currentWeather.index
     IWLoop=nil
