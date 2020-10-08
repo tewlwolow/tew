@@ -30,7 +30,7 @@ local function playOpenSound(e)
         local containerType
 
         for type, filepath in pairs(containersData["open"]) do
-            if string.find(e.target.object.id:lower(), type) then
+            if string.find(e.target.object.name:lower(), type) then
                 path=filepath
                 containerType=type
                 break
@@ -49,14 +49,14 @@ local function playCloseSound(e)
 
     local containerType
     for type, filepath in pairs(containersData["close"]) do
-        if string.find(e.reference.object.id:lower(), type) then
+        if string.find(e.reference.object.name:lower(), type) then
             path=filepath
             containerType=type
             break
         end
     end
     if path ~= "" then
-        tes3.playSound{soundPath=path, reference=e.target, volume=0.8, pitch=getPitch(containerType)-0.2}
+        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8, pitch=getPitch(containerType)-0.2}
         debugLog("Playing container closing sound.")
     end
     path=""
@@ -68,8 +68,3 @@ debugLog("Containers module initialised.")
 
 event.register("activate", playOpenSound)
 event.register("containerClosed", playCloseSound)
-
---[[ TODO:
-    * add more types to containersData.lua
-    * maybe skip .id, just use .object? General name then shown?
---]]
