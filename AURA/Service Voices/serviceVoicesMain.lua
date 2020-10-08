@@ -121,7 +121,7 @@ local function spell_repairGreet(e)
             tes3.removeSound{reference=npcId}
 
             if UISpells then
-               tes3.playSound{sound="sprigganmagic", volume=0.6, pitch=1.5}
+               tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6}
                debugLog("Opening spell menu sound played.")
             end
 
@@ -185,7 +185,7 @@ local function spell_repairGreet(e)
             tes3.removeSound{reference=npcId}
 
             if UISpells then
-               tes3.playSound{sound="sprigganmagic", volume=0.6, pitch=1.5}
+               tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6}
                debugLog("Opening spell menu sound played.")
             end
 

@@ -16,7 +16,7 @@ local function onSpellClick(e)
     for _, spellClick in pairs(element.children) do
         if string.find(spellClick.text, "gp") then
             spellClick:register("mouseDown", function()
-            tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.8}
+            tes3.playSound{sound="sprigganmagic", volume=0.7, pitch=1.5}
             debugLog("Purchase spell sound played.")
             end)
         end

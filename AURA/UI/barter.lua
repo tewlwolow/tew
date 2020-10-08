@@ -11,13 +11,13 @@ local function debugLog(string)
 
 local function playBarterSounds(e)
 
-    tes3.playSound{sound="chest open", volume=0.7, pitch=0.7}
+    tes3.playSound{sound="chest open", volume=0.7, pitch=0.6}
     debugLog("Barter menu opening sound played.")
 
     local closeBarterButton=e.element:findChild(tes3ui.registerID("MenuBarter_Cancelbutton"))
     if closeBarterButton then
         closeBarterButton:register("mouseDown", function()
-        tes3.playSound{sound="chest close", volume=0.7, pitch=0.7}
+        tes3.playSound{sound="chest close", volume=0.6, pitch=0.8}
         debugLog("Barter menu closing sound played.")
         end)
     end
