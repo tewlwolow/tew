@@ -3,6 +3,7 @@ local version = modversion.version
 local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
 local UIvol=config.UIvol/200
+--local moduleContainers=config.moduleContainers
 
 local function debugLog(string)
     if debugLogOn then

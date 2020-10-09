@@ -5,6 +5,7 @@ local debugLogOn=config.debugLogOn
 local Cvol=config.Cvol/200
 
 local path = ""
+local flag = 0
 local containersData = require("tew\\AURA\\Containers\\containersData")
 
 local function debugLog(string)
@@ -47,7 +48,8 @@ local function playOpenSound(e)
 end
 
 local function playCloseSound(e)
-
+    --if not e.reference.object.baseObject == tes3.objectType.container then return end
+    if flag == 1 then return end
     local containerType
     for type, filepath in pairs(containersData["close"]) do
         if string.find(e.reference.object.name:lower(), type) then
@@ -59,8 +61,12 @@ local function playCloseSound(e)
     if path ~= "" then
         tes3.playSound{soundPath=path, reference=e.reference, volume=0.8*Cvol, pitch=getPitch(containerType)-0.2}
         debugLog("Playing container closing sound.")
+        flag=1
     end
     path=""
+    timer.start{type=timer.real, duration=1, callback=function()
+        flag=0
+    end}
 
 end
 
