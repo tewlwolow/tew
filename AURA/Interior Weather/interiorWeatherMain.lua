@@ -5,7 +5,7 @@ local common=require("tew\\AURA\\common")
 local IWAURAdir="tew\\AURA\\Interior Weather\\"
 local version = modversion.version
 local debugLogOn=config.debugLogOn
-local vol = config.intVol/200
+local vol = config.IWvol/200
 
 local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
@@ -82,6 +82,7 @@ end
 local function cellCheck()
 
     local cell=tes3.getPlayerCell()
+    if not cell then return end
     if not cell.isInterior
     or (cell.isInterior and cell.behavesAsExterior) then
         debugLog("Found exterior cell. Returning.")
@@ -131,7 +132,7 @@ local function cellCheck()
 
     if IWLoop==nil then
         debugLog("Clearing windoors.")
-        if  windoors~={} then
+        if windoors~={} and windoors~=nil then
             for _, windoor in ipairs(windoors) do
                 tes3.removeSound{reference=windoor}
             end

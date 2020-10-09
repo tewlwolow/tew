@@ -3,6 +3,8 @@ local version = modversion.version
 local config=require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
 
+local vol=config.yurtVol/200
+
 local yurtDoors={
     "in_ashl_door_01",
     "in_ashl_door_02",
@@ -20,7 +22,7 @@ end
 local function yurtFlap(e)
     for _, door in pairs(yurtDoors) do
         if e.target.object.id==door then
-            tes3.playSound({soundPath="tew\\AURA\\Misc\\yurtflap.wav", volume=0.9, pitch=0.8, reference=tes3.player})
+            tes3.playSound({soundPath="tew\\AURA\\Misc\\yurtflap.wav", volume=0.9*vol, pitch=0.8, reference=tes3.player})
             debugLog("Playing yurt flap sound.")
             return
         end

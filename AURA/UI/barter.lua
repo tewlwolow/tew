@@ -2,6 +2,7 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
+local UIvol=config.UIvol/200
 
 local function debugLog(string)
     if debugLogOn then
@@ -11,13 +12,13 @@ local function debugLog(string)
 
 local function playBarterSounds(e)
 
-    tes3.playSound{sound="chest open", volume=0.7, pitch=0.6}
+    tes3.playSound{sound="chest open", volume=0.7*UIvol, pitch=0.6}
     debugLog("Barter menu opening sound played.")
 
     local closeBarterButton=e.element:findChild(tes3ui.registerID("MenuBarter_Cancelbutton"))
     if closeBarterButton then
         closeBarterButton:register("mouseDown", function()
-        tes3.playSound{sound="chest close", volume=0.6, pitch=0.8}
+        tes3.playSound{sound="chest close", volume=0.6*UIvol, pitch=0.8}
         debugLog("Barter menu closing sound played.")
         end)
     end

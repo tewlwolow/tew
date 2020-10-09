@@ -3,6 +3,9 @@ local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
+local UIvol=config.UIvol/200
+local SVvol=config.SVvol/200
+local moduleUI=config.moduleUI
 
 local raceNames=serviceVoicesData.raceNames
 local commonVoices=serviceVoicesData.commonVoices
@@ -68,7 +71,7 @@ local function serviceGreet(e)
       end
       tes3.removeSound{reference=npcId}
       tes3.say{
-      volume=0.9,
+      volume=0.9*SVvol*SVvol,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       newVoice..".mp3", reference=npcId
       }
@@ -121,22 +124,23 @@ local function spell_repairGreet(e)
             end
             tes3.removeSound{reference=npcId}
 
-            if UISpells then
-               tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6}
-               debugLog("Opening spell menu sound played.")
-            end
-
-            tes3.playSound{sound="Menu Click", reference=npcId}
-            tes3.say{
-            volume=0.9,
-            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            newVoice..".mp3", reference=npcId
-            }
-            lastVoice=newVoice
-            debugLog("NPC says a spellmaker comment.")
+            timer.start{duration=0.6, type=timer.real, callback=function()
+               tes3.say{
+               volume=0.9*SVvol,
+               soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+               newVoice..".mp3", reference=npcId
+               }
+               lastVoice=newVoice
+               debugLog("NPC says a spellmaker comment.")
+            end}
          else
             serviceGreet(e)
          end
+         if UISpells and moduleUI then
+            tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol}
+            debugLog("Opening spell menu sound played.")
+         end
+         tes3.playSound{sound="Menu Click", reference=npcId}
       end
 
       local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spellmaking"))
@@ -167,22 +171,23 @@ local function spell_repairGreet(e)
 
             tes3.removeSound{reference=npcId}
 
-            if UISpells then
-               tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6}
-               debugLog("Opening spell menu sound played.")
-            end
-
-            tes3.playSound{sound="Menu Click", reference=npcId}
-            tes3.say{
-            volume=0.9,
-            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            newVoice..".mp3", reference=npcId
-            }
-            lastVoice=newVoice
-            debugLog("NPC says a spell vendor comment.")
+            timer.start{duration=0.6, type=timer.real, callback=function()
+               tes3.say{
+               volume=0.9*SVvol,
+               soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+               newVoice..".mp3", reference=npcId
+               }
+               lastVoice=newVoice
+               debugLog("NPC says a spell vendor comment.")
+            end}
          else
             serviceGreet(e)
          end
+         if UISpells and moduleUI then
+            tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=1.3*UIvol}
+            debugLog("Opening spell menu sound played.")
+         end
+         tes3.playSound{sound="Menu Click", reference=npcId}
       end
 
       local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spells"))
@@ -210,14 +215,17 @@ local function spell_repairGreet(e)
                newVoice=serviceFeed[math.random(1, #serviceFeed)]
             end
             tes3.removeSound{reference=npcId}
-            tes3.playSound{sound="Menu Click", reference=npcId}
-            tes3.say{
-            volume=0.9,
-            soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-            newVoice..".mp3", reference=npcId
-            }
-            lastVoice=newVoice
-            debugLog("NPC says a repair comment.")
+
+            timer.start{duration=0.6, type=timer.real, callback=function()
+               tes3.playSound{sound="Menu Click", reference=npcId}
+               tes3.say{
+               volume=0.9*SVvol,
+               soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+               newVoice..".mp3", reference=npcId
+               }
+               lastVoice=newVoice
+               debugLog("NPC says a repair comment.")
+            end}
          else
             serviceGreet(e)
          end
@@ -268,7 +276,7 @@ local function travelGreet(e)
       end
       tes3.removeSound{reference=npcId}
       tes3.say{
-      volume=0.9,
+      volume=0.9*SVvol,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       newVoice..".mp3", reference=npcId
       }
@@ -326,7 +334,7 @@ local function trainingGreet(e)
       end
       tes3.removeSound{reference=npcId}
       tes3.say{
-      volume=0.9,
+      volume=0.9*SVvol,
       soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
       newVoice..".mp3", reference=npcId
       }

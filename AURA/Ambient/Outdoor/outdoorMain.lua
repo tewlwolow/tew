@@ -9,7 +9,8 @@ local playTransSounds=config.playTransSounds
 local playSplash=config.playSplash
 local debugLogOn = config.debugLogOn
 local calmChance=config.calmChance/100
-local vol = config.vol/200
+local OAvol = config.OAvol/200
+local splashVol = config.splashVol/200
 local playWindy=config.playWindy
 local playInteriorAmbient=config.playInteriorAmbient
 local version = modversion.version
@@ -125,9 +126,9 @@ local function getPathWindy()
 end
 
 local function playExterior(cell)
-   timer.start{duration=1.5, type=timer.real, callback=function()
+   timer.start{duration=1, type=timer.real, callback=function()
       debugLog("Playing exterior loop. File: "..pathNow)
-      tes3.playSound{soundPath=pathNow, volume=1.0*vol, loop=true, reference=cell}
+      tes3.playSound{soundPath=pathNow, volume=1.0*OAvol, loop=true, reference=cell}
    end}
 end
 
@@ -135,20 +136,20 @@ local function playTrans(cell)
    if cell.isInterior and not cell.behavesAsExterior then
       return
    else
-   tes3.playSound{sound=tSound, volume=0.3*vol, pitch=0.7, reference=tes3.player}
+   tes3.playSound{sound=tSound, volume=0.3*OAvol, pitch=0.7, reference=tes3.player}
    debugLog("Playing transition rustle. Sound: "..tSound)
    end
  end
 
 local function playInteriorBig(windoor)
-   timer.start{duration=1.5, type=timer.real, callback=function()
+   timer.start{duration=1, type=timer.real, callback=function()
       if windoor==nil then debugLog("Dodging an empty ref.") return end
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*vol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*OAvol, pitch=0.8}
       end
    end}
 end
@@ -165,13 +166,13 @@ local function updateInteriorBig()
 end
 
 local function playInteriorSmall(cell)
-   timer.start{duration=1.5, type=timer.real, callback=function()
+   timer.start{duration=1, type=timer.real, callback=function()
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*vol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
       end
    end}
 end
@@ -311,17 +312,17 @@ local function positionCheck(e)
    else
       debugLog("Player underwater. Stopping AURA sounds.")
       tes3.removeSound{reference=cell}
-      tes3.playSound{soundPath=pathLast, volume=0.4*vol, pitch=0.5, reference=cell, loop=true}
+      tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
       if playSplash and moduleAmbientOutdoor then
-         tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5, pitch=0.6}
+         tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*splashVol, pitch=0.6}
       end
       element:register("destroy", function()
          debugLog("Player above water level. Resetting AURA sounds.")
          tes3.removeSound{reference=cell}
-         tes3.playSound{soundPath=pathLast, volume=1.0*vol, reference=cell, loop=true}
+         tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
          timer.start({duration=5, callback=cellCheck, type=timer.real})
          if playSplash and moduleAmbientOutdoor then
-            tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5, pitch=0.8}
+            tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5*splashVol, pitch=0.8}
          end
       end)
    end

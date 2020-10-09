@@ -1,6 +1,8 @@
 local trainingData = require("tew\\AURA\\UI\\trainingData")
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
+local config = require("tew\\AURA\\config")
+local UIvol=config.UIvol/200
 
 --[[
 local config = require("tew\\AURA\\config")
@@ -24,7 +26,7 @@ local function onTrainingMenu(e)
                     skillClick:register("mouseDown", function()
                         for skill, sound in pairs(trainingData) do
                             if string.find(skillClick.text, skill) then
-                                tes3.playSound{soundPath=sound, reference=tes3.player, volume=0.8}
+                                tes3.playSound{soundPath=sound, reference=tes3.player, volume=0.7*UIvol}
                             end
                         end
                     end)

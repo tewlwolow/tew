@@ -60,15 +60,15 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in accordance with local climate, weather, player position, and time.\n\nSettings:"
     }
     pageOA:createSlider{
-        label = "Changes % volume. Default = 100%.\nReload a save for immediate effect or wait for a loop change. Volume %",
+        label = "Changes % volume for Outdoor Ambient module. Default = 120%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
         jump = 10,
-        variable=registerVariable("vol")
+        variable=registerVariable("OAvol")
     }
     pageOA:createSlider{
-        label = "Changes % chance for a calm track to play instead of the regular one. Default = 30%.\nReload a save for immediate effect or wait for a loop change. Chance %",
+        label = "Changes % chance for a calm track to play instead of the regular one. Default = 30%.\nRequires restart. Chance %",
         min = 0,
         max = 100,
         step = 1,
@@ -94,12 +94,12 @@ local template = mwse.mcm.createTemplate{
         label = "Plays weather sounds in interiors.\n\nSettings:"
     }
     pageIW:createSlider{
-        label = "Changes % volume. Default = 100%.\nReload a save for immediate effect or wait for a loop change.\nVolume %",
+        label = "Changes % volume for Interior Weather module. Default = 150%.\nRequires restart.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
         jump = 10,
-        variable=registerVariable("intVol")
+        variable=registerVariable("IWvol")
     }
 
     local pageSV = template:createPage{label="Service Voices"}
@@ -134,10 +134,26 @@ local template = mwse.mcm.createTemplate{
         label = "Enable voice comments on barter service?",
         variable = registerVariable("serviceBarter"),
     }
+    pageSV:createSlider{
+        label = "Changes % volume for Service Voices module. Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("SVvol")
+    }
 
-    local pageContainers = template:createPage{label="Containers"}
-    pageContainers:createCategory{
+    local pageC = template:createPage{label="Containers"}
+    pageC:createCategory{
         label = "Plays container sound on open/close.\n\nSettings:"
+    }
+    pageC:createSlider{
+        label = "Changes % volume for Containers module. Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("Cvol")
     }
 
     local pageUI = template:createPage{label="UI"}
@@ -164,6 +180,14 @@ local template = mwse.mcm.createTemplate{
         label = "Enable eating sound for ingredients in inventory menu?",
         variable = registerVariable("UIEating"),
     }
+    pageUI:createSlider{
+        label = "Changes % volume for UI module. Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("UIvol")
+    }
 
     local pageMisc = template:createPage{label="Misc", noScroll=true}
     pageMisc:createCategory{
@@ -173,9 +197,25 @@ local template = mwse.mcm.createTemplate{
         label = "Enable splash sounds when going underwater and back to surface?",
         variable = registerVariable("playSplash"),
     }
+    pageMisc:createSlider{
+        label = "Changes % volume for splash sounds. Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("splashVol")
+    }
     pageMisc:createYesNoButton{
         label = "Enable yurt door sound?",
         variable = registerVariable("playYurtFlap"),
+    }
+    pageMisc:createSlider{
+        label = "Changes % volume for yurt flaps. Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("yurtVol")
     }
 
 template:saveOnClose(configPath, config)

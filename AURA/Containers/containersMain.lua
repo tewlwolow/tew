@@ -2,6 +2,7 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
+local Cvol=config.Cvol/200
 
 local path = ""
 local containersData = require("tew\\AURA\\Containers\\containersData")
@@ -37,7 +38,7 @@ local function playOpenSound(e)
             end
         end
         if path ~= "" then
-            tes3.playSound{soundPath=path, reference=e.target, volume=0.8, pitch=getPitch(containerType)}
+            tes3.playSound{soundPath=path, reference=e.target, volume=0.8*Cvol, pitch=getPitch(containerType)}
             debugLog("Playing container opening sound.")
         end
         path=""
@@ -56,7 +57,7 @@ local function playCloseSound(e)
         end
     end
     if path ~= "" then
-        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8, pitch=getPitch(containerType)-0.2}
+        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8*Cvol, pitch=getPitch(containerType)-0.2}
         debugLog("Playing container closing sound.")
     end
     path=""

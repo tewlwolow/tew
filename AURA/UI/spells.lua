@@ -1,6 +1,7 @@
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
+local UIvol=config.UIvol/200
 local debugLogOn=config.debugLogOn
 
 local function debugLog(string)
@@ -16,7 +17,7 @@ local function onSpellClick(e)
     for _, spellClick in pairs(element.children) do
         if string.find(spellClick.text, "gp") then
             spellClick:register("mouseDown", function()
-            tes3.playSound{sound="sprigganmagic", volume=0.7, pitch=1.5}
+            tes3.playSound{sound="sprigganmagic", volume=0.7*UIvol, pitch=1.5}
             debugLog("Purchase spell sound played.")
             end)
         end
