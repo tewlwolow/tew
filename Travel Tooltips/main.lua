@@ -37,11 +37,6 @@ end
 local function createTooltip(e)
 
     local npc=tes3ui.getServiceActor(e).object
-    if string.startswith(npc.id, "TR_") or
-    string.startswith(npc.id, "PC_") or
-    string.startswith(npc.id, "Sky_") then
-        return
-    end
 
     if npc.class.id == "Gondolier" and not config.showGondola then
         return
@@ -69,6 +64,16 @@ local function createTooltip(e)
 
                 local description, headerPath="", ""
                 local trDestinationText=string.sub(trDestination.text, 1, -7)
+
+                if string.find(trDestinationText, "Old Ebonheart") then return end
+
+                for kHead, vHead in pairs(headers) do
+                    if string.find(trDestinationText, kHead) then
+                        headerPath=vHead
+                    end
+                end
+
+                if headerPath=="" then return end
 
                 if npc.class.id == "Gondolier" and config.showGondola then
                     for kDest, vDescr in pairs(gondoliersTable) do
@@ -102,12 +107,6 @@ local function createTooltip(e)
                     destLabel.wrapText = true
                     destLabel.font=config.fontLabel
                     destLabel.borderBottom=3*scale
-
-                    for kHead, vHead in pairs(headers) do
-                        if string.find(trDestinationText, kHead) then
-                            headerPath=vHead
-                        end
-                    end
 
                     local destHeader=destBlock:createImage{path=headerPath}
                     getColour()
@@ -146,12 +145,6 @@ local function createTooltip(e)
                     destLabel.wrapText = true
                     destLabel.font=config.fontLabel
                     destLabel.borderBottom=3*scale
-
-                    for kHead, vHead in pairs(headers) do
-                        if string.find(trDestinationText, kHead) then
-                            headerPath=vHead
-                        end
-                    end
 
                     local destHeader=destBlock:createImage{path=headerPath}
                     getColour()
