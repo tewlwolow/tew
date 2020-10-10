@@ -6,5 +6,6 @@ return mwse.loadConfig("Travel Tooltips", {
         mainMap="\\Textures\\tew\\Travel Tooltips\\MW_travelroutes.tga",
         scale=100,
         size="Wide",
-        showGondola=true
+        showGondola=true,
+        headers="headers_Stuporstar",
     })

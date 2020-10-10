@@ -1,5 +1,5 @@
 -- Travel Tooltips (by tewlwolow)) --
---- v 1.0.4 ---
+--- v 1.1.0 ---
 
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\Travel Tooltips\\mcm.lua")
@@ -8,10 +8,10 @@ end)
 local data=require("tew\\Travel Tooltips\\data")
 local config=require("tew\\Travel Tooltips\\config")
 local descriptionTable=data.descriptionTable
-local headers=data.headers
+local headers
 local gondoliersTable=data.gondoliersTable
 
-local version="1.0.4"
+local version="1.1.0"
 local mapColour=nil
 local mapColours={
     ["Indoril"] = {1.0, 1.0, 1.0},
@@ -66,6 +66,13 @@ local function createTooltip(e)
                 local trDestinationText=string.sub(trDestination.text, 1, -7)
 
                 if string.find(trDestinationText, "Old Ebonheart") then return end
+
+                headers=config.headers
+                if headers == "headers_ComradeRaven" then
+                    headers=data.headers_ComradeRaven
+                elseif headers == "headers_Stuporstar" then
+                    headers=data.headers_Stuporstar
+                end
 
                 for kHead, vHead in pairs(headers) do
                     if string.find(trDestinationText, kHead) then

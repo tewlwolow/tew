@@ -1,5 +1,5 @@
 local config = require("tew\\Travel Tooltips\\config")
-local version="1.0.4"
+local version="1.1.0"
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{
@@ -15,7 +15,7 @@ local template = mwse.mcm.createTemplate{
     local page = template:createPage{label="Travel Tooltips Settings"}
 
     page:createCategory{
-        label = "Travel Tooltips version "..version.." by tewlwolow.\nHovering over a destination in the 'Travel' tab (and, optionally, on 'Travel' button itself) will now display an appropriate map and a short description. Illustrations are courtesy of Stuporstar; slightly edited by me.\n\nSettings:",
+        label = "Travel Tooltips version "..version.." by tewlwolow.\nHovering over a destination in the 'Travel' tab (and, optionally, on 'Travel' button itself) will now display an appropriate map and a short description. Illustrations are courtesy of Stuporstar and ComradeRaven (edited by me).\n\nSettings:",
     }
 
     page:createYesNoButton{
@@ -27,10 +27,19 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("showMainMap")}
 
     page:createDropdown{
+        label = "Choose map pack:",
+        options = {
+            {label = "Stuporstar pack (Default)", value = "headers_Stuporstar"},
+            {label = "ComradeRaven pack", value = "headers_ComradeRaven"},
+            },
+            variable=registerVariable("headers")}
+
+    page:createDropdown{
         label = "Choose map for the above setting. Does nothing when set to 'No'.",
         options = {
-            {label = "Vvardenfell Travel Routes Map (Default)", value = "\\Textures\\tew\\Travel Tooltips\\MW_travelroutes.tga"},
-            {label = "Generic Vvardenfell Map", value = "\\Textures\\tew\\Travel Tooltips\\vvardenfellcitymap.tga"}
+            {label = "[Stuporstar] Vvardenfell Travel Routes Map (Default)", value = "\\Textures\\tew\\Travel Tooltips\\MW_travelroutes.tga"},
+            {label = "[Stuporstar] Generic Vvardenfell Map", value = "\\Textures\\tew\\Travel Tooltips\\vvardenfellcitymap.tga"},
+            {label = "[ComradeRaven] BookArt map", value = "\\Textures\\tew\\Travel Tooltips\\ComradeRaven\\RedMountain_377_253.tga"},
             },
             variable=registerVariable("mainMap")}
 
