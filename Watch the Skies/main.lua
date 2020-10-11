@@ -162,7 +162,7 @@ local function init()
     end
 end
 
-event.register("initialized", init)
+event.register("initialized", init, {priority=-150})
 
 -- Registers MCM menu --
 event.register("modConfigReady", function()

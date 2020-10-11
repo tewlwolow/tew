@@ -49,6 +49,7 @@ this.cellTypesSmall={
 
 this.cellTypesTent={
     "in_ashl_tent",
+    "Drs_Tnt",
 }
 
 this.windows={
@@ -57,7 +58,8 @@ this.windows={
     "cwin",
     "wincover",
     "swin",
-    "palacewin"
+    "palacewin",
+    "triwin",
 }
 
 this.cellTypesCaves={

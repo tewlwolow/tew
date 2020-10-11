@@ -23,7 +23,7 @@ local serviceEnchantment=config.serviceEnchantment
 local serviceTravel=config.serviceTravel
 local serviceBarter=config.serviceBarter
 
-local trainingFlag, spellsFlag, spellMakingFlag, repairFlag = 0, 0, 0, 0 
+local trainingFlag, spellsFlag, spellMakingFlag, repairFlag = 0, 0, 0, 0
 local newVoice, lastVoice = "init", "init"
 
 local function debugLog(string)
@@ -134,6 +134,7 @@ local function trainingGreet(e)
 
    local closeButton=e.element:findChild(tes3ui.registerID("MenuServiceTraining_Okbutton"))
    closeButton:register("mouseDown", function()
+      tes3.playSound{sound="Click", reference=tes3.mobilePlayer}
       trainingFlag=0
    end)
 
@@ -372,6 +373,7 @@ local function repairGreet(e)
       lastVoice=newVoice
       repairFlag=1
       debugLog("NPC says a repair comment.")
+      tes3.playSound{sound="Click", reference=tes3.mobilePlayer}
    end
 
 end

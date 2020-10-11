@@ -40,13 +40,18 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
-        label = "Enable UI sounds module?",
+        label = "Enable UI module?",
         variable = registerVariable("moduleUI"),
         restartRequired=true
     }
     page:createYesNoButton{
-        label = "Enable containers sounds module?",
+        label = "Enable Containers module?",
         variable = registerVariable("moduleContainers"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
+        label = "Enable PC module?",
+        variable = registerVariable("modulePC"),
         restartRequired=true
     }
     page:createYesNoButton{
@@ -83,10 +88,12 @@ local template = mwse.mcm.createTemplate{
     pageOA:createYesNoButton{
         label = "Enable additional wind tracks in bad weather (overcast, rain, thunder, snow)?",
         variable = registerVariable("playWindy"),
+        restartRequired=true
     }
     pageOA:createYesNoButton{
         label = "Enable transition sounds?",
         variable = registerVariable("playTransSounds"),
+        restartRequired=true
     }
 
     local pageIW = template:createPage{label="Interior Weather"}
@@ -94,7 +101,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays weather sounds in interiors.\n\nSettings:"
     }
     pageIW:createSlider{
-        label = "Changes % volume for Interior Weather module. Default = 150%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for Interior Weather module. Default = 100%.\nRequires restart.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -141,6 +148,31 @@ local template = mwse.mcm.createTemplate{
         step = 1,
         jump = 10,
         variable=registerVariable("SVvol")
+    }
+
+    local pagePC = template:createPage{label="PC"}
+    pagePC:createCategory{
+        label = "Plays sounds related to the player character.\n\nSettings:"
+    }
+    pagePC:createYesNoButton{
+        label = "Enable low health sounds?",
+        variable = registerVariable("PChealth"),
+    }
+    pagePC:createYesNoButton{
+        label = "Enable low fatigue sounds?",
+        variable = registerVariable("PCfatigue"),
+    }
+    pagePC:createYesNoButton{
+        label = "Enable low magicka sounds?",
+        variable = registerVariable("PCmagicka"),
+    }
+    pagePC:createSlider{
+        label = "Changes % volume for vital signs (health, fatigue, magicka). Default = 200%.\nRequires restart.\nVolume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("vsVol")
     }
 
     local pageC = template:createPage{label="Containers"}
