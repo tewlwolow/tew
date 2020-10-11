@@ -59,15 +59,14 @@ local function playCloseSound(e)
         end
     end
     if path ~= "" then
-        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8*Cvol, pitch=getPitch(containerType)-0.2}
+        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8*Cvol, pitch=getPitch(containerType)-0.1}
         debugLog("Playing container closing sound.")
         flag=1
     end
     path=""
-    timer.start{type=timer.real, duration=1, callback=function()
+    timer.start{type=timer.real, duration=1.5, callback=function()
         flag=0
     end}
-
 end
 
 
