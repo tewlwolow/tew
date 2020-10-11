@@ -146,10 +146,10 @@ local function playInteriorBig(windoor)
       if windoor==nil then debugLog("Dodging an empty ref.") return end
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.3*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.2*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.3*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.2*OAvol, pitch=0.8}
       end
    end}
 end

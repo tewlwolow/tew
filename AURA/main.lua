@@ -2,18 +2,9 @@ local modversion = require("tew.AURA.version")
 local version = modversion.version
 
 local function volumeAdjust()
-
+    tes3.game.volumeMaster=250
+    tes3.game.volumeEffect=250
     tes3.game.soundQuality=2
-    tes3.game.volumeMaster=244
-    tes3.game.volumeEffect=244
-    timer.delayOneFrame{
-    callback=function()
-    tes3.game.volumeMaster=250
-    tes3.game.volumeEffect=250
-    end}
-    tes3.game.volumeMaster=250
-    tes3.game.volumeEffect=250
-
 end
 
 local function warning()
@@ -21,6 +12,10 @@ local function warning()
 end
 
 local function init()
+
+    tes3.game.volumeMaster=250
+    tes3.game.volumeEffect=250
+    tes3.game.soundQuality=2
 
     event.register("uiActivated", warning, {filter="MenuAudio"})
     event.register("cellChanged", volumeAdjust, {priority=-160})
@@ -34,6 +29,7 @@ local function init()
     local moduleContainers = config.moduleContainers
     local moduleUI = config.moduleUI
     local moduleMisc = config.moduleMisc
+    local modulePC = config.modulePC
 
     if moduleAmbientOutdoor then
         mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")
@@ -65,10 +61,19 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Containers\\containersMain.lua")
     end
 
+    if modulePC then
+        mwse.log("[AURA "..version.."] Loading file: PCMain.lua")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\PC\\PCMain.lua")
+    end
+
     -- Old version deleter --
-    if lfs.dir("Data Files/MWSE/mods/AURA/") then
-        lfs.rmdir("Data Files/MWSE/mods/AURA/", true)
-        mwse.log("[AURA "..version.."]: Old version found and deleted.")
+    if lfs.dir("Data Files\\MWSE\\mods\\AURA") then
+        lfs.rmdir("Data Files\\MWSE\\mods\\AURA", true)
+        mwse.log("[AURA "..version.."]: Old mod folder found and deleted.")
+    end
+    if lfs.dir("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua") then
+        os.remove("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua")
+        mwse.log("[AURA "..version.."]: Old 'travelFee.lua' file found and deleted.")
     end
 end
 

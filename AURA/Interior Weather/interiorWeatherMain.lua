@@ -22,7 +22,7 @@ end
 local function playThunder()
     thunder=thunArray[math.random(1, #thunArray)]
     debugLog("Playing thunder: "..thunder)
-    tes3.playSound{sound=thunder, volume=0.4, pitch=0.6, reference=thunRef}
+    tes3.playSound{sound=thunder, volume=0.2, pitch=0.6, reference=thunRef}
 end
 
 local function updateThunderBig()
@@ -40,27 +40,27 @@ end
 local function playInteriorSmall(cell)
     local IWPath=IWAURAdir..interiorType.."\\"..IWLoop..".wav"
     if IWLoop=="rain heavy" then
-        tes3.playSound{soundPath=IWPath, volume=0.9*vol, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.8*vol, loop=true, reference=cell}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
     elseif IWLoop=="Rain" then
-        tes3.playSound{soundPath=IWPath, volume=0.8*vol, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.7*vol, loop=true, reference=cell}
         debugLog("Playing small interior rain loops.")
     elseif IWLoop=="Blight" or IWLoop=="ashstorm" or IWLoop=="BM Blizzard" then
-        tes3.playSound{sound=IWLoop, volume=0.5*vol, pitch=0.5, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=cell}
         tes3.playSound{soundPath=IWAURAdir.."Common\\wind gust.wav", volume=0.4, loop=true, reference=cell}
     else
-        tes3.playSound{sound=IWLoop, volume=0.5*vol, pitch=0.4, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.4, loop=true, reference=cell}
     end
 end
 
 local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
     if IWLoop=="Rain" then
-        tes3.playSound{sound="Sound Test", volume=0.8*vol, pitch=0.8, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=0.7*vol, pitch=0.8, loop=true, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif IWLoop=="rain heavy" then
-        tes3.playSound{sound="Sound Test", volume=0.9*vol, pitch=1.2, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=0.8*vol, pitch=1.4, loop=true, reference=windoor}
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
