@@ -245,7 +245,7 @@ local function spellGreet(e)
       serviceGreet(e)
    end
    if UISpells and moduleUI then
-      tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol, pitch=0.9}
+      tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol, pitch=1.3}
       debugLog("Opening spell menu sound played.")
    end
 
