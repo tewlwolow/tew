@@ -1,6 +1,5 @@
 -- Travel Tooltips (by tewlwolow)) --
 --- v 1.1.0 ---
-
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\Travel Tooltips\\mcm.lua")
 end)
@@ -8,8 +7,11 @@ end)
 local data=require("tew\\Travel Tooltips\\data")
 local config=require("tew\\Travel Tooltips\\config")
 local descriptionTable=data.descriptionTable
-local headers
 local gondoliersTable=data.gondoliersTable
+local useFallback=config.useFallback
+local headers
+
+local vehkDir = "Data Files\\Textures\\tew\\Travel Tooltips\\Vehk's Ink\\"
 
 local version="1.1.0"
 local mapColour=nil
@@ -26,6 +28,7 @@ local mapColours={
     ["Ayleid"] = {0.0, 0.3, 0.8},
     ["Reman"] = {1.0, 0.4, 0.7}
 }
+
 local function getColour()
     for k, v in pairs(mapColours) do
         if k==config.mapColour then
@@ -72,15 +75,41 @@ local function createTooltip(e)
                     headers=data.headers_ComradeRaven
                 elseif headers == "headers_Stuporstar" then
                     headers=data.headers_Stuporstar
+                elseif headers == "headers_vehk" then
+                    headers=data.headers_vehk
                 end
 
-                for kHead, vHead in pairs(headers) do
-                    if string.find(trDestinationText, kHead) then
-                        headerPath=vHead
+                if headers ~= data.headers_vehk then
+                    for kHead, vHead in pairs(headers) do
+                        if string.find(trDestinationText, kHead) then
+                            headerPath=vHead
+                            break
+                        end
+                    end
+                elseif headers == data.headers_vehk then
+                    for city, maps in pairs(headers) do
+                        if string.find(trDestinationText, city) then
+                            if maps and city then
+                                headerPath=vehkDir..city.."\\"..maps[math.random(1, #maps)]
+                                break
+                            end
+                        end
                     end
                 end
 
-                if headerPath=="" then return end
+                if headerPath == "" and not useFallback then
+                    return
+                elseif headerPath == "" and useFallback then
+                    headers=data.headers_Stuporstar
+                    for kHead, vHead in pairs(headers) do
+                        if string.find(trDestinationText, kHead) then
+                            headerPath=vHead
+                            break
+                        end
+                    end
+                end
+
+                if headerPath == "" then return end
 
                 if npc.class.id == "Gondolier" and config.showGondola then
                     for kDest, vDescr in pairs(gondoliersTable) do
@@ -116,8 +145,10 @@ local function createTooltip(e)
                     destLabel.borderBottom=3*scale
 
                     local destHeader=destBlock:createImage{path=headerPath}
-                    getColour()
-                    destHeader.color=mapColour
+                    if not headers==data.headers_vehk then
+                        getColour()
+                        destHeader.color=mapColour
+                    end
                     destHeader.autoHeight=true
                     destHeader.autoWidth=true
                     destHeader.borderBottom = 2*scale
@@ -154,8 +185,10 @@ local function createTooltip(e)
                     destLabel.borderBottom=3*scale
 
                     local destHeader=destBlock:createImage{path=headerPath}
-                    getColour()
-                    destHeader.color=mapColour
+                    if not headers==data.headers_vehk then
+                        getColour()
+                        destHeader.color=mapColour
+                    end
                     destHeader.autoHeight=true
                     destHeader.autoWidth=true
                     destHeader.borderBottom = 2*scale
@@ -185,14 +218,14 @@ end
 
 local function createTravelMap(e)
 
+    if config.showMainMap==false then
+        return
+    end
+
     local npc=tes3ui.getServiceActor().reference.object
     if string.startswith(npc.id, "TR_") or
     string.startswith(npc.id, "PC_") or
     string.startswith(npc.id, "Sky_") then
-        return
-    end
-
-    if config.showMainMap==false then
         return
     end
 
@@ -221,15 +254,30 @@ local function createTravelMap(e)
 end
 
 local function init()
+
+    for city, maps in pairs(data.headers_vehk) do
+        for folder in lfs.dir(vehkDir) do
+            if city==folder then
+                for map in lfs.dir(vehkDir..folder) do
+                    if string.endswith(map, ".dds") or string.endswith(map, ".tga") then
+                        table.insert(maps, map)
+                        print("[Travel Tooltips] Vehk's Ink: Adding file: '"..map.."' to array: '"..city.."'.")
+                    end
+                end
+            end
+        end
+    end
+
     event.register("uiActivated", createTravelMap, {filter="MenuDialog"})
     event.register("uiActivated", createTooltip, {filter="MenuServiceTravel"})
     mwse.log("[Travel Tooltips] Version "..version.." initialised.")
 
     -- Old version deleter --
-    if lfs.dir("Data Files/MWSE/mods/Travel Tooltips/") then
-        lfs.rmdir("Data Files/MWSE/mods/Travel Tooltips/", true)
-        mwse.log("[Travel Tooltips "..version.."]: Old version found and deleted.")
+    if lfs.dir("Data Files\\MWSE\\mods\\Travel Tooltips\\") then
+        lfs.rmdir("Data Files\\MWSE\\mods\\Travel Tooltips\\", true)
+        mwse.log("[Travel Tooltips "..version.."]: Old mod folder found and deleted.")
     end
 end
+
 
 event.register("initialized", init)

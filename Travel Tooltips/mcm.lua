@@ -15,22 +15,27 @@ local template = mwse.mcm.createTemplate{
     local page = template:createPage{label="Travel Tooltips Settings"}
 
     page:createCategory{
-        label = "Travel Tooltips version "..version.." by tewlwolow.\nHovering over a destination in the 'Travel' tab (and, optionally, on 'Travel' button itself) will now display an appropriate map and a short description. Illustrations are courtesy of Stuporstar and ComradeRaven (edited by me).\n\nSettings:",
+        label = "Travel Tooltips version "..version.." by tewlwolow.\nHovering over a destination in the 'Travel' tab (and, optionally, on 'Travel' button itself) will now display an appropriate map and a short description.\nAvailable map packs:\n* Stuporstar's - wonderful and HQ art\n* ComradeRaven's - beautifully redone vanilla artwork\n* Vehk's Ink [tewlwolow/AI Gahaku] - awe-inspiring ink-style paintings (AI-processed screenshots)\n\nSettings:",
     }
+
+    page:createYesNoButton{
+        label = "Show Vvardenfell map when hovering over 'Travel' in dialogue menu?\nDefault: Yes.",
+        variable = registerVariable("showMainMap")}
 
     page:createYesNoButton{
         label = "Show travel tooltips for Vivec gondoliers?\nDefault: Yes.",
         variable = registerVariable("showGondola")}
 
     page:createYesNoButton{
-        label = "Show Vvardenfell map when hovering over 'Travel' in dialogue menu?\nDefault: Yes.",
-        variable = registerVariable("showMainMap")}
+        label = "Use images from other map packs if the currently used one doesn't cover all destinations?\nDefault: No.",
+        variable = registerVariable("useFallback")}
 
     page:createDropdown{
         label = "Choose map pack:",
         options = {
-            {label = "Stuporstar pack (Default)", value = "headers_Stuporstar"},
-            {label = "ComradeRaven pack", value = "headers_ComradeRaven"},
+            {label = "Stuporstar's pack (Default)", value = "headers_Stuporstar"},
+            {label = "ComradeRaven's pack", value = "headers_ComradeRaven"},
+            {label = "Vehk's Ink [tewlwolow/AI Gahaku] pack", value = "headers_vehk"},
             },
             variable=registerVariable("headers")}
 
