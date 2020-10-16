@@ -82,4 +82,5 @@ event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\AURA\\mcm.lua")
 end)
 
+
 event.register("initialized", init)
