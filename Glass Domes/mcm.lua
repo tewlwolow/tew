@@ -1,7 +1,7 @@
 local configPath = "Glass Domes"
 local config = require("tew.Glass Domes.config")
 mwse.loadConfig("Glass Domes")
-local version = "1.0.0"
+local version = "1.1.0"
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{
