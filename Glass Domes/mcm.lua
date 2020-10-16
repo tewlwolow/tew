@@ -15,8 +15,9 @@ local template = mwse.mcm.createTemplate{
     headerImagePath="\\Textures\\tew\\Glass Domes\\Moonrain_logo.tga"}
 
     local page = template:createPage{label="Main Page", noScroll=true}
+
     page:createCategory{
-        label = "Glass Domes of Vivec, Moonrain Edition "..version.." by Sade1212, qwertyquit, Leyawynn, RandomPal and tewlwolow.\n\nThis is a lua script to control dome weather."
+        label = "Glass Domes of Vivec, Moonrain Edition "..version.." by Sade1212, qwertyquit, Leyawynn, RandomPal and tewlwolow and others members of the MMC.\n\nThis is a configuration page for lua script controlling dome weather."
     }
 
     page:createYesNoButton{
@@ -27,7 +28,8 @@ local template = mwse.mcm.createTemplate{
 
     page:createYesNoButton{
         label = "Use green sun tint for dome interiors? Requires MGE XE.\nDefault: No.",
-        variable = registerVariable("greenTint")}
+        variable = registerVariable("greenTint")
+    }
 
     page:createDropdown{
         label = "Choose tint strength. Reload or re-enter cell after changing this setting. Default: Moderate.",
@@ -35,8 +37,9 @@ local template = mwse.mcm.createTemplate{
             {label = "Weak", value = "Weak"},
             {label = "Moderate", value = "Moderate"},
             {label = "Strong", value = "Strong"},
-            },
-            variable=registerVariable("tintStrength")}
+        },
+        variable=registerVariable("tintStrength")
+    }
 
 
 template:saveOnClose(configPath, config)
