@@ -126,7 +126,7 @@ local function getPathWindy()
 end
 
 local function playExterior(cell)
-   timer.start{duration=1, type=timer.real, callback=function()
+   timer.start{duration=0.6, type=timer.real, callback=function()
       debugLog("Playing exterior loop. File: "..pathNow)
       tes3.playSound{soundPath=pathNow, volume=1.0*OAvol, loop=true, reference=cell}
    end}
@@ -142,7 +142,7 @@ local function playTrans(cell)
  end
 
 local function playInteriorBig(windoor)
-   timer.start{duration=1, type=timer.real, callback=function()
+   timer.start{duration=0.6, type=timer.real, callback=function()
       if windoor==nil then debugLog("Dodging an empty ref.") return end
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
@@ -274,7 +274,9 @@ local function cellCheck()
    end
 
    if not cell.isInterior
-   or (cell.isInterior and cell.behavesAsExterior) then
+   or (cell.isInterior) and (cell.behavesAsExterior
+   and not string.find(cell.name:lower(), "plaza")
+   and not string.find(cell.name:lower(), "vivec")) then
       debugLog("Found exterior cell.")
       playExterior(cell)
    elseif cell.isInterior then
