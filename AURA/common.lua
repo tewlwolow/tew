@@ -45,6 +45,8 @@ this.cellTypesSmall={
     "in_de_shack",
     "in_nord_house_02",
     "in_nord_house_03",
+    "s12",
+    "rp",
 }
 
 this.cellTypesTent={
@@ -99,7 +101,9 @@ function this.getWindoors(cell)
     end
     for door in cell:iterateReferences(tes3.objectType.door) do
         if door.destination then
-            if not door.destination.cell.isInterior or door.destination.cell.behavesAsExterior then
+            if not (door.destination.cell.isInterior)
+            or (door.destination.cell.behavesAsExterior and not (string.find(cell.name:lower(), "plaza")
+            and not string.find(cell.name:lower(), "vivec") and not string.find(cell.name:lower(), "arena pit"))) then
                 table.insert(windoors, door)
             end
         end
@@ -108,9 +112,9 @@ function this.getWindoors(cell)
 end
 
 --[[
-function this.getObjects(cell, objectType, stringArray)
+function this.getObjects(cell, object, stringArray)
     local objectArray={}
-    for obj in cell:iterateReferences(objectType) do
+    for obj in cell:iterateReferences(tes3.objectType.object) do
         for _, pattern in pairs(stringArray) do
             if string.find(obj.object.id, pattern) then
                 table.insert(objectArray, obj)
