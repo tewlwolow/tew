@@ -1,22 +1,11 @@
 local WtC
 local plazaWeathers = {0,1,2,3,4,5}
 local config = require("tew\\Glass Domes\\config")
+local tewLib = require("tew\\tewLib\\tewLib")
+local isOpenPlaza=tewLib.isOpenPlaza
 local greenTint = config.greenTint
 local debugLogOn = config.debugLogOn
 local lastCell
-
-local function isOpenPlaza(cell)
-    if not cell.behavesAsExterior then
-        return false
-    else
-        if (string.find(cell.name:lower(), "plaza") and string.find(cell.name:lower(), "vivec"))
-        or string.find(cell.name:lower(), "arena pit") then
-            return true
-        else
-            return false
-        end
-    end
-end
 
 local function debugLog(string)
     if debugLogOn then
@@ -63,8 +52,9 @@ local function onCellChanged(e)
     local cell = e.cell or tes3.getPlayerCell()
     local currentWeather = WtC.currentWeather
     local nextWeather = WtC.nextWeather
+    if not cell then return end
 
-    if isOpenPlaza(cell)==false and isOpenPlaza(lastCell)==true and greenTint then
+    if isOpenPlaza(cell)==false and lastCell and isOpenPlaza(lastCell)==true and not cell.isInterior and greenTint then
         debugLog("Reverting tint.")
         for _, w in pairs(WtC.weathers) do
             for wIndex, _ in pairs(weatherTintsOld) do

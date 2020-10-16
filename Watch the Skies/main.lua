@@ -10,6 +10,8 @@ local randomiseCloudsSpeed=config.randomiseCloudsSpeed
 local modversion = require("tew\\Watch the Skies\\version")
 local version = modversion.version
 local WtC, intWeatherTimer
+local tewLib = require("tew\\tewLib\\tewLib")
+local isOpenPlaza=tewLib.isOpenPlaza
 
 
 local interiorWeathers={0,1,2,3,4,5}
@@ -46,6 +48,7 @@ end
 
 local function skyChoice(e)
     if not e then return end
+
     debugLog("Starting cloud texture randomisation.")
     if vanChance<math.random() then
         local sArray=weathers[e.to.index]
@@ -89,7 +92,14 @@ end
 
 local function onCellChanged(e)
     debugLog("Cell changed.")
-    local cell=e.cell
+    local cell=e.cell or tes3.getPlayerCell()
+
+    if isOpenPlaza(cell)==true then
+        WtC.weathers[5].maxParticles=1500
+        WtC.weathers[6].maxParticles=3000
+        WtC.weathers[5].particleRadius=1200
+        WtC.weathers[6].particleRadius=1200
+    end
 
     if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
         if intWeatherTimer then
