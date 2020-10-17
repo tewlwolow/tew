@@ -1,7 +1,7 @@
 local configPath = "Glass Domes"
 local config = require("tew.Glass Domes.config")
 mwse.loadConfig("Glass Domes")
-local version = "1.1.0"
+local version="1.2.0"
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{
@@ -17,7 +17,7 @@ local template = mwse.mcm.createTemplate{
     local page = template:createPage{label="Main Page", noScroll=true}
 
     page:createCategory{
-        label = "Glass Domes of Vivec, Moonrain Edition "..version.." by Sade1212, qwertyquit, Leyawynn, RandomPal and tewlwolow and others members of the MMC.\n\nThis is a configuration page for lua script controlling dome weather."
+        label = "Glass Domes of Vivec, Moonrain Edition v"..version.." by Sade1212, qwertyquit, Leyawynn, RandomPal and tewlwolow.\n\nThis is a configuration page for lua script controlling dome weather."
     }
 
     page:createYesNoButton{
@@ -27,12 +27,12 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createYesNoButton{
-        label = "Use green sun tint for dome interiors? Requires MGE XE.\nDefault: No.",
+        label = "Use green sun tint for dome interiors (excluding Arena Pit)?\nDefault: No.",
         variable = registerVariable("greenTint")
     }
 
     page:createDropdown{
-        label = "Choose tint strength. Reload or re-enter cell after changing this setting. Default: Moderate.",
+        label = "Choose sun tint strength. Reload or re-enter cell after changing this setting. Default: Moderate.",
         options = {
             {label = "Weak", value = "Weak"},
             {label = "Moderate", value = "Moderate"},
