@@ -2,6 +2,8 @@ local climates = require("tew\\AURA\\Ambient\\Outdoor\\outdoorClimates")
 local config = require("tew\\AURA\\config")
 local modversion = require("tew\\AURA\\version")
 local common=require("tew\\AURA\\common")
+local tewLib = require("tew\\tewLib\\tewLib")
+local isOpenPlaza=tewLib.isOpenPlaza
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 local moduleInteriorWeather=config.moduleInteriorWeather
@@ -275,13 +277,13 @@ local function cellCheck()
 
    if not cell.isInterior
    or (cell.isInterior) and (cell.behavesAsExterior
-   and not string.find(cell.name:lower(), "plaza")
-   and not string.find(cell.name:lower(), "vivec")) then
+   and not isOpenPlaza(cell)) then
       debugLog("Found exterior cell.")
       playExterior(cell)
    elseif cell.isInterior then
-      if not playInteriorAmbient then
+      if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
          debugLog("Found interior cell. Removing sounds.")
+         tes3.removeSound{reference=cell}
       else
          if common.getCellType(cell, common.cellTypesSmall)==true
          or common.getCellType(cell, common.cellTypesTent)==true then

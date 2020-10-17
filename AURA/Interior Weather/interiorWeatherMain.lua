@@ -44,7 +44,7 @@ local function playInteriorSmall(cell)
     local volBoost
 
     if isOpenPlaza(cell)==true then
-        volBoost=0.4
+        volBoost=0.2
         thunderTimerSmall:pause()
         debugLog("Found open plaza. Applying volume boost and removing thunder timer.")
     else
@@ -123,12 +123,13 @@ local function cellCheck()
     if not cell.isInterior
     and isOpenPlaza(cell)==false then
         debugLog("Found exterior cell. Returning.")
-        tes3.getSound("Rain").volume = 1
-        tes3.getSound("rain heavy").volume = 1
+        if not tes3.getSound("Rain").volume == 0.8 then
+            tes3.getSound("Rain").volume = 0.8
+        elseif not  tes3.getSound("rain heavy").volume == 1 then
+            tes3.getSound("rain heavy").volume = 1
+        end
         return
     end
-
-    tes3.removeSound{reference=cell}
 
     local IWweather=WtC.currentWeather.index
     IWLoop=nil
@@ -148,9 +149,17 @@ local function cellCheck()
     end
     debugLog("Weather: "..IWweather)
 
+    if (isOpenPlaza(cell) == true)
+    and (IWLoop == "Blight"
+    or IWLoop == "ashstorm") then
+        return
+    end
+
+    tes3.removeSound{reference=cell}
+
     if IWLoop==nil then
-        debugLog("Clearing windoors.")
         if windoors~={} and windoors~=nil then
+            debugLog("Clearing windoors.")
             for _, windoor in ipairs(windoors) do
                 tes3.removeSound{reference=windoor}
             end
