@@ -24,6 +24,8 @@ local function debugLog(string)
     end
 end
 
+local nightTint = {0.029529996216297,0.11865200102329,0.090317867696285}
+
 local tintStrengths={
     ["Weak"] = {0.53574013710022,0.82729339599609,0.72401332855225},
     ["Moderate"] = {0.37413274645805,0.85105844736099,0.70162286758423},
@@ -81,7 +83,7 @@ local function applyGreenTint()
         table.insert(weatherTintsOld[w.index], getWeatherData(w.sunSunriseColor))
         table.insert(weatherTintsOld[w.index], getWeatherData(w.sunSunsetColor))
         setTint(w.sunDayColor, tintGlass)
-        setTint(w.sunNightColor, tintGlass)
+        setTint(w.sunNightColor, nightTint)
         setTint(w.sunSunriseColor, tintGlass)
         setTint(w.sunSunsetColor, tintGlass)
         debugLog("Setting green tints for weather: ["..w.index.."]")
