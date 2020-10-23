@@ -76,6 +76,36 @@ local template = mwse.mcm.createTemplate{
         }
     }
 
+    template:createExclusionsPage{
+        label = "Weathers",
+        description = "Select which weathers should the shader be applied to. Move weathers to the left table to enable.",
+        toggleText = "Toggle",
+        leftListLabel = "Heat weathers",
+        rightListLabel = "All weathers",
+        showAllBlocked = false,
+        variable = mwse.mcm.createTableVariable{
+            id = "heatWeathers",
+            table = config,
+        },
+
+        filters = {
+
+            {
+                label = "Weathers",
+                callback = (
+                    function()
+                        local weatherNames = {}
+                        for weather, _ in pairs(tes3.weather) do
+                            table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                        end
+                        return weatherNames
+                    end
+                )
+            },
+
+        }
+    }
+
 
 
 template:saveOnClose(configPath, config)

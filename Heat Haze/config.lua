@@ -8,4 +8,9 @@ return mwse.loadConfig("Heat Haze", {
         ["Armun Ashlands Region"]=true,
         ["Molag Mar Region"]=true
     },
+    heatWeathers={
+        ["Clear"]=true,
+        ["Cloudy"]=true,
+        ["Overcast"]=true
+    }
 })

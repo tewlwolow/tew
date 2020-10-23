@@ -11,7 +11,8 @@ local getObjects = tewLib.getObjects
 local getDistance = tewLib.getDistance
 
 local distanceTimer
-local heatEmitters={}
+local heatWeathers = {}
+local heatEmitters = {}
 
 local heatEmittersClassifiers={
     ["activators"]={
@@ -30,7 +31,17 @@ local defaultFloats = {
 
 local strongFloats = {
     ["warpint"] = 0.01,
-    ["wspeed"] = -0.5
+    ["wspeed"] = -0.75
+}
+
+local farInts = {
+    ["dmaskint1"] = 5005,
+    ["dmaskint2"] = 9000
+}
+
+local closeInts = {
+    ["dmaskint1"] = 500,
+    ["dmaskint2"] = 506
 }
 
 local function getHeatEmitters(cell, objects, array)
@@ -47,17 +58,34 @@ local function debugLog(string)
 end
 
 local function isHeatRegion(regionID)
-    if heatRegions[regionID] then
+    if heatRegions[regionID] and regionID ~= nil then
         return true
     end
+end
+
+local function isHeatWeather(weather)
+    for _, w in pairs(heatWeathers) do
+        if w == weather and w ~= nil then
+            return true
+        end
+    end
+end
+
+local function removeHeatShader()
+    mge.disableShader({shader="heathaze"})
+    timer.start{
+        type=timer.real,
+        duration=0.1,
+        iterations=10,
+        callback = function()
+            mge.disableShader({shader="heathaze"})
+    end}
 end
 
 local function startHaze()
 
     local cell = tes3.getPlayerCell()
     if not cell then return end
-
-    tes3.messageBox("Cell changed!")
 
     heatEmitters={}
 
@@ -69,59 +97,51 @@ local function startHaze()
         }
     end
 
+    for float, val in pairs(farInts) do
+        mge.setShaderLong{
+            shader="heathaze",
+            variable=float,
+            value=val
+        }
+    end
+
     if cell.isInterior then
         debugLog("Detected interior cell. Removing shader.")
-        mge.disableShader({shader="heathaze"})
         distanceTimer:pause()
-        timer.start{
-            type=timer.real,
-            duration=0.1,
-            iterations=10,
-            callback = function()
-                mge.disableShader({shader="heathaze"})
-            end}
+        removeHeatShader()
         return
     end
 
     local regionID = cell.region.id
     if not isHeatRegion(regionID) then
         debugLog("Detected ineligible region. Removing shader.")
-        mge.disableShader({shader="heathaze"})
         distanceTimer:pause()
-        timer.start{
-            type=timer.real,
-            duration=0.1,
-            iterations=10,
-            callback = function()
-                mge.disableShader({shader="heathaze"})
-            end}
+        removeHeatShader()
         return
     end
 
     local WtC=tes3.getWorldController().weatherController
     local currentWeather = WtC.currentWeather
-    if currentWeather.index > 3 or currentWeather.index == 2 then
+    local weatherNow
 
-        getHeatEmitters(cell, tes3.objectType.activator, heatEmittersClassifiers["activators"])
-        getHeatEmitters(cell, tes3.objectType.static, heatEmittersClassifiers["statics"])
-
-        if heatEmitters[1]~=nil and currentWeather.index == 2 then
-            debugLog("Near lava in foggy weather. Enabling shader.")
-            mge.enableShader({shader="heathaze"})
-            distanceTimer:resume()
-        else
-            debugLog("Detected ineligible weather. Removing shader.")
-            mge.disableShader({shader="heathaze"})
-            distanceTimer:pause()
-            timer.start{
-                type=timer.real,
-                duration=0.1,
-                iterations=10,
-                callback = function()
-                    mge.disableShader({shader="heathaze"})
-                end}
-            return
+    heatWeathers = {}
+    for weather, _ in pairs(config.heatWeathers) do
+        if not heatWeathers[weather:lower()] then
+            table.insert(heatWeathers, weather:lower())
         end
+    end
+
+    for name, weather in pairs(tes3.weather) do
+        if currentWeather.index == weather then
+            weatherNow=name:lower()
+        end
+    end
+
+    if not isHeatWeather(weatherNow) then
+        debugLog("Detected ineligible weather. Removing shader.")
+        distanceTimer:pause()
+        removeHeatShader()
+        return
     end
 
     local gameHour=tes3.worldController.hour.value
@@ -134,26 +154,15 @@ local function startHaze()
             distanceTimer:resume()
         else
             debugLog("Detected ineligible game hour. Removing shader.")
-            mge.disableShader({shader="heathaze"})
             distanceTimer:pause()
-            timer.start{
-                type=timer.real,
-                duration=0.1,
-                iterations=10,
-                callback = function()
-                    mge.disableShader({shader="heathaze"})
-                end}
+            removeHeatShader()
             return
         end
     end
 
-    if cell.isInterior==false
-    and isHeatRegion(regionID)
-    and (currentWeather.index <= 3 and currentWeather.index ~= 2)
-    and (gameHour >= hazeStartHour and gameHour < hazeEndHour) then
-        debugLog("Check ok. Enabling shader.")
-        mge.enableShader({shader="heathaze"})
-    end
+    debugLog("Check ok. Enabling shader.")
+    mge.enableShader({shader="heathaze"})
+
     if (regionID == "Red Mountain Region"
     or regionID == "Ashlands Region"
     or regionID == "Armun Ashlands Region"
@@ -172,8 +181,7 @@ local function updateHaze()
     if not heatEmitters then return end
     local playerPos=tes3.player.position
     for _, emitter in ipairs(heatEmitters) do
-        if getDistance(playerPos, emitter.position) <= 1700 then
-            tes3.messageBox("Very close to lava.")
+        if getDistance(playerPos, emitter.position) <= 1500 then
             for float, val in pairs(strongFloats) do
                 mge.setShaderFloat{
                     shader="heathaze",
@@ -181,11 +189,24 @@ local function updateHaze()
                     value=val
                 }
             end
+            for float, val in pairs(closeInts) do
+                mge.setShaderLong{
+                    shader="heathaze",
+                    variable=float,
+                    value=val
+                }
+            end
             break
         else
-            tes3.messageBox("Far from lava.")
             for float, val in pairs(defaultFloats) do
                 mge.setShaderFloat{
+                    shader="heathaze",
+                    variable=float,
+                    value=val
+                }
+            end
+            for float, val in pairs(farInts) do
+                mge.setShaderLong{
                     shader="heathaze",
                     variable=float,
                     value=val
@@ -223,3 +244,28 @@ event.register("initialized", init)
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\Heat Haze\\mcm.lua")
 end)
+
+
+--[[
+local distConst = 2000
+if getDistance(playerPos, emitter.position) <= distConst then
+    local dist = getDistance(playerPos, emitter.position)
+
+    local const1 = 5005
+    local const2 = 9000
+
+    local val1 = const1 / 2 * distConst
+    local val2 = const2 / 4 * distConst
+
+    mge.setShaderLong{
+        shader="heathaze",
+        variable="dmaskint1",
+        value=dist*val1
+    }
+    mge.setShaderLong{
+        shader="heathaze",
+        variable="dmaskint2",
+        value=dist*val2
+    }
+end
+--]]
