@@ -7,16 +7,19 @@ local hazeEndHour = config.hazeEndHour
 local heatRegions = config.heatRegions
 
 local tewLib = require("tew\\tewLib\\tewLib")
-local getObjects = tewLib.getObjects
+local getObjects = tewLib.getObjectsStartsWith
 local getDistance = tewLib.getDistance
 
 local distanceTimer
 local heatWeathers = {}
 local heatEmitters = {}
 
+local activator = tes3.objectType.activator
+local static = tes3.objectType.static
+
 local heatEmittersClassifiers={
     ["activators"]={
-        "in_lava",
+        "in_lava_",
     },
     ["statics"]={
         "volcano",
@@ -40,9 +43,11 @@ local farInts = {
 }
 
 local closeInts = {
-    ["dmaskint1"] = 500,
-    ["dmaskint2"] = 506
+    ["dmaskint1"] = 600,
+    ["dmaskint2"] = 715
 }
+
+local lavaDistance = 1350
 
 local function getHeatEmitters(cell, objects, array)
     local heatObjects = getObjects(cell, objects, array)
@@ -97,10 +102,10 @@ local function startHaze()
         }
     end
 
-    for float, val in pairs(farInts) do
+    for int, val in pairs(farInts) do
         mge.setShaderLong{
             shader="heathaze",
-            variable=float,
+            variable=int,
             value=val
         }
     end
@@ -146,8 +151,8 @@ local function startHaze()
 
     local gameHour=tes3.worldController.hour.value
     if gameHour < hazeStartHour or gameHour >= hazeEndHour  then
-        getHeatEmitters(cell, tes3.objectType.activator, heatEmittersClassifiers["activators"])
-        getHeatEmitters(cell, tes3.objectType.static, heatEmittersClassifiers["statics"])
+        getHeatEmitters(cell, activator, heatEmittersClassifiers["activators"])
+        getHeatEmitters(cell, static, heatEmittersClassifiers["statics"])
         if heatEmitters[1]~=nil then
             debugLog("Near lava at night. Enabling shader.")
             mge.enableShader({shader="heathaze"})
@@ -168,8 +173,8 @@ local function startHaze()
     or regionID == "Armun Ashlands Region"
     or regionID == "Molag Mar Region") then
         debugLog("Found region with lava. Running lava distance checks.")
-        getHeatEmitters(cell, tes3.objectType.activator, heatEmittersClassifiers["activators"])
-        getHeatEmitters(cell, tes3.objectType.static, heatEmittersClassifiers["statics"])
+        getHeatEmitters(cell, activator, heatEmittersClassifiers["activators"])
+        getHeatEmitters(cell, static, heatEmittersClassifiers["statics"])
         if heatEmitters[1]~=nil then
             distanceTimer:resume()
         end
@@ -181,7 +186,7 @@ local function updateHaze()
     if not heatEmitters then return end
     local playerPos=tes3.player.position
     for _, emitter in ipairs(heatEmitters) do
-        if getDistance(playerPos, emitter.position) <= 1500 then
+        if getDistance(playerPos, emitter.position) <= lavaDistance then
             for float, val in pairs(strongFloats) do
                 mge.setShaderFloat{
                     shader="heathaze",
@@ -189,10 +194,10 @@ local function updateHaze()
                     value=val
                 }
             end
-            for float, val in pairs(closeInts) do
+            for int, val in pairs(closeInts) do
                 mge.setShaderLong{
                     shader="heathaze",
-                    variable=float,
+                    variable=int,
                     value=val
                 }
             end
@@ -205,10 +210,10 @@ local function updateHaze()
                     value=val
                 }
             end
-            for float, val in pairs(farInts) do
+            for int, val in pairs(farInts) do
                 mge.setShaderLong{
                     shader="heathaze",
-                    variable=float,
+                    variable=int,
                     value=val
                 }
             end
@@ -245,27 +250,35 @@ event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\Heat Haze\\mcm.lua")
 end)
 
+-----------------------------------------------------------------------------
 
 --[[
-local distConst = 2000
-if getDistance(playerPos, emitter.position) <= distConst then
-    local dist = getDistance(playerPos, emitter.position)
 
-    local const1 = 5005
-    local const2 = 9000
+TODO:
+* smoother trans for lava
+* check for lava objs in interior, use strong floats and close ints
+* check if player is facing a heat source:
+    dot((object-eyepos), eyevec)
 
-    local val1 = const1 / 2 * distConst
-    local val2 = const2 / 4 * distConst
+local interiorInts = {
+    ["dmaskint1"] = 500,
+    ["dmaskint2"] = 506
+}
 
+for int, val in pairs(interiorInts) do
     mge.setShaderLong{
         shader="heathaze",
-        variable="dmaskint1",
-        value=dist*val1
-    }
-    mge.setShaderLong{
-        shader="heathaze",
-        variable="dmaskint2",
-        value=dist*val2
+        variable=int,
+        value=val
     }
 end
+for float, val in pairs(interiorInts) do
+    mge.setShaderLong{
+        shader="heathaze",
+        variable=float,
+        value=val
+    }
+end
+mge.enableShader({shader="heathaze"})
+
 --]]
