@@ -12,6 +12,7 @@ local version="1.2.0"
 
 local ashValues = fauxWeathers.ashValues
 local blightValues = fauxWeathers.blightValues
+local foggyValues = fauxWeathers.foggyValues
 local overcastValues = fauxWeathers.overcastValues
 
 local function getWeatherData(var)
@@ -134,6 +135,28 @@ local function prepareFauxBlight()
     wO.cloudTexture=blightValues["cloudTexture"]
 end
 
+local function prepareFauxFoggy()
+    local wO =  WtC.weathers[4]
+    debugLog("Applying faux foggy weather.")
+    setTint(wO.sunDayColor, foggyValues["sunDayColor"])
+    setTint(wO.fogSunsetColor, foggyValues["fogSunsetColor"])
+    setTint(wO.fogDayColor, foggyValues["fogDayColor"])
+    setTint(wO.skyNightColor, foggyValues["skyNightColor"])
+    setTint(wO.fogSunriseColor, foggyValues["fogSunriseColor"])
+    setTint(wO.ambientSunsetColor, foggyValues["ambientSunsetColor"])
+    setTint(wO.ambientSunriseColor, foggyValues["ambientSunriseColor"])
+    setTint(wO.ambientDayColor, foggyValues["ambientDayColor"])
+    setTint(wO.sunNightColor, foggyValues["sunNightColor"])
+    setTint(wO.sunSunriseColor, foggyValues["sunSunriseColor"])
+    setTint(wO.sunSunsetColor, foggyValues["sunSunsetColor"])
+    setTint(wO.sundiscSunsetColor, foggyValues["sundiscSunsetColor"])
+    setTint(wO.skyDayColor, foggyValues["skyDayColor"])
+    setTint(wO.ambientNightColor, foggyValues["ambientNightColor"])
+    setTint(wO.fogNightColor, foggyValues["fogNightColor"])
+    setTint(wO.skySunriseColor, foggyValues["skySunriseColor"])
+    wO.cloudTexture=foggyValues["cloudTexture"]
+end
+
 local function onCellChanged()
     local cell = tes3.getPlayerCell()
     local currentWeather = WtC.currentWeather
@@ -152,8 +175,19 @@ local function onCellChanged()
 
         if lastDomeWeather == "ashstorm" then
             WtC:switchImmediate(6)
+            WtC:updateVisuals()
+            WtC:switchImmediate(6)
+            WtC:updateVisuals()
         elseif lastDomeWeather == "Blight" then
             WtC:switchImmediate(7)
+            WtC:updateVisuals()
+            WtC:switchImmediate(7)
+            WtC:updateVisuals()
+        elseif lastDomeWeather == "Foggy" then
+            WtC:switchImmediate(2)
+            WtC:updateVisuals()
+            WtC:switchImmediate(2)
+            WtC:updateVisuals()
         end
 
         debugLog("Reverting faux weathers.")
@@ -174,12 +208,14 @@ local function onCellChanged()
         setTint(wO.fogNightColor, overcastValues["fogNightColor"])
         setTint(wO.skySunriseColor, overcastValues["skySunriseColor"])
         wO.cloudTexture=overcastValues["cloudTexture"]
+
     end
+
 
     if isOpenPlaza(cell)==true then
 
         if (greenTint and not string.find(cell.name:lower(), "arena pit"))
-        and lastDomeWeather~="Blight" and lastDomeWeather~="ashstorm" then
+        and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
             applyGreenTint()
         end
 
@@ -212,13 +248,20 @@ local function onCellChanged()
             debugLog("Weather switched to Blight, sounds added.")
         end
 
+        if currentWeather.index == 2 or (nextWeather and nextWeather.index == 2) then
+            prepareFauxFoggy()
+            WtC:switchImmediate(3)
+            WtC:updateVisuals()
+            lastDomeWeather = "Foggy"
+            debugLog("Weather switched to Foggy.")
+        end
+
     end
 
     lastCell=cell
 end
 
 local function onTransition()
-    debugLog("Weather transitioned to ash or blight.")
     local cell = tes3.getPlayerCell()
     local currentWeather = WtC.currentWeather
     local nextWeather = WtC.nextWeather
@@ -226,9 +269,10 @@ local function onTransition()
     if not cell then return end
 
     if isOpenPlaza(cell)==true then
+        debugLog("Weather transitioned to ash or blight.")
 
         if (greenTint and not string.find(cell.name:lower(), "arena pit"))
-        and lastDomeWeather~="Blight" and lastDomeWeather~="ashstorm" then
+        and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
             applyGreenTint()
         end
 
@@ -254,6 +298,14 @@ local function onTransition()
             debugLog("Weather switched to Blight, sounds added.")
         end
 
+        if currentWeather.index == 2 or (nextWeather and nextWeather.index == 2) then
+            prepareFauxFoggy()
+            WtC:switchImmediate(3)
+            WtC:updateVisuals()
+            lastDomeWeather = "Foggy"
+            debugLog("Weather switched to Foggy.")
+        end
+
     end
 
     lastCell=cell
@@ -263,14 +315,14 @@ end
 local function onWeatherTrans(e)
     local cell = tes3.getPlayerCell()
     if isOpenPlaza(cell) then
+        if (e.to.index == 3) and (lastDomeWeather~="ashstorm" or lastDomeWeather~="Blight" or lastDomeWeather~="Foggy")  then
+            WtC:switchTransition(plazaWeathers[math.random(1, #plazaWeathers)])
+        end
         if e.to.index <= 5 and e.to.index~=3 then
             debugLog("Resetting faux weather flags.")
             lastDomeWeather = "other"
         elseif e.to.index > 5 then
             onTransition()
-        end
-        if (e.to.index == 3) and (lastDomeWeather~="ashstorm" or lastDomeWeather~="Blight") then
-            WtC:switchTransition(plazaWeathers[math.random(1, #plazaWeathers)])
         end
     end
 end
