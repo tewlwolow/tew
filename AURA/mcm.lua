@@ -65,7 +65,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in accordance with local climate, weather, player position, and time.\n\nSettings:"
     }
     pageOA:createSlider{
-        label = "Changes % volume for Outdoor Ambient module. Default = 120%.\nRequires restart. Volume %",
+        label = "Changes % volume for Outdoor Ambient module. Default = 100%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
@@ -101,7 +101,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays weather sounds in interiors.\n\nSettings:"
     }
     pageIW:createSlider{
-        label = "Changes % volume for Interior Weather module. Default = 100%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for Interior Weather module. Default = 150%.\nRequires restart.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -167,7 +167,7 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("PCmagicka"),
     }
     pagePC:createSlider{
-        label = "Changes % volume for vital signs (health, fatigue, magicka). Default = 200%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for vital signs (health, fatigue, magicka). Default = 200%.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -180,7 +180,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays container sound on open/close.\n\nSettings:"
     }
     pageC:createSlider{
-        label = "Changes % volume for Containers module. Default = 200%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for Containers module. Default = 120%.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -213,7 +213,7 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("UIEating"),
     }
     pageUI:createSlider{
-        label = "Changes % volume for UI module. Default = 200%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for UI module. Default = 200%.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -230,7 +230,7 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("playSplash"),
     }
     pageMisc:createSlider{
-        label = "Changes % volume for splash sounds. Default = 200%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for splash sounds. Default = 200%.\nVolume %",
         min = 0,
         max = 200,
         step = 1,
@@ -242,7 +242,7 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("playYurtFlap"),
     }
     pageMisc:createSlider{
-        label = "Changes % volume for yurt flaps. Default = 200%.\nRequires restart.\nVolume %",
+        label = "Changes % volume for yurt flaps. Default = 200%.\nVolume %",
         min = 0,
         max = 200,
         step = 1,

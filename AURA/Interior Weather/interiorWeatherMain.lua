@@ -7,7 +7,7 @@ local isOpenPlaza=tewLib.isOpenPlaza
 local IWAURAdir="tew\\AURA\\Interior Weather\\"
 local version = modversion.version
 local debugLogOn=config.debugLogOn
-local vol = config.IWvol/200
+local IWvol = config.IWvol/200
 
 local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
@@ -22,10 +22,16 @@ local function debugLog(string)
 end
 
 local function playThunder()
+    local thunVol
     if thunRef==nil then return end
+    if thunRef.region then
+        thunVol=0.6
+    else
+        thunVol=0.2
+    end
     thunder=thunArray[math.random(1, #thunArray)]
     debugLog("Playing thunder: "..thunder)
-    tes3.playSound{sound=thunder, volume=0.2, pitch=0.6, reference=thunRef}
+    tes3.playSound{sound=thunder, volume=thunVol, pitch=0.6, reference=thunRef}
 end
 
 local function updateThunderBig()
@@ -41,48 +47,46 @@ local function updateThunderBig()
 end
 
 local function playInteriorSmall(cell)
-    local volBoost
+    local volBoost=0
 
     if isOpenPlaza(cell)==true then
         volBoost=0.2
         thunderTimerSmall:pause()
         debugLog("Found open plaza. Applying volume boost and removing thunder timer.")
-    else
-        volBoost=0
     end
 
     local IWPath=IWAURAdir..interiorType.."\\"..IWLoop..".wav"
 
     if IWLoop=="rain heavy" then
-        tes3.playSound{soundPath=IWPath, volume=0.8*vol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif IWLoop=="Rain" then
-        tes3.playSound{soundPath=IWPath, volume=0.7*vol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
         debugLog("Playing small interior rain loops.")
     elseif IWLoop=="Blight" or IWLoop=="ashstorm" or IWLoop=="BM Blizzard" then
-        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=cell}
-        tes3.playSound{soundPath=IWAURAdir.."Common\\wind gust.wav", volume=0.4, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.6*IWvol, pitch=0.7, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWAURAdir.."Common\\wind gust.wav", volume=0.2, loop=true, reference=cell}
     else
-        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.4, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.6*IWvol, pitch=0.6, loop=true, reference=cell}
     end
 end
 
 local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
     if IWLoop=="Rain" then
-        tes3.playSound{sound="Sound Test", volume=0.7*vol, pitch=0.8, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=0.9*IWvol, pitch=0.8, loop=true, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif IWLoop=="rain heavy" then
-        tes3.playSound{sound="Sound Test", volume=0.8*vol, pitch=1.4, loop=true, reference=windoor}
+        tes3.playSound{sound="Sound Test", volume=0.9*IWvol, pitch=1.4, loop=true, reference=windoor}
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
         debugLog("Playing big interior loop: "..IWLoop)
-        tes3.playSound{sound=IWLoop, volume=0.4*vol, pitch=0.5, loop=true, reference=windoor}
+        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.5, loop=true, reference=windoor}
     end
 end
 
@@ -98,23 +102,25 @@ end
 
 local function cellCheck()
 
+    IWvol = config.IWvol/200
+
     local cell=tes3.getPlayerCell()
     if not cell then return end
 
     if not interiorTimer then
-        interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
+        interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig})
         interiorTimer:pause()
     else
         interiorTimer:pause()
     end
     if not thunderTimerBig then
-        thunderTimerBig = timer.start({duration=15, iterations=-1, callback=updateThunderBig})
+        thunderTimerBig = timer.start({duration=15, iterations=-1, callback=updateThunderBig, type=timer.real})
         thunderTimerBig:pause()
     else
         thunderTimerBig:pause()
     end
     if not thunderTimerSmall then
-        thunderTimerSmall = timer.start({duration=15, iterations=-1, callback=playThunder})
+        thunderTimerSmall = timer.start({duration=15, iterations=-1, callback=playThunder, type=timer.real})
         thunderTimerSmall:pause()
     else
         thunderTimerSmall:pause()
@@ -171,12 +177,6 @@ local function cellCheck()
 
     windoors={}
     windoors=common.getWindoors(cell)
-
-    if (IWLoop == "Rain" or IWLoop == "rain heavy" )
-    and isOpenPlaza(cell)==true then
-        tes3.getSound("Rain").volume = 0
-        tes3.getSound("rain heavy").volume = 0
-    end
 
     debugLog("Found interior cell.")
     if common.getCellType(cell, common.cellTypesSmall)==true then

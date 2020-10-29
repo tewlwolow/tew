@@ -2,7 +2,6 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
-local Cvol=config.Cvol/200
 
 local path = ""
 local flag = 0
@@ -14,57 +13,74 @@ local function debugLog(string)
     end
 end
 
-local function getPitch(containerType)
+
+local function getVolume(containerType)
     if not containerType then return 1.0 end
-    local pitch
-    for k, v in pairs(containersData["pitch"]) do
-        if string.find(containerType:lower(), k) then
-            pitch=v
+    local vol
+    for k, v in pairs(containersData["volume"]) do
+        if containerType:lower() == k then
+            vol=v
         end
     end
-    return pitch or 1.0
+    return vol or 0.8
 end
 
 local function playOpenSound(e)
-    if e.target.object.objectType == tes3.objectType.container
-    and not tes3.getLocked({reference=e.target}) then
-
-        local containerType
-
-        for type, filepath in pairs(containersData["open"]) do
-            if string.find(e.target.object.name:lower(), type) then
+    local Cvol=config.Cvol/200
+    local containerType
+    if not tes3.getLocked({reference=e.target}) then
+        for cont, filepath in pairs(containersData["open"]) do
+            if e.target.object.name:lower() == cont then
+                containerType=cont
                 path=filepath
-                containerType=type
                 break
             end
         end
+        if path == "" then
+            for cont, filepath in pairs(containersData["open"]) do
+                if string.find(e.target.object.name:lower(), cont) then
+                    containerType=cont
+                    path=filepath
+                    break
+                end
+            end
+        end
         if path ~= "" then
-            tes3.playSound{soundPath=path, reference=e.target, volume=0.8*Cvol, pitch=getPitch(containerType)}
+            tes3.playSound{soundPath=path, reference=e.target, volume=getVolume(containerType)*Cvol}
             debugLog("Playing container opening sound.")
         end
         path=""
-
     end
 end
 
 local function playCloseSound(e)
-    --if not e.reference.object.baseObject == tes3.objectType.container then return end
+    local Cvol=config.Cvol/200
     if flag == 1 then return end
     local containerType
-    for type, filepath in pairs(containersData["close"]) do
-        if string.find(e.reference.object.name:lower(), type) then
+    for cont, filepath in pairs(containersData["close"]) do
+        if e.reference.object.name:lower() == cont then
             path=filepath
-            containerType=type
+            containerType=cont
             break
         end
     end
+    if path == "" then
+        for cont, filepath in pairs(containersData["close"]) do
+            if string.find(e.reference.object.name:lower(), cont) then
+                path=filepath
+                containerType=cont
+                break
+            end
+        end
+    end
     if path ~= "" then
-        tes3.playSound{soundPath=path, reference=e.reference, volume=0.8*Cvol, pitch=getPitch(containerType)-0.1}
+        tes3.removeSound{reference=e.reference}
+        tes3.playSound{soundPath=path, reference=e.reference, volume=getVolume(containerType)*Cvol}
         debugLog("Playing container closing sound.")
         flag=1
     end
     path=""
-    timer.start{type=timer.real, duration=1.5, callback=function()
+    timer.start{type=timer.real, duration=1.6, callback=function()
         flag=0
     end}
 end

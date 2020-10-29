@@ -168,7 +168,7 @@ local function updateInteriorBig()
 end
 
 local function playInteriorSmall(cell)
-   timer.start{duration=1, type=timer.real, callback=function()
+   timer.start{duration=0.6, type=timer.real, callback=function()
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
          tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
@@ -180,11 +180,14 @@ local function playInteriorSmall(cell)
 end
 
 local function cellCheck()
+
+   OAvol = config.OAvol/200
+
    debugLog("Cell changed or time check triggered. Running cell check.")
 
    -- Getting rid of timers on cell check --
    if not interiorTimer then
-      interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
+      interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig})
       interiorTimer:pause()
    else
       interiorTimer:pause()
@@ -216,8 +219,10 @@ local function cellCheck()
    debugLog("Time: "..timeNow)
 
    -- Checking current weather --
-   weatherNow=wTC.currentWeather.index
-   debugLog("Weather: "..weatherNow)
+   if wTC.currentWeather then
+      weatherNow=wTC.currentWeather.index
+      debugLog("Weather: "..weatherNow)
+   end
 
    -- Transition filter chunk --
    if timeNow==timeLast

@@ -43,14 +43,12 @@ this.thunArray={
 
 this.cellTypesSmall={
     "in_de_shack",
-    "in_nord_house_02",
-    "in_nord_house_03",
-    "s12",
-    "rp",
+    "s12_v_plaza",
+    "rp_v_arena",
 }
 
 this.cellTypesTent={
-    "in_ashl_tent",
+    "in_ashl_tent_0",
     "Drs_Tnt",
 }
 
@@ -83,7 +81,7 @@ function this.getCellType(cell, celltype)
     end
     for stat in cell:iterateReferences(tes3.objectType.static) do
         for _, pattern in pairs(celltype) do
-            if string.find(stat.object.id:lower(), pattern) then
+            if string.startswith(stat.object.id:lower(), pattern) then
                 return true
             end
         end
@@ -110,20 +108,6 @@ function this.getWindoors(cell)
     end
     return windoors
 end
-
---[[
-function this.getObjects(cell, object, stringArray)
-    local objectArray={}
-    for obj in cell:iterateReferences(tes3.objectType.object) do
-        for _, pattern in pairs(stringArray) do
-            if string.find(obj.object.id, pattern) then
-                table.insert(objectArray, obj)
-            end
-        end
-    end
-    return objectArray
-end
---]]
 
 function this.getDistance(v0, v1)
     local dx=v1.x-v0.x
