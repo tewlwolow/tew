@@ -8,7 +8,7 @@ local debugLogOn = config.debugLogOn
 local fauxWeathers = require("tew\\Glass Domes\\fauxWeathers")
 local lastCell
 local lastDomeWeather = ""
-local version="1.2.0"
+local version="1.2.5"
 
 local ashValues = fauxWeathers.ashValues
 local blightValues = fauxWeathers.blightValues
@@ -166,6 +166,10 @@ local function onCellChanged()
     if not cell then return end
 
     if isOpenPlaza(cell)==false and lastCell and isOpenPlaza(lastCell)==true then
+
+        tes3.getSound("Rain").volume = 0.8
+        tes3.getSound("rain heavy").volume = 1.0
+
         if greenTint then
             removeGreenTint()
         end
@@ -213,6 +217,9 @@ local function onCellChanged()
 
 
     if isOpenPlaza(cell)==true then
+
+        tes3.getSound("Rain").volume = 0
+        tes3.getSound("rain heavy").volume = 0
 
         if (greenTint and not string.find(cell.name:lower(), "arena pit"))
         and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
