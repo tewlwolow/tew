@@ -10,6 +10,19 @@ local PCfatigue = config.PCfatigue
 local PCmagicka = config.PCmagicka
 local vsVol = config.vsVol/200
 
+local function isPlayerUnderWater()
+    local cell = tes3.getPlayerCell()
+    if cell.hasWater then
+        local waterHeight = cell.waterLevel or 0
+        local playerZ = tes3.player.position.z
+        local height = playerZ - waterHeight
+        if height < -50 then
+            return true
+        end
+    end
+    return false
+end
+
 local function checkGender()
 
     if tes3.player.object.female then
@@ -77,6 +90,14 @@ local function playVitals()
 
     if PCfatigue then
 
+        if isPlayerUnderWater() == true then
+            if fatigueTimer then
+                fatigueTimer:pause()
+            end
+            fatigueFlag = 0
+            return
+        end
+
         local maxFatigue = player.fatigue.base
         local currentFatigue = player.fatigue.current
 
@@ -107,5 +128,15 @@ local function playVitals()
 
 end
 
+local function positionCheck()
+    if PCfatigue then
+        if fatigueTimer then
+            fatigueTimer:pause()
+        end
+        fatigueFlag = 0
+    end
+end
+
+event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
 event.register("loaded", checkGender)
 event.register("simulate", playVitals)

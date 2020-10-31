@@ -25,13 +25,13 @@ local function playThunder()
     local thunVol
     if thunRef==nil then return end
     if thunRef.region then
-        thunVol=0.6
+        thunVol=0.8
     else
         thunVol=0.2
     end
     thunder=thunArray[math.random(1, #thunArray)]
     debugLog("Playing thunder: "..thunder)
-    tes3.playSound{sound=thunder, volume=thunVol, pitch=0.6, reference=thunRef}
+    tes3.playSound{sound=thunder, volume=thunVol, pitch=0.7, reference=thunRef}
 end
 
 local function updateThunderBig()
@@ -58,14 +58,14 @@ local function playInteriorSmall(cell)
     local IWPath=IWAURAdir..interiorType.."\\"..IWLoop..".wav"
 
     if IWLoop=="rain heavy" then
-        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.8*IWvol+volBoost, loop=true, reference=cell}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif IWLoop=="Rain" then
-        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.8*IWvol+volBoost, loop=true, reference=cell}
         debugLog("Playing small interior rain loops.")
     elseif IWLoop=="Blight" or IWLoop=="ashstorm" or IWLoop=="BM Blizzard" then
         tes3.playSound{sound=IWLoop, volume=0.6*IWvol, pitch=0.7, loop=true, reference=cell}

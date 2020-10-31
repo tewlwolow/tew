@@ -316,25 +316,21 @@ end
 local function positionCheck(e)
    local cell=tes3.getPlayerCell()
    local element=e.element
-   if cell.isInterior and not cell.behavesAsExterior then
-      return
-   else
-      debugLog("Player underwater. Stopping AURA sounds.")
-      tes3.removeSound{reference=cell}
-      tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
-      if playSplash and moduleAmbientOutdoor then
-         tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*splashVol, pitch=0.6}
-      end
-      element:register("destroy", function()
-         debugLog("Player above water level. Resetting AURA sounds.")
-         tes3.removeSound{reference=cell}
-         tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
-         timer.start({duration=5, callback=cellCheck, type=timer.real})
-         if playSplash and moduleAmbientOutdoor then
-            tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5*splashVol, pitch=0.8}
-         end
-      end)
+   debugLog("Player underwater. Stopping AURA sounds.")
+   tes3.removeSound{reference=cell}
+   tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
+   if playSplash and moduleAmbientOutdoor then
+      tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*splashVol, pitch=0.6}
    end
+   element:register("destroy", function()
+      debugLog("Player above water level. Resetting AURA sounds.")
+      tes3.removeSound{reference=cell}
+      tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
+      timer.start({duration=5, callback=cellCheck, type=timer.real})
+      if playSplash and moduleAmbientOutdoor then
+         tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5*splashVol, pitch=0.8}
+      end
+   end)
 end
 local function runResetter()
    pathLast, pathNow, tSound = "", "", ""

@@ -134,7 +134,7 @@ local function trainingGreet(e)
 
    local closeButton=e.element:findChild(tes3ui.registerID("MenuServiceTraining_Okbutton"))
    closeButton:register("mouseDown", function()
-      tes3.playSound{sound="Click", reference=tes3.mobilePlayer}
+      tes3.playSound{sound="Menu Click", reference=tes3.player}
       trainingFlag=0
    end)
 
@@ -192,6 +192,7 @@ local function spellGreet(e)
 
    local closeButton=e.element:findChild(tes3ui.registerID("MenuServiceSpells_Okbutton"))
    closeButton:register("mouseDown", function()
+      tes3.playSound{sound="Menu Click", reference=tes3.player}
       spellsFlag=0
    end)
 
@@ -256,6 +257,7 @@ local function spellMakingGreet(e)
 
    local cancelButton=e.element:findChild(tes3ui.registerID("MenuSpellmaking_Cancelbutton"))
    cancelButton:register("mouseDown", function()
+      tes3.playSound{sound="Menu Click", reference=tes3.player}
       spellMakingFlag=0
    end)
 
@@ -373,7 +375,7 @@ local function repairGreet(e)
       lastVoice=newVoice
       repairFlag=1
       debugLog("NPC says a repair comment.")
-      tes3.playSound{sound="Click", reference=tes3.mobilePlayer}
+      tes3.playSound{sound="Menu Click", reference=tes3.player}
    end
 
 end

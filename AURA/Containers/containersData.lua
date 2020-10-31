@@ -90,5 +90,10 @@ return {
         ["sack"] = 1.0,
         ["small chest"] = 0.9,
         ["table"] = 0.8,
+        ["urn"] = 1.5,
+        ["vase"] = 1.5,
+        ["culdem"] = 1.5,
+        ["clay jar"] = 1.5,
+        ["amphora"] = 1.5,
     },
 }
