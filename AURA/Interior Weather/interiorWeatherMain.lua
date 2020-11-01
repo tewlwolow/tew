@@ -129,11 +129,10 @@ local function cellCheck()
     if not cell.isInterior
     and isOpenPlaza(cell)==false then
         debugLog("Found exterior cell. Returning.")
-        if not tes3.getSound("Rain").volume == 0.8 then
             tes3.getSound("Rain").volume = 0.8
-        elseif not  tes3.getSound("rain heavy").volume == 1 then
             tes3.getSound("rain heavy").volume = 1
-        end
+            tes3.getSound("Rain").volume = 0.8
+            tes3.getSound("rain heavy").volume = 1
         return
     end
 
@@ -180,13 +179,18 @@ local function cellCheck()
 
     debugLog("Found interior cell.")
     if common.getCellType(cell, common.cellTypesSmall)==true then
+        debugLog("Playing small interior sounds.")
+        if isOpenPlaza(cell) == true then
+            tes3.getSound("Rain").volume = 0
+            tes3.getSound("rain heavy").volume = 0
+        else
+            if IWLoop=="rain heavy" then
+                thunRef=cell
+                thunderTimerSmall:resume()
+            end
+        end
         interiorType="Small"
         playInteriorSmall(cell, interiorType)
-        debugLog("Playing small interior sounds.")
-        if IWLoop=="rain heavy" then
-            thunRef=cell
-            thunderTimerSmall:resume()
-        end
     elseif common.getCellType(cell, common.cellTypesTent)==true then
         interiorType="Tent"
         playInteriorSmall(cell, interiorType)

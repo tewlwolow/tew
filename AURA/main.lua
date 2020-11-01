@@ -2,6 +2,8 @@ local modversion = require("tew.AURA.version")
 local version = modversion.version
 
 local function volumeAdjust()
+    tes3.game.volumeMaster=245
+    tes3.game.volumeEffect=245
     tes3.game.volumeMaster=250
     tes3.game.volumeEffect=250
     tes3.game.soundQuality=2
@@ -13,9 +15,7 @@ end
 
 local function init()
 
-    tes3.game.volumeMaster=250
-    tes3.game.volumeEffect=250
-    tes3.game.soundQuality=2
+    volumeAdjust()
 
     event.register("uiActivated", warning, {filter="MenuAudio"})
     event.register("cellChanged", volumeAdjust, {priority=-160})
