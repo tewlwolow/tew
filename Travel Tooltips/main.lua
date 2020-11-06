@@ -62,6 +62,9 @@ local function createTooltip(e)
     end
 
     local function updateTooltip()
+        if not e.newlyCreated then
+            return
+        end
         for _, trDestination in pairs(destinationList) do
             trDestination:register("help", function()
 
