@@ -25,6 +25,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
+        label = "Enable hackish volume fix? You won't be able to change Master or Effects audio settings if true.",
+        variable = registerVariable("volumeFix"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
         label = "Enable Outdoor Ambient module?",
         variable = registerVariable("moduleAmbientOutdoor"),
         restartRequired=true

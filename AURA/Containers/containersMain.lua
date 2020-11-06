@@ -26,6 +26,7 @@ local function getVolume(containerType)
 end
 
 local function playOpenSound(e)
+    if not e.target.object.objectType == tes3.objectType.container then return end
     local Cvol=config.Cvol/200
     local containerType
     if not tes3.getLocked({reference=e.target}) then

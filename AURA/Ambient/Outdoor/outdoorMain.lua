@@ -187,7 +187,7 @@ local function cellCheck()
 
    -- Getting rid of timers on cell check --
    if not interiorTimer then
-      interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig})
+      interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
       interiorTimer:pause()
    else
       interiorTimer:pause()

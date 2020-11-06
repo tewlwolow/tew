@@ -9,16 +9,14 @@ local function volumeAdjust()
     tes3.game.soundQuality=2
 end
 
-local function warning()
+local function warning(e)
+    if not e.newlyCreated then
+        return
+    end
     tes3.messageBox("[AURA]: Do NOT adjust MASTER or EFFECTS slider! Do NOT change the 3D audio setting!")
 end
 
 local function init()
-
-    volumeAdjust()
-
-    event.register("uiActivated", warning, {filter="MenuAudio"})
-    event.register("cellChanged", volumeAdjust, {priority=-160})
 
     mwse.log("[AURA] Version "..version.." initialised.")
 
@@ -30,6 +28,13 @@ local function init()
     local moduleUI = config.moduleUI
     local moduleMisc = config.moduleMisc
     local modulePC = config.modulePC
+    local volumeFix = config.volumeFix
+
+    if volumeFix then
+        volumeAdjust()
+        event.register("uiActivated", warning, {filter="MenuAudio"})
+        event.register("cellChanged", volumeAdjust, {priority=-160})
+    end
 
     if moduleAmbientOutdoor then
         mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")

@@ -9,6 +9,7 @@ local version = modversion.version
 local debugLogOn=config.debugLogOn
 local IWvol = config.IWvol/200
 
+local cellLast
 local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
 local WtC=tes3.getWorldController().weatherController
@@ -108,7 +109,7 @@ local function cellCheck()
     if not cell then return end
 
     if not interiorTimer then
-        interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig})
+        interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
         interiorTimer:pause()
     else
         interiorTimer:pause()
@@ -127,12 +128,13 @@ local function cellCheck()
     end
 
     if not cell.isInterior
-    and isOpenPlaza(cell)==false then
+    and isOpenPlaza(cell)==false
+    and common.checkCellDiff(cell, cellLast)==true then
         debugLog("Found exterior cell. Returning.")
-            tes3.getSound("Rain").volume = 0.8
-            tes3.getSound("rain heavy").volume = 1
-            tes3.getSound("Rain").volume = 0.8
-            tes3.getSound("rain heavy").volume = 1
+        tes3.getSound("Rain").volume = 0.8
+        tes3.getSound("rain heavy").volume = 1
+        tes3.getSound("Rain").volume = 0.8
+        tes3.getSound("rain heavy").volume = 1
         return
     end
 
@@ -211,6 +213,8 @@ local function cellCheck()
             thunderTimerBig:resume()
         end
     end
+
+    cellLast=cell
 end
 
 

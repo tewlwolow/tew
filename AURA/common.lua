@@ -42,7 +42,7 @@ this.thunArray={
 }
 
 this.cellTypesSmall={
-    "in_de_shack",
+    "in_de_shack_",
     "s12_v_plaza",
     "rp_v_arena",
 }

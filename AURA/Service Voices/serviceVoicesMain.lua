@@ -229,28 +229,37 @@ local function spellGreet(e)
       end
    end
 
-   if serviceFeed[1] then
-      while newVoice == lastVoice or newVoice == nil do
-         newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   if not serviceFeed[1] then
+      for kRace, _ in pairs(commonVoices) do
+         if kRace==raceLet then
+            for kSex, _ in pairs(commonVoices[kRace]) do
+               if kSex==sexLet then
+                  for _, voice in pairs(commonVoices[kRace][kSex]) do
+                     table.insert(serviceFeed, voice)
+                  end
+               end
+            end
+         end
       end
-      tes3.removeSound{reference=npcId}
-      tes3.say{
-      volume=0.9*SVvol,
-      soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-      newVoice..".mp3", reference=npcId
-      }
-      lastVoice=newVoice
-      spellsFlag=1
-      debugLog("NPC says a spell vendor comment.")
-   else
-      serviceGreet(e)
    end
+
+   while newVoice == lastVoice or newVoice == nil do
+      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   end
+   tes3.removeSound{reference=npcId}
+   tes3.say{
+   volume=0.9*SVvol,
+   soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+   newVoice..".mp3", reference=npcId
+   }
+   lastVoice=newVoice
+   spellsFlag=1
+   debugLog("NPC says a spell vendor comment.")
+
    if UISpells and moduleUI then
       tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol, pitch=1.3}
       debugLog("Opening spell menu sound played.")
    end
-
-
 end
 
 local function spellMakingGreet(e)
@@ -299,22 +308,33 @@ local function spellMakingGreet(e)
       end
    end
 
-   if serviceFeed[1] then
-      while newVoice == lastVoice or newVoice == nil do
-         newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   if not serviceFeed[1] then
+      for kRace, _ in pairs(commonVoices) do
+         if kRace==raceLet then
+            for kSex, _ in pairs(commonVoices[kRace]) do
+               if kSex==sexLet then
+                  for _, voice in pairs(commonVoices[kRace][kSex]) do
+                     table.insert(serviceFeed, voice)
+                  end
+               end
+            end
+         end
       end
-      tes3.removeSound{reference=npcId}
-      tes3.say{
-      volume=0.9*SVvol,
-      soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
-      newVoice..".mp3", reference=npcId
-      }
-      lastVoice=newVoice
-      spellMakingFlag=1
-      debugLog("NPC says a spellmaking comment.")
-   else
-      serviceGreet(e)
    end
+
+   while newVoice == lastVoice or newVoice == nil do
+      newVoice=serviceFeed[math.random(1, #serviceFeed)]
+   end
+   tes3.removeSound{reference=npcId}
+   tes3.say{
+   volume=0.9*SVvol,
+   soundPath="Vo\\"..raceLet.."\\"..sexLet.."\\"..
+   newVoice..".mp3", reference=npcId
+   }
+   lastVoice=newVoice
+   spellMakingFlag=1
+   debugLog("NPC says a spellmaking comment.")
+
    if UISpells and moduleUI then
       tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol, pitch=0.9}
       debugLog("Opening spell menu sound played.")
@@ -375,7 +395,6 @@ local function repairGreet(e)
       lastVoice=newVoice
       repairFlag=1
       debugLog("NPC says a repair comment.")
-      tes3.playSound{sound="Menu Click", reference=tes3.player}
    end
 
 end
