@@ -166,29 +166,44 @@ local function onCellChanged()
     if not cell then return end
 
     if isOpenPlaza(cell)==false and lastCell and isOpenPlaza(lastCell)==true then
-
+        debugLog("Transitioning from plaza cell.")
         if greenTint then
             removeGreenTint()
         end
 
+        tes3.getSound("Rain").volume = 0.8
+        tes3.getSound("rain heavy").volume = 1
+        tes3.getSound("Rain").volume = 0.8
+        tes3.getSound("rain heavy").volume = 1
+
         tes3.removeSound{sound="ashstorm", reference=tes3.mobilePlayer}
         tes3.removeSound{sound="Blight", reference=tes3.mobilePlayer}
 
-        if lastDomeWeather == "ashstorm" then
-            WtC:switchImmediate(6)
-            WtC:updateVisuals()
-            WtC:switchImmediate(6)
-            WtC:updateVisuals()
-        elseif lastDomeWeather == "Blight" then
-            WtC:switchImmediate(7)
-            WtC:updateVisuals()
-            WtC:switchImmediate(7)
-            WtC:updateVisuals()
-        elseif lastDomeWeather == "Foggy" then
-            WtC:switchImmediate(2)
-            WtC:updateVisuals()
-            WtC:switchImmediate(2)
-            WtC:updateVisuals()
+        if not cell.isInterior then
+            if lastDomeWeather == "ashstorm" then
+                WtC:switchImmediate(6)
+                WtC:updateVisuals()
+                WtC:switchImmediate(6)
+                WtC:updateVisuals()
+            elseif lastDomeWeather == "Blight" then
+                WtC:switchImmediate(7)
+                WtC:updateVisuals()
+                WtC:switchImmediate(7)
+                WtC:updateVisuals()
+            elseif lastDomeWeather == "Foggy" then
+                WtC:switchImmediate(2)
+                WtC:updateVisuals()
+                WtC:switchImmediate(2)
+                WtC:updateVisuals()
+            end
+        else
+            if lastDomeWeather == "ashstorm" then
+                WtC:switchImmediate(6)
+            elseif lastDomeWeather == "Blight" then
+                WtC:switchImmediate(7)
+            elseif lastDomeWeather == "Foggy" then
+                WtC:switchImmediate(2)
+            end
         end
 
         debugLog("Reverting faux weathers.")
@@ -215,7 +230,9 @@ local function onCellChanged()
 
     if isOpenPlaza(cell)==true then
 
-        if (greenTint and not string.find(cell.name:lower(), "arena pit"))
+        if (greenTint) and
+        (not string.find(cell.name:lower(), "arena pit"))
+        or (not string.find(cell.name:lower(), "molag mar, plaza"))
         and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
             applyGreenTint()
         end
@@ -272,7 +289,9 @@ local function onTransition()
     if isOpenPlaza(cell)==true then
         debugLog("Weather transitioned to ash or blight.")
 
-        if (greenTint and not string.find(cell.name:lower(), "arena pit"))
+        if (greenTint) and
+        (not string.find(cell.name:lower(), "arena pit"))
+        or (not string.find(cell.name:lower(), "molag mar, plaza"))
         and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
             applyGreenTint()
         end
@@ -334,7 +353,9 @@ local function changeFlags(e)
         if e.to.index <= 5 and e.to.index~=3 then
             debugLog("Resetting faux weather flags and removing sounds.")
             lastDomeWeather = "other"
-            if (greenTint and not string.find(cell.name:lower(), "arena pit")) then
+            if (greenTint) and
+            (not string.find(cell.name:lower(), "arena pit"))
+            or (not string.find(cell.name:lower(), "molag mar, plaza")) then
                 applyGreenTint()
             end
             tes3.removeSound{sound="ashstorm", reference=tes3.mobilePlayer}
