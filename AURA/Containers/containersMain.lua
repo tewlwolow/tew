@@ -3,6 +3,9 @@ local version = modversion.version
 local config = require("tew\\AURA\\config")
 local debugLogOn=config.debugLogOn
 
+local tewLib = require("tew\\tewLib\\tewLib")
+local findWholeWords = tewLib.findWholeWords
+
 local path = ""
 local flag = 0
 local containersData = require("tew\\AURA\\Containers\\containersData")
@@ -39,7 +42,7 @@ local function playOpenSound(e)
         end
         if path == "" then
             for cont, filepath in pairs(containersData["open"]) do
-                if string.find(e.target.object.name:lower(), cont) then
+                if findWholeWords(e.target.object.name:lower(), cont) then
                     containerType=cont
                     path=filepath
                     break
@@ -67,7 +70,7 @@ local function playCloseSound(e)
     end
     if path == "" then
         for cont, filepath in pairs(containersData["close"]) do
-            if string.find(e.reference.object.name:lower(), cont) then
+            if findWholeWords(e.reference.object.name:lower(), cont) then
                 path=filepath
                 containerType=cont
                 break
