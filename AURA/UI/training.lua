@@ -16,6 +16,10 @@ end--]]
 
 local function onTrainingMenu(e)
 
+    if not e.newlyCreated then
+        return
+    end
+
     local element=e.element
     element=element:findChild(-1155)
 
