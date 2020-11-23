@@ -6,14 +6,13 @@ local function volumeAdjust()
     tes3.game.volumeEffect=245
     tes3.game.volumeMaster=250
     tes3.game.volumeEffect=250
-    tes3.game.soundQuality=2
 end
 
 local function warning(e)
     if not e.newlyCreated then
         return
     end
-    tes3.messageBox("[AURA]: Do NOT adjust MASTER or EFFECTS slider! Do NOT change the 3D audio setting!")
+    tes3.messageBox("[AURA]: Do NOT adjust MASTER or EFFECTS slider!")
 end
 
 local function init()
