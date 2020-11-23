@@ -187,7 +187,7 @@ local function cellCheck()
 
    -- Getting rid of timers on cell check --
    if not interiorTimer then
-      interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
+      interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig, type=timer.real})
       interiorTimer:pause()
    else
       interiorTimer:pause()
@@ -196,6 +196,7 @@ local function cellCheck()
    local cell=tes3.getPlayerCell()
    local region=tes3.getRegion().name or getInteriorRegion(cell)
    if not region then return end
+   if not cell.name then return end
 
    -- Checking climate --
    for kRegion, vClimate in pairs(climates.regions) do
@@ -311,6 +312,7 @@ local function cellCheck()
    weatherLast=weatherNow
    cellLast=cell
    pathLast=pathNow
+   debugLog("Cell check complete.")
 end
 
 local function positionCheck(e)
@@ -318,17 +320,21 @@ local function positionCheck(e)
    local element=e.element
    debugLog("Player underwater. Stopping AURA sounds.")
    tes3.removeSound{reference=cell}
-   tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
+   if (not cell.isInterior) or (cell.behavesAsExterior) then
+      tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
+   end
    if playSplash and moduleAmbientOutdoor then
       tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*splashVol, pitch=0.6}
    end
    element:register("destroy", function()
       debugLog("Player above water level. Resetting AURA sounds.")
       tes3.removeSound{reference=cell}
-      tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
+      if (not cell.isInterior) or (cell.behavesAsExterior) then
+         tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
+      end
       timer.start({duration=5, callback=cellCheck, type=timer.real})
       if playSplash and moduleAmbientOutdoor then
-         tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.5*splashVol, pitch=0.8}
+         tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.6*splashVol, pitch=0.7}
       end
    end)
 end
