@@ -64,15 +64,24 @@ this.windows={
 
 this.cellTypesCaves={
     "cave",
+    "sewer",
+    "grotto",
 }
 
 function this.checkCellDiff(cell, cellLast)
-    if (cell.isInterior and not cellLast.isInterior)
-    or (not cell.isInterior and cellLast.isInterior) then
+    if (cellLast==nil) then return true end
+    if (cell.isInterior) and (not cellLast.isInterior)
+    or (not cell.isInterior) and (cellLast.isInterior)
+    or (cell.isInterior) and (cellLast.behavesAsExterior)
+    or (cell.behavesAsExterior) and (not cellLast.behavesAsExterior) then
         return true
-    else
-        return false
     end
+    for _, name in pairs(this.cellTypesCaves) do
+        if string.find(cell.name:lower(), name) then
+            return true
+        end
+    end
+    return false
 end
 
 function this.getCellType(cell, celltype)
@@ -100,8 +109,10 @@ function this.getWindoors(cell)
     for door in cell:iterateReferences(tes3.objectType.door) do
         if door.destination then
             if not (door.destination.cell.isInterior)
-            or (door.destination.cell.behavesAsExterior and not (string.find(cell.name:lower(), "plaza")
-            and not string.find(cell.name:lower(), "vivec") and not string.find(cell.name:lower(), "arena pit"))) then
+            or (door.destination.cell.behavesAsExterior and
+            (not string.find(cell.name:lower(), "plaza") and
+            (not string.find(cell.name:lower(), "vivec") and
+            (not string.find(cell.name:lower(), "arena pit"))))) then
                 table.insert(windoors, door)
             end
         end
