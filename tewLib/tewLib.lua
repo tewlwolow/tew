@@ -5,7 +5,8 @@ function this.isOpenPlaza(cell)
         return false
     else
         if (string.find(cell.name:lower(), "plaza") and string.find(cell.name:lower(), "vivec"))
-        or string.find(cell.name:lower(), "arena pit") then
+        or (string.find(cell.name:lower(), "plaza") and string.find(cell.name:lower(), "molag mar"))
+        or (string.find(cell.name:lower(), "arena pit") and string.find(cell.name:lower(), "vivec")) then
             return true
         else
             return false
@@ -42,6 +43,10 @@ function this.getDistance(v0, v1)
     local dy=v1.y-v0.y
     local dz=v1.z-v0.z
     return math.sqrt(dx*dx+dy*dy+dz*dz)
+end
+
+function this.findWholeWords(string, pattern)
+    return string.find(string, "%f[%a]"..pattern.."%f[%A]")
 end
 
 return this
