@@ -105,11 +105,8 @@ local function cellCheck()
 
     IWvol = config.IWvol/200
 
-    local cell=tes3.getPlayerCell()
-    if not cell then return end
-
     if not interiorTimer then
-        interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig})
+        interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig, type=timer.real})
         interiorTimer:pause()
     else
         interiorTimer:pause()
@@ -127,14 +124,13 @@ local function cellCheck()
         thunderTimerSmall:pause()
     end
 
+    local cell=tes3.getPlayerCell()
+    if not cell then debugLog("No cell detected. Returning.") return end
+
     if not cell.isInterior
     and isOpenPlaza(cell)==false
     and common.checkCellDiff(cell, cellLast)==true then
         debugLog("Found exterior cell. Returning.")
-        tes3.getSound("Rain").volume = 0.8
-        tes3.getSound("rain heavy").volume = 1
-        tes3.getSound("Rain").volume = 0.8
-        tes3.getSound("rain heavy").volume = 1
         return
     end
 
