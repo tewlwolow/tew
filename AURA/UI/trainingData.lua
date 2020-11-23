@@ -22,7 +22,7 @@ return {
     ["Restoration"]="Fx\\magic\\restC.wav",
     ["Security"]="Fx\\DOORM1.wav",
     ["Short Blade"]="Fx\\item\\shrtbladOUT.wav",
-    ["Sneak"]="Fx\\FOOT\\walkkr_lt.wav",
+    ["Sneak"]="Fx\\FOOT\\walkr_lt.wav",
     ["Spear"]="Fx\\item\\spear.wav",
     ["Speechcraft"]="Fx\\envrn\\ent_react04a.wav",
     ["Unarmored"]="Fx\\body hit.wav",
