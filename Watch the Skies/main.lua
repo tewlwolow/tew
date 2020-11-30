@@ -13,9 +13,6 @@ local WtC, intWeatherTimer
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
-
-local interiorWeathers={0,1,2,3,4,5}
-
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
@@ -82,8 +79,31 @@ end
 
 local function changeInteriorWeather()
     local currentWeather=WtC.currentWeather.index
+    local newWeather
     debugLog("Weather before randomisation: "..currentWeather)
-    local newWeather=interiorWeathers[math.random(1, #interiorWeathers)]
+
+    local region = tes3.getRegion()
+    local regionChances={
+    [0] = region.weatherChanceClear,
+    [1] = region.weatherChanceCloudy,
+    [2] = region.weatherChanceFoggy,
+    [3] = region.weatherChanceOvercast,
+    [4] = region.weatherChanceRain,
+    [5] = region.weatherChanceThunder,
+    [6] = region.weatherChanceAsh,
+    [7] = region.weatherChanceBlight,
+    [8] = region.weatherChanceSnow,
+    [9] = region.weatherChanceBlizzard
+    }
+
+    while newWeather == nil do
+        for weather, chance in pairs(regionChances) do
+            if chance/100 > math.random() then
+                newWeather = weather
+                break
+            end
+        end
+    end
 
     WtC:switchTransition(newWeather)
 
@@ -93,6 +113,7 @@ end
 local function onCellChanged(e)
     debugLog("Cell changed.")
     local cell=e.cell or tes3.getPlayerCell()
+    if not cell then return end
 
     if isOpenPlaza(cell)==true then
         WtC.weathers[5].maxParticles=1500
@@ -107,6 +128,7 @@ local function onCellChanged(e)
         debugLog("Player in exterior. Pausing interior timer.") end
     elseif (cell.isInterior) and not (cell.behavesAsExterior) then
         if intWeatherTimer then
+            intWeatherTimer:pause()
             intWeatherTimer:cancel()
             intWeatherTimer=nil
         end
