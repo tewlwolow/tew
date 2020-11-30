@@ -52,6 +52,12 @@ this.cellTypesTent={
     "Drs_Tnt",
 }
 
+this.cellTypesCaves={
+    "cave",
+    "sewer",
+    "grotto",
+}
+
 this.windows={
     "_win_",
     "window",
@@ -62,25 +68,22 @@ this.windows={
     "triwin",
 }
 
-this.cellTypesCaves={
-    "cave",
-    "sewer",
-    "grotto",
-}
-
 function this.checkCellDiff(cell, cellLast)
     if (cellLast==nil) then return true end
     if (cell.isInterior) and (not cellLast.isInterior)
+    or (cell.isInterior) and (cellLast.isInterior)
     or (not cell.isInterior) and (cellLast.isInterior)
     or (cell.isInterior) and (cellLast.behavesAsExterior)
     or (cell.behavesAsExterior) and (not cellLast.behavesAsExterior) then
         return true
     end
-    for _, name in pairs(this.cellTypesCaves) do
-        if string.find(cell.name:lower(), name) then
-            return true
+    --[[if cell.name ~= nil then
+        for _, name in pairs(this.cellTypesCaves) do
+            if string.find(cell.name:lower(), name) then
+                return true
+            end
         end
-    end
+    end]]
     return false
 end
 
@@ -98,17 +101,10 @@ function this.getCellType(cell, celltype)
 end
 
 function this.getWindoors(cell)
-    local windoors={}
-    for stat in cell:iterateReferences(tes3.objectType.static) do
-        for _, window in pairs(this.windows) do
-            if string.find(stat.object.id:lower(), window) then
-                table.insert(windoors, stat)
-            end
-        end
-    end
+    local windoors = {}
     for door in cell:iterateReferences(tes3.objectType.door) do
         if door.destination then
-            if not (door.destination.cell.isInterior)
+            if (not door.destination.cell.isInterior)
             or (door.destination.cell.behavesAsExterior and
             (not string.find(cell.name:lower(), "plaza") and
             (not string.find(cell.name:lower(), "vivec") and
@@ -117,7 +113,21 @@ function this.getWindoors(cell)
             end
         end
     end
-    return windoors
+
+    if #windoors == 0 then
+        return nil
+    else
+        for stat in cell:iterateReferences(tes3.objectType.static) do
+            if (not string.find(cell.name:lower(), "plaza")) then
+                for _, window in pairs(this.windows) do
+                    if string.find(stat.object.id:lower(), window) then
+                        table.insert(windoors, stat)
+                    end
+                end
+            end
+        end
+        return windoors
+    end
 end
 
 function this.getDistance(v0, v1)

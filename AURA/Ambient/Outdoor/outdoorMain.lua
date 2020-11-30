@@ -128,7 +128,7 @@ local function getPathWindy()
 end
 
 local function playExterior(cell)
-   timer.start{duration=0.6, type=timer.real, callback=function()
+   timer.start{duration=0.62, type=timer.real, callback=function()
       debugLog("Playing exterior loop. File: "..pathNow)
       tes3.playSound{soundPath=pathNow, volume=1.0*OAvol, loop=true, reference=cell}
    end}
@@ -141,17 +141,17 @@ local function playTrans(cell)
    tes3.playSound{sound=tSound, volume=0.3*OAvol, pitch=0.7, reference=tes3.player}
    debugLog("Playing transition rustle. Sound: "..tSound)
    end
- end
+end
 
 local function playInteriorBig(windoor)
-   timer.start{duration=0.6, type=timer.real, callback=function()
+   timer.start{duration=0.62, type=timer.real, callback=function()
       if windoor==nil then debugLog("Dodging an empty ref.") return end
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.4*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.5*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.4*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.5*OAvol, pitch=0.8}
       end
    end}
 end
@@ -168,7 +168,7 @@ local function updateInteriorBig()
 end
 
 local function playInteriorSmall(cell)
-   timer.start{duration=0.6, type=timer.real, callback=function()
+   timer.start{duration=0.62, type=timer.real, callback=function()
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
          tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.4*OAvol, pitch=0.8}
@@ -193,10 +193,11 @@ local function cellCheck()
       interiorTimer:pause()
    end
 
-   local cell=tes3.getPlayerCell()
-   local region=tes3.getRegion().name or getInteriorRegion(cell)
-   if not region then return end
-   if not cell.name then return end
+   local cell = tes3.getPlayerCell()
+   local region = tes3.getRegion().name
+   if region == nil and cell and cell.isInterior then region = getInteriorRegion(cell) end
+   if region == nil then debugLog("No region detected. Returning.") return end
+   if cell == nil then debugLog("No cell detected. Returning.") return end
 
    -- Checking climate --
    for kRegion, vClimate in pairs(climates.regions) do
@@ -298,11 +299,13 @@ local function cellCheck()
          else
             windoors=nil
             windoors=common.getWindoors(cell)
-            for _, windoor in ipairs(windoors) do
-               playInteriorBig(windoor)
+            if windoors ~= nil then
+               for _, windoor in ipairs(windoors) do
+                  playInteriorBig(windoor)
+               end
+               interiorTimer:resume()
+               debugLog("Found big interior cell. Playing interior loops.")
             end
-           interiorTimer:resume()
-           debugLog("Found big interior cell. Playing interior loops.")
         end
       end
    end
@@ -319,8 +322,8 @@ local function positionCheck(e)
    local cell=tes3.getPlayerCell()
    local element=e.element
    debugLog("Player underwater. Stopping AURA sounds.")
-   tes3.removeSound{reference=cell}
    if (not cell.isInterior) or (cell.behavesAsExterior) then
+      tes3.removeSound{reference=cell}
       tes3.playSound{soundPath=pathLast, volume=0.4*OAvol, pitch=0.5, reference=cell, loop=true}
    end
    if playSplash and moduleAmbientOutdoor then
@@ -328,8 +331,8 @@ local function positionCheck(e)
    end
    element:register("destroy", function()
       debugLog("Player above water level. Resetting AURA sounds.")
-      tes3.removeSound{reference=cell}
       if (not cell.isInterior) or (cell.behavesAsExterior) then
+         tes3.removeSound{reference=cell}
          tes3.playSound{soundPath=pathLast, volume=1.0*OAvol, reference=cell, loop=true}
       end
       timer.start({duration=5, callback=cellCheck, type=timer.real})
@@ -338,6 +341,7 @@ local function positionCheck(e)
       end
    end)
 end
+
 local function runResetter()
    pathLast, pathNow, tSound = "", "", ""
    climateLast, weatherLast, timeLast = nil, nil, nil
@@ -355,4 +359,4 @@ event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
 event.register("weatherTransitionFinished", cellCheck, {priority=-160})
 event.register("weatherChangedImmediate", cellCheck, {priority=-160})
-event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
+event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
