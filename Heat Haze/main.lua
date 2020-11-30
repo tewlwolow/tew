@@ -110,7 +110,7 @@ local function startHaze()
         }
     end
 
-    if cell.isInterior then
+    if cell.isInterior and not cell.behavesAsExterior then
         debugLog("Detected interior cell. Removing shader.")
         distanceTimer:pause()
         removeHeatShader()
