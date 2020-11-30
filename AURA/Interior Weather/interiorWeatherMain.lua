@@ -87,7 +87,7 @@ local function playInteriorBig(windoor)
         thunderTimerBig:resume()
     else
         debugLog("Playing big interior loop: "..IWLoop)
-        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.5, loop=true, reference=windoor}
+        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.6, loop=true, reference=windoor}
     end
 end
 
@@ -127,9 +127,9 @@ local function cellCheck()
     local cell=tes3.getPlayerCell()
     if not cell then debugLog("No cell detected. Returning.") return end
 
-    if not cell.isInterior
-    and isOpenPlaza(cell)==false
-    and common.checkCellDiff(cell, cellLast)==true then
+    if (not cell.isInterior or cell.behavesAsExterior)
+    and (isOpenPlaza(cell)==false
+    and common.checkCellDiff(cell, cellLast)==true) then
         debugLog("Found exterior cell. Returning.")
         return
     end
