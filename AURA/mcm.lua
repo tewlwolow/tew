@@ -35,6 +35,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
+        label = "Enable Ruins Ambient module?",
+        variable = registerVariable("moduleRuinsAmbient"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
         label = "Enable Interior Weather module?",
         variable = registerVariable("moduleInteriorWeather"),
         restartRequired=true

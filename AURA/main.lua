@@ -2,10 +2,10 @@ local modversion = require("tew.AURA.version")
 local version = modversion.version
 
 local function volumeAdjust()
-    tes3.game.volumeMaster=245
     tes3.game.volumeEffect=245
-    tes3.game.volumeMaster=250
+    tes3.game.volumeMaster=245
     tes3.game.volumeEffect=250
+    tes3.game.volumeMaster=250
 end
 
 local function warning(e)
@@ -21,6 +21,7 @@ local function init()
 
     local config=require("tew.AURA.config")
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
+    local moduleRuinsAmbient = config.moduleRuinsAmbient
     local moduleInteriorWeather = config.moduleInteriorWeather
     local moduleServiceVoices = config.moduleServiceVoices
     local moduleContainers = config.moduleContainers
@@ -32,13 +33,19 @@ local function init()
     if volumeFix then
         volumeAdjust()
         event.register("uiActivated", warning, {filter="MenuAudio"})
-        event.register("cellChanged", volumeAdjust, {priority=-160})
+        event.register("cellChanged", volumeAdjust, {priority=-200})
     end
 
     if moduleAmbientOutdoor then
         mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Outdoor\\outdoorMain.lua")
     end
+
+    if moduleRuinsAmbient then
+        mwse.log("[AURA "..version.."] Loading file: ruinsMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Ruins\\ruinsMain.lua")
+    end
+
 
     if moduleInteriorWeather then
         mwse.log("[AURA "..version.."] Loading file: interiorWeatherMain.lua.")
