@@ -1,6 +1,7 @@
 local this = {}
 
 function this.isOpenPlaza(cell)
+    if not cell then return false end
     if not cell.behavesAsExterior then
         return false
     else
