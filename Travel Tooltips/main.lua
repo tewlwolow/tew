@@ -92,7 +92,7 @@ local function createTooltip(e)
                 elseif headers == data.headers_vehk then
                     for city, maps in pairs(headers) do
                         if string.find(trDestinationText, city) then
-                            if maps and city then
+                            if maps ~= nil and city ~= nil then
                                 headerPath=vehkDir..city.."\\"..maps[math.random(1, #maps)]
                                 break
                             end
