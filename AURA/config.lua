@@ -9,7 +9,7 @@ return mwse.loadConfig("AURA", {
     Cvol=120,
     vsVol=200,
     moduleAmbientOutdoor=true,
-    moduleRuinsAmbient=true,
+    moduleAmbientInterior=true,
     moduleInteriorWeather=true,
     moduleServiceVoices=true,
     moduleUI=true,

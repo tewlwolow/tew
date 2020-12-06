@@ -21,7 +21,7 @@ local function init()
 
     local config=require("tew.AURA.config")
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
-    local moduleRuinsAmbient = config.moduleRuinsAmbient
+    local moduleAmbientInterior = config.moduleAmbientInterior
     local moduleInteriorWeather = config.moduleInteriorWeather
     local moduleServiceVoices = config.moduleServiceVoices
     local moduleContainers = config.moduleContainers
@@ -41,9 +41,9 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Outdoor\\outdoorMain.lua")
     end
 
-    if moduleRuinsAmbient then
-        mwse.log("[AURA "..version.."] Loading file: ruinsMain.lua.")
-        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Ruins\\ruinsMain.lua")
+    if moduleAmbientInterior then
+        mwse.log("[AURA "..version.."] Loading file: interiorMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Interior\\interiorMain.lua")
     end
 
 
