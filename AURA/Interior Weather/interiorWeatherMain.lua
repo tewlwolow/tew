@@ -59,20 +59,20 @@ local function playInteriorSmall(cell)
     local IWPath=IWAURAdir..interiorType.."\\"..IWLoop..".wav"
 
     if IWLoop=="rain heavy" then
-        tes3.playSound{soundPath=IWPath, volume=0.8*IWvol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.7*IWvol+volBoost, loop=true, reference=cell}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif IWLoop=="Rain" then
-        tes3.playSound{soundPath=IWPath, volume=0.8*IWvol+volBoost, loop=true, reference=cell}
+        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
         debugLog("Playing small interior rain loops.")
     elseif IWLoop=="Blight" or IWLoop=="ashstorm" or IWLoop=="BM Blizzard" then
-        tes3.playSound{sound=IWLoop, volume=0.6*IWvol, pitch=0.7, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.7, loop=true, reference=cell}
         tes3.playSound{soundPath=IWAURAdir.."Common\\wind gust.wav", volume=0.2, loop=true, reference=cell}
     else
-        tes3.playSound{sound=IWLoop, volume=0.6*IWvol, pitch=0.6, loop=true, reference=cell}
+        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.6, loop=true, reference=cell}
     end
 end
 
