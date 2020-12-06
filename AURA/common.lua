@@ -52,11 +52,11 @@ this.cellTypesTent={
     "Drs_Tnt",
 }
 
-this.cellTypesCaves={
+--[[this.cellTypesCaves={
     "cave",
     "sewer",
     "grotto",
-}
+}]]
 
 this.windows={
     "_win_",
@@ -67,6 +67,17 @@ this.windows={
     "palacewin",
     "triwin",
 }
+
+-- Getting region on loaded save in interior. Taken from Provincial Music --
+function this.getInteriorRegion(cell)
+   for ref in cell:iterateReferences(tes3.objectType.door) do
+      if (ref.destination) then
+         if (ref.destination.cell.region) then
+            return ref.destination.cell.region.name
+         end
+      end
+   end
+end
 
 function this.checkCellDiff(cell, cellLast)
     if (cellLast==nil) then return true end

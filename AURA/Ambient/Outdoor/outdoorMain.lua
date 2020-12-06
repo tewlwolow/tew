@@ -3,7 +3,9 @@ local config = require("tew\\AURA\\config")
 local modversion = require("tew\\AURA\\version")
 local common=require("tew\\AURA\\common")
 local tewLib = require("tew\\tewLib\\tewLib")
+
 local isOpenPlaza=tewLib.isOpenPlaza
+local getInteriorRegion = common.getInteriorRegion
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 local moduleInteriorWeather=config.moduleInteriorWeather
@@ -33,17 +35,6 @@ local tArray=common.tArray
 local function debugLog(string)
    if debugLogOn then
       mwse.log("[AURA "..version.."] OA: "..string.format("%s", string))
-   end
-end
-
--- Getting region on loaded save in interior. Taken from Provincial Music --
-local function getInteriorRegion (cell)
-   for ref in cell:iterateReferences(tes3.objectType.door) do
-      if (ref.destination) then
-         if (ref.destination.cell.region) then
-            return ref.destination.cell.region.name
-         end
-      end
    end
 end
 
@@ -138,7 +129,7 @@ local function playTrans(cell)
    if cell.isInterior and not cell.behavesAsExterior then
       return
    else
-   tes3.playSound{sound=tSound, volume=0.3*OAvol, pitch=0.7, reference=tes3.player}
+   tes3.playSound{sound=tSound, volume=0.3*OAvol, pitch=0.8, reference=tes3.player}
    debugLog("Playing transition rustle. Sound: "..tSound)
    end
 end
@@ -148,10 +139,10 @@ local function playInteriorBig(windoor)
       if windoor==nil then debugLog("Dodging an empty ref.") return end
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.5*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.35*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.5*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.35*OAvol, pitch=0.8}
       end
    end}
 end
@@ -171,15 +162,16 @@ local function playInteriorSmall(cell)
    timer.start{duration=0.62, type=timer.real, callback=function()
       if cellLast and pathLast and not cellLast.isInterior then
          debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
-         tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.4*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
       else
          debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
-         tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.4*OAvol, pitch=0.8}
+         tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
       end
    end}
 end
 
 local function cellCheck()
+   local region
 
    OAvol = config.OAvol/200
 
@@ -194,10 +186,15 @@ local function cellCheck()
    end
 
    local cell = tes3.getPlayerCell()
-   local region = tes3.getRegion().name
-   if region == nil and cell and cell.isInterior then region = getInteriorRegion(cell) end
-   if region == nil then debugLog("No region detected. Returning.") return end
    if cell == nil then debugLog("No cell detected. Returning.") return end
+
+   if cell.isInterior then
+      region = getInteriorRegion(cell)
+   else
+      region = tes3.getRegion().name
+   end
+
+   if region == nil then debugLog("No region detected. Returning.") return end
 
    -- Checking climate --
    for kRegion, vClimate in pairs(climates.regions) do
@@ -205,6 +202,7 @@ local function cellCheck()
          climateNow=vClimate
       end
    end
+   if not climateNow then debugLog ("Blacklisted region - no climate detected. Returning.") return end
    debugLog("Climate: "..climateNow)
 
    -- Checking time --
@@ -230,7 +228,8 @@ local function cellCheck()
    if timeNow==timeLast
    and climateNow==climateLast
    and weatherNow==weatherLast
-   and common.checkCellDiff(cell, cellLast)==false then
+   and (common.checkCellDiff(cell, cellLast)==false
+   or cell == cellLast) then
       debugLog("Same conditions detected. Returning.")
       return
    elseif timeNow~=timeLast and weatherNow==weatherLast then
