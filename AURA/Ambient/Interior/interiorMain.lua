@@ -25,6 +25,7 @@ local arrays = {
     ["Mages"] = {},
     ["Fighters"] = {},
     ["Temple"] = {},
+    ["Library"] = {},
 }
 
 for interiorType, _ in pairs(arrays) do
@@ -43,6 +44,8 @@ local function cellCheck(e)
         tes3.removeSound{reference = tes3.player}
         playedFlag = 0
     end
+
+    if not (cell) or not (cell.isInterior) or not (cell.name) then return end
 
     for cellType, nameTable in pairs(data.names) do
         for _, pattern in pairs(nameTable) do

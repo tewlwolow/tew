@@ -42,8 +42,14 @@ this.names = {
     ["Temple"] = {
         "Temple",
         "Maar Gan Shrine",
-        "Vos Chapel"
+        "Vos Chapel",
+        "High Fane",
+        "Necrom",
+        "Holamayan"
     },
+    ["Library"] = {
+        "Library",
+    }
 }
 
 return this
