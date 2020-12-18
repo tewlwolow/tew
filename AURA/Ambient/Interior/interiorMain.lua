@@ -41,7 +41,9 @@ local function cellCheck(e)
     local cell = e.cell
 
     if playedFlag == 1 then
-        tes3.removeSound{reference = tes3.player}
+        timer.start{duration=0.82, type=timer.real, callback=function()
+            tes3.removeSound{reference = tes3.player}
+        end}
         playedFlag = 0
     end
 
@@ -66,24 +68,32 @@ local function cellCheck(e)
         end
     end
 
+    local count = 0
+    local typeCell
+
     for cellType, typeArray in pairs(data.statics) do
         if getCellType(cell, typeArray) == true then
-            debugLog("Found appropriate cell. Playing interior ambient sound.")
-            path = interiorDir..cellType.."\\"..arrays[cellType][math.random(1, #arrays[cellType])]
-            timer.start{duration=0.82, type=timer.real, callback=function()
-                tes3.playSound{
-                soundPath = path,
-                reference = tes3.player,
-                volume = 0.8,
-                loop=true
-                }
-            end}
-            playedFlag = 1
-            return
-        else
-            debugLog("No appropriate cell detected.")
-            playedFlag = 0
+            count = count + 1
+            typeCell = cellType
         end
+    end
+
+    if count > 3 then
+        debugLog("Found appropriate cell. Playing interior ambient sound.")
+        path = interiorDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
+        timer.start{duration=0.82, type=timer.real, callback=function()
+            tes3.playSound{
+            soundPath = path,
+            reference = tes3.player,
+            volume = 0.8,
+            loop=true
+            }
+        end}
+        playedFlag = 1
+        return
+    else
+        debugLog("No appropriate cell detected.")
+        playedFlag = 0
     end
 end
 
