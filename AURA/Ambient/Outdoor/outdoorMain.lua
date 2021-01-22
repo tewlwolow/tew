@@ -189,7 +189,8 @@ local function cellCheck()
    if cell == nil then debugLog("No cell detected. Returning.") return end
 
    if cell.isInterior then
-      region = getInteriorRegion(cell)
+      region = tes3.getRegion({useDoors=true}).name
+      --region = getInteriorRegion(cell)
    else
       region = tes3.getRegion().name
    end

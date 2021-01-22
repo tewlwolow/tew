@@ -134,7 +134,7 @@ local function cellCheck()
         return
     end
 
-    local IWweather=WtC.currentWeather.index
+    local IWweather = tes3.getRegion({useDoors=true}).weather.index
     IWLoop=nil
     if not (IWweather >=4 and IWweather <= 7) and not IWweather==9 then
         debugLog("Uneligible weather detected. Returning.")
@@ -198,15 +198,17 @@ local function cellCheck()
             thunderTimerSmall:resume()
         end
     else
-        for _, windoor in ipairs(windoors) do
-            tes3.removeSound{reference=windoor}
-            playInteriorBig(windoor)
-        end
-        interiorTimer:resume()
-        debugLog("Playing big interior sound.")
-        if IWLoop=="rain heavy" then
-            updateThunderBig()
-            thunderTimerBig:resume()
+        if windoors and windoors[1] ~= nil then
+            for _, windoor in ipairs(windoors) do
+                tes3.removeSound{reference=windoor}
+                playInteriorBig(windoor)
+            end
+            interiorTimer:resume()
+            debugLog("Playing big interior sound.")
+            if IWLoop=="rain heavy" then
+                updateThunderBig()
+                thunderTimerBig:resume()
+            end
         end
     end
 
