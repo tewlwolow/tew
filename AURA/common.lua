@@ -45,6 +45,7 @@ this.cellTypesSmall={
     "in_de_shack_",
     "s12_v_plaza",
     "rp_v_arena",
+    "in_nord_house_04"
 }
 
 this.cellTypesTent={
