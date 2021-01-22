@@ -153,7 +153,7 @@ local function cellCheck()
     local function getPopulatedCell(maxCount)
         local count = 0
         for npc in cell:iterateReferences(tes3.objectType.NPC) do
-            if not npc.object.mobile.isDead then
+            if (npc.object.mobile) and (not npc.object.mobile.isDead) then
                 count = count + 1
             end
             if count >= maxCount then return true end
