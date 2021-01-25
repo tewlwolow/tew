@@ -46,12 +46,16 @@ this.names = {
     },
     ["Temple"] = {
         "Temple",
-        "Maar Gan Shrine",
+        "Maar Gan, Shrine",
         "Vos Chapel",
         "High Fane",
+        "Fane of the Ancestors",
+        "Tiriramanu",
     },
     ["Library"] = {
         "Library",
+        "Bookseller",
+        "Books"
     },
     ["Trader"] = {
         "Trader",
@@ -68,6 +72,13 @@ this.names = {
         "Clothier",
         "Tailors",
     },
+    ["Tomb"]= {
+        "Tomb",
+        "Burial",
+        "Crypt",
+        "Barrow",
+        "Catacomb",
+    }
 }
 
 this.tavernNames = {
@@ -75,7 +86,7 @@ this.tavernNames = {
         --[["Cornerclub",
         "Corner Club",
         "Tradehouse",]]
-        "The Rat in the Pot",
+        "Rat in the Pot",
         "House of Earthly Delights",
     },
     ["Imperial"] = {
