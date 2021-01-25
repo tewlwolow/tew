@@ -1,6 +1,18 @@
 local this = {}
 
 this.statics = {
+    ["Abandoned"] = {
+        "in_stronghold",
+        "in_strong",
+        "in_strongruin",
+        "in_sewer",
+        "T_Ayl_DngRuin",
+        "T_Bre_DngRuin",
+        "T_De_DngStrongh",
+        "T_He_DngDirenni",
+        "T_Imp_DngRuinCyr",
+        "T_Imp_DngSewers",
+    },
     ["Caves"] = {
         "in_moldcave",
         "in_mudcave",
@@ -10,17 +22,26 @@ this.statics = {
         "in_bc_cave",
         "in_m_sewer",
         "in_sewer",
+        "AB_In_Kwama",
+        "AB_In_Lava",
+        "AB_In_MVCave",
+        "T_Cyr_CaveGC",
+        "T_Glb_Cave",
+        "T_Mw_Cave",
+        "T_Sky_Cave"
     },
     ["Daedric"] = {
         "in_dae_hall",
         "in_dae_room",
         "in_dae_pillar",
+        "T_Dae_DngRuin"
     },
     ["Dwemer"]= {
         "in_dwrv_hall",
         "in_dwrv_corr",
         "in_dwe_corr",
         "in_dwe_archway",
+        "T_Dwe_DngRuin",
     },
     ["Ice Caves"] = {
         "bm_ic_",

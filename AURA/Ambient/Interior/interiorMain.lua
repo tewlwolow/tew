@@ -46,6 +46,7 @@ local function getPopulatedCell(maxCount, cell)
 end
 
 local arrays = {
+    ["Abandoned"] = {},
     ["Alchemist"] = {},
     ["Caves"] = {},
     ["Clothier"] = {},
