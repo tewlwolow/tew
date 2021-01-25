@@ -12,7 +12,7 @@ local IWvol = config.IWvol/200
 local cellLast
 local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
 
-local WtC=tes3.getWorldController().weatherController
+--local WtC=tes3.getWorldController().weatherController
 
 local thunArray=common.thunArray
 

@@ -5,7 +5,7 @@ local common=require("tew\\AURA\\common")
 local tewLib = require("tew\\tewLib\\tewLib")
 
 local isOpenPlaza=tewLib.isOpenPlaza
-local getInteriorRegion = common.getInteriorRegion
+--local getInteriorRegion = common.getInteriorRegion
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 local moduleInteriorWeather=config.moduleInteriorWeather
@@ -18,7 +18,7 @@ local splashVol = config.splashVol/200
 local playWindy=config.playWindy
 local playInteriorAmbient=config.playInteriorAmbient
 local version = modversion.version
-local wTC=tes3.getWorldController().weatherController
+--local wTC=tes3.getWorldController().weatherController
 
 local AURAdir = "Data Files\\Sound\\tew\\AURA"
 local climDir = "\\Climates\\"
@@ -220,10 +220,8 @@ local function cellCheck()
    debugLog("Time: "..timeNow)
 
    -- Checking current weather --
-   if wTC.currentWeather then
-      weatherNow=wTC.currentWeather.index
-      debugLog("Weather: "..weatherNow)
-   end
+   weatherNow=tes3.getRegion({useDoors=true}).weather.index
+   debugLog("Weather: "..weatherNow)
 
    -- Transition filter chunk --
    if timeNow==timeLast
