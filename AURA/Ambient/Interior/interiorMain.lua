@@ -17,6 +17,34 @@ local function debugLog(string)
     end
 end
 
+local function getTypeCell(maxCount, cell)
+    local count = 0
+    local typeCell
+    for stat in cell:iterateReferences(tes3.objectType.static) do
+        for cellType, typeArray in pairs(data.statics) do
+            for _, statName in ipairs(typeArray) do
+                if string.startswith(stat.object.id:lower(), statName) then
+                    count = count + 1
+                    typeCell = cellType
+                    if count >= maxCount then return typeCell end
+                end
+            end
+        end
+    end
+    if count == 0 then return nil end
+end
+
+local function getPopulatedCell(maxCount, cell)
+    local count = 0
+    for npc in cell:iterateReferences(tes3.objectType.NPC) do
+        if (npc.object.mobile) and (not npc.object.mobile.isDead) then
+            count = count + 1
+        end
+        if count >= maxCount then return true end
+    end
+    if count < maxCount then return false end
+end
+
 local arrays = {
     ["Alchemist"] = {},
     ["Caves"] = {},
@@ -29,6 +57,7 @@ local arrays = {
     ["Temple"] = {},
     ["Library"] = {},
     ["Trader"] = {},
+    ["Tomb"] = {},
     ["Tavern"] = {
         ["Imperial"] = {},
         ["Dark Elf"] = {},
@@ -43,7 +72,7 @@ local musicArrays = {
 }
 
 local function playInterior()
-    timer.start{duration=0.82, type=timer.real, callback=function()
+    timer.start{duration=0.84, type=timer.real, callback=function()
         playedFlag = 1
         debugLog("Playing interior track: "..path)
         tes3.playSound{
@@ -56,14 +85,16 @@ local function playInterior()
 end
 
 local function playMusic()
-        playedFlag = 1
-        lastMusicPath=musicPath
-        --debugLog("Playing music track: "..musicPath)
-        tes3.streamMusic{
-            path = musicPath,
-            crossfade = 0,
-        }
+    playedFlag = 1
+    lastMusicPath = musicPath
+    --debugLog("Playing music track: "..musicPath)
+    tes3.streamMusic{
+        path = musicPath,
+        crossfade = 0,
+    }
 end
+
+
 
 for interiorType, _ in pairs(arrays) do
     for soundfile in lfs.dir("Data Files\\Sound\\"..interiorDir.."\\"..interiorType) do
@@ -94,7 +125,10 @@ for folder in lfs.dir("Data Files\\Music\\tew\\AURA") do
     end
 end
 
+
+
 local function cellCheck()
+
     local cell = tes3.getPlayerCell()
 
     if playedFlag == 1 then
@@ -105,9 +139,6 @@ local function cellCheck()
         end}
 
         debugLog("Removing music.")
-        --musicTimer:pause()
-        --musicTimer:cancel()
-        --musicTimer = nil
         timer.start{duration=0.01, type=timer.real, iterations=5, callback=function()
             tes3.streamMusic{
                 path = "tew\\AURA\\Special\\silence.mp3",
@@ -122,6 +153,15 @@ local function cellCheck()
         return
     end
 
+    local typeCell = getTypeCell(5, cell)
+    if typeCell ~= nil then
+        debugLog("Found appropriate cell. Playing interior ambient sound.")
+        path = interiorDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
+        playInterior()
+        return
+    end
+
+    if getPopulatedCell(1, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
     for cellType, nameTable in pairs(data.names) do
         for _, pattern in pairs(nameTable) do
             if findWholeWords(cell.name, pattern) then
@@ -133,44 +173,7 @@ local function cellCheck()
         end
     end
 
-    local function getTypeCell(maxCount)
-        local count = 0
-        local typeCell
-        for stat in cell:iterateReferences(tes3.objectType.static) do
-            for cellType, typeArray in pairs(data.statics) do
-                for _, statName in ipairs(typeArray) do
-                    if string.startswith(stat.object.id:lower(), statName) then
-                        count = count + 1
-                        typeCell = cellType
-                        if count >= maxCount then return typeCell end
-                    end
-                end
-            end
-        end
-        if count == 0 then return nil end
-    end
-
-    local function getPopulatedCell(maxCount)
-        local count = 0
-        for npc in cell:iterateReferences(tes3.objectType.NPC) do
-            if (npc.object.mobile) and (not npc.object.mobile.isDead) then
-                count = count + 1
-            end
-            if count >= maxCount then return true end
-        end
-        if count < maxCount then return false end
-    end
-
-    if getPopulatedCell(3) == false then debugLog ("Too few people in a cell. Returning.") return end
-
-    local typeCell = getTypeCell(5)
-    if typeCell ~= nil then
-        debugLog("Found appropriate cell. Playing interior ambient sound.")
-        path = interiorDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
-        playInterior()
-        return
-    end
-
+    if getPopulatedCell(3, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
     for race, _ in pairs(data.tavernNames) do
         for _, pattern in ipairs(data.tavernNames[race]) do
             if string.find(cell.name, pattern) then
@@ -217,14 +220,18 @@ local function onMusicSelection()
 
     if not (cell) or not (cell.isInterior) or not (cell.name) then return end
 
+    if getPopulatedCell(3, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+
     for race, _ in pairs(data.tavernNames) do
         for _, pattern in ipairs(data.tavernNames[race]) do
             if string.find(cell.name, pattern) then
                 while musicPath == lastMusicPath do
-                    musicPath = "tew\\AURA\\"..race.."\\"..table.choice(musicArrays[race])
+                    musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
                 end
 
-                playMusic()
+                timer.start{duration=5, type=timer.real, callback=function()
+                    playMusic()
+                end}
 
                 playedFlag = 1
                 return
@@ -246,10 +253,10 @@ local function onMusicSelection()
             end
 
             while musicPath == lastMusicPath do
-                musicPath = "tew\\AURA\\"..race.."\\"..table.choice(musicArrays[race])
+                musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
             end
 
-            timer.start{duration=3, type=timer.real, callback=function()
+            timer.start{duration=5, type=timer.real, callback=function()
                 playMusic()
             end}
 
@@ -261,7 +268,7 @@ local function onMusicSelection()
 end
 
 local function deathCheck(e)
-    if e.reference
+    if e.reference and e.reference.baseObject == tes3.objectType.npc
     and (e.reference.object.class.id == "Publican"
     or  e.reference.object.class.id == "T_Sky_Publican"
     or  e.reference.object.class.id == "T_Cyr_Publican") then
