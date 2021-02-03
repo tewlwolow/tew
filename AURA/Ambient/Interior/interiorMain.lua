@@ -221,7 +221,7 @@ local function onMusicSelection()
 
     if not (cell) or not (cell.isInterior) or not (cell.name) then return end
 
-    if getPopulatedCell(3, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+    if getPopulatedCell(3, cell) == false then return end
 
     for race, _ in pairs(data.tavernNames) do
         for _, pattern in ipairs(data.tavernNames[race]) do
