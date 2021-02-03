@@ -62,7 +62,7 @@ end
 
 local function removeGreenTint()
     debugLog("Reverting green tint.")
-    if weatherTintsOld[1][1] then
+    if weatherTintsOld[0][1] ~= nil then
         for _, w in pairs(WtC.weathers) do
             for wIndex, _ in pairs(weatherTintsOld) do
                 if w.index == wIndex then
@@ -167,6 +167,7 @@ local function onCellChanged()
 
     if isOpenPlaza(cell)==false and lastCell and isOpenPlaza(lastCell)==true then
         debugLog("Transitioning from plaza cell.")
+        
         if greenTint then
             removeGreenTint()
         end
