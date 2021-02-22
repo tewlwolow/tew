@@ -169,6 +169,7 @@ local function init()
                 end
                 if texPath~=nil and weathers[index][1]~=nil then
                     weather.cloudTexture=WtSdir..texPath.."\\"..weathers[index][math.random(1, #weathers[index])]
+                    debugLog("Cloud texture path set to: "..weather.cloudTexture)
                 end
             end
         end
