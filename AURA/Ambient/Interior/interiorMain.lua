@@ -149,7 +149,7 @@ local function cellCheck()
         playedFlag = 0
     end
 
-    if not (cell) or not (cell.isInterior) or not (cell.name) then
+    if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then
         debugLog("Player in exterior or no cell found. Returning.")
         return
     end
@@ -219,7 +219,7 @@ end
 local function onMusicSelection()
     local cell = tes3.getPlayerCell()
 
-    if not (cell) or not (cell.isInterior) or not (cell.name) then return end
+    if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then return end
 
     if getPopulatedCell(3, cell) == false then return end
 
