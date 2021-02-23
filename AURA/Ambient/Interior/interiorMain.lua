@@ -87,11 +87,12 @@ end
 
 local function playMusic()
     playedFlag = 1
+
     lastMusicPath = musicPath
     --debugLog("Playing music track: "..musicPath)
     tes3.streamMusic{
         path = musicPath,
-        crossfade = 0,
+        --crossfade = 0,
     }
 end
 
@@ -140,11 +141,9 @@ local function cellCheck()
         end}
 
         debugLog("Removing music.")
-        timer.start{duration=0.01, type=timer.real, iterations=5, callback=function()
             tes3.streamMusic{
                 path = "tew\\AURA\\Special\\silence.mp3",
             }
-        end}
 
         playedFlag = 0
     end
@@ -230,9 +229,7 @@ local function onMusicSelection()
                     musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
                 end
 
-                timer.start{duration=5, type=timer.real, callback=function()
-                    playMusic()
-                end}
+                playMusic()
 
                 playedFlag = 1
                 return
@@ -257,9 +254,7 @@ local function onMusicSelection()
                 musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
             end
 
-            timer.start{duration=5, type=timer.real, callback=function()
-                playMusic()
-            end}
+            playMusic()
 
             playedFlag = 1
             return
