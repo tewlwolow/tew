@@ -46,7 +46,6 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Interior\\interiorMain.lua")
     end
 
-
     if moduleInteriorWeather then
         mwse.log("[AURA "..version.."] Loading file: interiorWeatherMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Interior Weather\\interiorWeatherMain.lua")

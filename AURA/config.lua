@@ -8,6 +8,7 @@ return mwse.loadConfig("AURA", {
     SVvol=200,
     Cvol=120,
     vsVol=200,
+    intVol=150,
     moduleAmbientOutdoor=true,
     moduleAmbientInterior=true,
     moduleInteriorWeather=true,
@@ -39,5 +40,6 @@ return mwse.loadConfig("AURA", {
     pcVitalSigns=true,
     PChealth=true,
     PCfatigue=true,
-    PCmagicka=true
+    PCmagicka=true,
+    interiorMusic=false
 })

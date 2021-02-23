@@ -7,6 +7,8 @@ local version = modversion.version
 --local getCellType = common.getCellType
 local tewLib = require("tew\\tewLib\\tewLib")
 local findWholeWords = tewLib.findWholeWords
+local intVol = config.intVol/200
+local interiorMusic = config.interiorMusic
 
 local interiorDir = "tew\\AURA\\Interior\\"
 local path, playedFlag, musicPath, lastMusicPath
@@ -57,6 +59,7 @@ local arrays = {
     ["Fighters"] = {},
     ["Temple"] = {},
     ["Library"] = {},
+    ["Smith"] = {},
     ["Trader"] = {},
     ["Tomb"] = {},
     ["Tavern"] = {
@@ -79,7 +82,7 @@ local function playInterior()
         tes3.playSound{
         soundPath = path,
         reference = tes3.player,
-        volume = 1.0,
+        volume = 1.0*intVol,
         loop=true
         }
     end}
@@ -140,10 +143,12 @@ local function cellCheck()
             playedFlag = 0
         end}
 
-        debugLog("Removing music.")
-            tes3.streamMusic{
-                path = "tew\\AURA\\Special\\silence.mp3",
-            }
+        if interiorMusic then
+            debugLog("Removing music.")
+                tes3.streamMusic{
+                    path = "tew\\AURA\\Special\\silence.mp3",
+                }
+        end
 
         playedFlag = 0
     end
@@ -269,12 +274,15 @@ local function deathCheck(e)
     or  e.reference.object.class.id == "T_Sky_Publican"
     or  e.reference.object.class.id == "T_Cyr_Publican") then
         cellCheck()
-        onMusicSelection()
+        if interiorMusic then
+            onMusicSelection()
+        end
     end
 end
 
 
 event.register("cellChanged", cellCheck, { priority = -200 })
-event.register("musicSelectTrack", onMusicSelection)
-
 event.register("death", deathCheck)
+if interiorMusic then
+    event.register("musicSelectTrack", onMusicSelection)
+end

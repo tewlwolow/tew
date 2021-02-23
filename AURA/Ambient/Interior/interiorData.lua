@@ -78,6 +78,16 @@ this.names = {
         "Bookseller",
         "Books"
     },
+    ["Smith"] = {
+        "Smith",
+        "Armorer",
+        "Weapons",
+        "Armor",
+        "Smithy",
+        "Weapon",
+        "Armors",
+        "Blacksmith",
+    },
     ["Trader"] = {
         "Trader",
         "Pawnbroker",
@@ -109,6 +119,7 @@ this.tavernNames = {
         "Tradehouse",]]
         "Rat in the Pot",
         "House of Earthly Delights",
+        "Elven Nations"
     },
     ["Imperial"] = {
         "Ebonheart, Six Fishes"

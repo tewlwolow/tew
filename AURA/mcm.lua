@@ -106,6 +106,24 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+    local pageIA = template:createPage{label="Interior Ambient"}
+    pageIA:createCategory{
+        label = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.\n\nSettings:"
+    }
+    pageIA:createSlider{
+        label = "Changes % volume for Interior Ambient module. Default = 150%.\nRequires restart. Volume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("intVol")
+    }
+    pageIA:createYesNoButton{
+        label = "Enable natural, native music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod. Requires restart.",
+        variable = registerVariable("interiorMusic"),
+        restartRequired=true
+    }
+
     local pageIW = template:createPage{label="Interior Weather"}
     pageIW:createCategory{
         label = "Plays weather sounds in interiors.\n\nSettings:"
