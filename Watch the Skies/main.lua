@@ -13,6 +13,39 @@ local WtC, intWeatherTimer
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
+local particleAmount = {
+    ["rain"] = {
+        100,
+        250,
+        400,
+        500,
+        1000,
+        1200,
+        1500,
+        2000
+    },
+    ["thunder"] = {
+        400,
+        500,
+        600,
+        900,
+        1400,
+        1700,
+        2000,
+        2200,
+    },
+    ["snow"] = {
+        100,
+        300,
+        460,
+        600,
+        1000,
+        1200,
+        1500,
+        1800
+    }
+}
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
@@ -20,9 +53,9 @@ local function debugLog(string)
 end
 
 local function changeMaxParticles()
-    WtC.weathers[5].maxParticles=math.random(100,1200)
-    WtC.weathers[6].maxParticles=math.random(400,1500)
-    WtC.weathers[9].maxParticles=math.random(100,1200)
+    WtC.weathers[5].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
+    WtC.weathers[6].maxParticles=particleAmount["thunder"][math.random(1, #particleAmount["thunder"])]
+    WtC.weathers[9].maxParticles=particleAmount["snow"][math.random(1, #particleAmount["snow"])]
     debugLog("Particles amount randomised.")
     debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
     debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
