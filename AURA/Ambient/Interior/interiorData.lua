@@ -6,12 +6,13 @@ this.statics = {
         "in_strong",
         "in_strongruin",
         "in_sewer",
-        "T_Ayl_DngRuin",
-        "T_Bre_DngRuin",
-        "T_De_DngStrongh",
-        "T_He_DngDirenni",
-        "T_Imp_DngRuinCyr",
-        "T_Imp_DngSewers",
+        "t_ayl_dngruin",
+        "t_bre_dngruin",
+        "t_de_dngrtrongh",
+        "t_he_dngrirenni",
+        "t_imp_dngruincyr",
+        "t_imp_dngsewers",
+        "in_om_"
     },
     ["Caves"] = {
         "in_moldcave",
@@ -22,26 +23,26 @@ this.statics = {
         "in_bc_cave",
         "in_m_sewer",
         "in_sewer",
-        "AB_In_Kwama",
-        "AB_In_Lava",
-        "AB_In_MVCave",
-        "T_Cyr_CaveGC",
-        "T_Glb_Cave",
-        "T_Mw_Cave",
-        "T_Sky_Cave"
+        "ab_in_kwama",
+        "ab_in_lava",
+        "ab_in_mvcave",
+        "t_cyr_cavegc",
+        "t_glb_cave",
+        "t_mw_cave",
+        "t_sky_cave"
     },
     ["Daedric"] = {
         "in_dae_hall",
         "in_dae_room",
         "in_dae_pillar",
-        "T_Dae_DngRuin"
+        "t_dae_dngruin"
     },
     ["Dwemer"]= {
         "in_dwrv_hall",
         "in_dwrv_corr",
         "in_dwe_corr",
         "in_dwe_archway",
-        "T_Dwe_DngRuin",
+        "t_dwe_dngruin",
     },
     ["Ice Caves"] = {
         "bm_ic_",
@@ -54,6 +55,7 @@ this.names = {
         "Alchemist",
         "Apothecary",
         "Tel Uvirith, Omavel's House",
+        "Healer",
     },
     ["Mages"] = {
         "Mages Guild",
@@ -71,7 +73,7 @@ this.names = {
         "Vos Chapel",
         "High Fane",
         "Fane of the Ancestors",
-        "Tiriramanu",
+        "Tiriramannu",
     },
     ["Library"] = {
         "Library",
@@ -97,7 +99,8 @@ this.names = {
         "Outfitter",
         "Laborers",
         "Brewers",
-        "Tradehouse"
+        "Tradehouse",
+        "Hostel",
     },
     ["Clothier"] = {
         "Clothier",
