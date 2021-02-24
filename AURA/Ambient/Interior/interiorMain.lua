@@ -28,12 +28,12 @@ local function getTypeCell(maxCount, cell)
                 if string.startswith(stat.object.id:lower(), statName) then
                     count = count + 1
                     typeCell = cellType
-                    if count >= maxCount then return typeCell end
+                    if count >= maxCount then debugLog("Enough statics. Cell type: "..typeCell) return typeCell end
                 end
             end
         end
     end
-    if count == 0 then return nil end
+    if count == 0 then debugLog("Too few statics. Count: "..count) return nil end
 end
 
 local function getPopulatedCell(maxCount, cell)
