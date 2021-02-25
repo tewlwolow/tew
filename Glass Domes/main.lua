@@ -8,7 +8,7 @@ local debugLogOn = config.debugLogOn
 local fauxWeathers = require("tew\\Glass Domes\\fauxWeathers")
 local lastCell
 local lastDomeWeather = ""
-local version="1.2.6"
+local version="1.2.8"
 
 local ashValues = fauxWeathers.ashValues
 local blightValues = fauxWeathers.blightValues
@@ -167,8 +167,8 @@ local function onCellChanged()
 
     if isOpenPlaza(cell)==false and lastCell and isOpenPlaza(lastCell)==true then
         debugLog("Transitioning from plaza cell.")
-        
-        if greenTint then
+
+        if greenTint == true then
             removeGreenTint()
         end
 
@@ -231,10 +231,10 @@ local function onCellChanged()
 
     if isOpenPlaza(cell)==true then
 
-        if (greenTint) and
-        (not string.find(cell.name:lower(), "arena pit"))
-        or (not string.find(cell.name:lower(), "molag mar, plaza"))
-        and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
+        if (greenTint == true) and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm")
+        and (not string.find(cell.name:lower(), "arena pit"))
+        or (greenTint == true) and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm")
+        and (not string.find(cell.name:lower(), "molag mar, plaza")) then
             applyGreenTint()
         end
 
@@ -246,7 +246,7 @@ local function onCellChanged()
         end
 
         if currentWeather.index == 6 or (nextWeather and nextWeather.index == 6) then
-            if greenTint then
+            if greenTint == true then
                 removeGreenTint()
             end
             prepareFauxAsh()
@@ -257,7 +257,7 @@ local function onCellChanged()
         end
 
         if currentWeather.index == 7 or (nextWeather and nextWeather.index == 7) then
-            if greenTint then
+            if greenTint == true then
                 removeGreenTint()
             end
             prepareFauxBlight()
@@ -290,15 +290,15 @@ local function onTransition()
     if isOpenPlaza(cell)==true then
         debugLog("Weather transitioned to ash or blight.")
 
-        if (greenTint) and
-        (not string.find(cell.name:lower(), "arena pit"))
-        or (not string.find(cell.name:lower(), "molag mar, plaza"))
-        and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm") then
+        if (greenTint == true) and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm")
+        and (not string.find(cell.name:lower(), "arena pit"))
+        or (greenTint == true) and (lastDomeWeather~="Blight" or lastDomeWeather~="ashstorm")
+        and (not string.find(cell.name:lower(), "molag mar, plaza")) then
             applyGreenTint()
         end
 
         if currentWeather.index == 6 or (nextWeather and nextWeather.index == 6) then
-            if greenTint then
+            if greenTint == true then
                 removeGreenTint()
             end
             prepareFauxAsh()
@@ -309,7 +309,7 @@ local function onTransition()
         end
 
         if currentWeather.index == 7 or (nextWeather and nextWeather.index == 7) then
-            if greenTint then
+            if greenTint == true then
                 removeGreenTint()
             end
             prepareFauxBlight()
@@ -354,9 +354,8 @@ local function changeFlags(e)
         if e.to.index <= 5 and e.to.index~=3 then
             debugLog("Resetting faux weather flags and removing sounds.")
             lastDomeWeather = "other"
-            if (greenTint) and
-            (not string.find(cell.name:lower(), "arena pit"))
-            or (not string.find(cell.name:lower(), "molag mar, plaza")) then
+            if greenTint == true and (not string.find(cell.name:lower(), "arena pit"))
+            or greenTint == true and (not string.find(cell.name:lower(), "molag mar, plaza")) then
                 applyGreenTint()
             end
             tes3.removeSound{sound="ashstorm", reference=tes3.mobilePlayer}
