@@ -1,7 +1,7 @@
 local configPath = "Glass Domes"
 local config = require("tew.Glass Domes.config")
 mwse.loadConfig("Glass Domes")
-local version="1.2.7"
+local version="1.2.8"
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{
@@ -28,7 +28,8 @@ local template = mwse.mcm.createTemplate{
 
     page:createYesNoButton{
         label = "Use green sun tint for dome interiors (excluding Arena Pit)?\nDefault: No.",
-        variable = registerVariable("greenTint")
+        variable = registerVariable("greenTint"),
+        restartRequired=true
     }
 
     page:createDropdown{
