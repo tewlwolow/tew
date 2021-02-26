@@ -3,8 +3,6 @@ local config = require("tew\\AURA\\config")
 local debugLogOn = config.debugLogOn
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
---local common = require("tew\\AURA\\common")
---local getCellType = common.getCellType
 local tewLib = require("tew\\tewLib\\tewLib")
 local findWholeWords = tewLib.findWholeWords
 local intVol = config.intVol/200
@@ -15,7 +13,7 @@ local path, playedFlag, musicPath, lastMusicPath
 
 local function debugLog(string)
     if debugLogOn then
-       mwse.log("[AURA "..version.."] RA: "..string.format("%s", string))
+       mwse.log("[AURA "..version.."] IA: "..string.format("%s", string))
     end
 end
 
