@@ -40,9 +40,9 @@ local function getPopulatedCell(maxCount, cell)
         if (npc.object.mobile) and (not npc.object.mobile.isDead) then
             count = count + 1
         end
-        if count >= maxCount then return true end
+        if count >= maxCount then debugLog("Enough people in a cell. Count :"..count) return true end
     end
-    if count < maxCount then return false end
+    if count < maxCount then debugLog("Too few people in a cell. Count: "..count) return false end
 end
 
 local arrays = {
