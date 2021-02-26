@@ -25,6 +25,7 @@ local function init()
     local moduleInteriorWeather = config.moduleInteriorWeather
     local moduleServiceVoices = config.moduleServiceVoices
     local moduleContainers = config.moduleContainers
+    local moduleAmbientPopulated = config.moduleAmbientPopulated
     local moduleUI = config.moduleUI
     local moduleMisc = config.moduleMisc
     local modulePC = config.modulePC
@@ -44,6 +45,11 @@ local function init()
     if moduleAmbientInterior then
         mwse.log("[AURA "..version.."] Loading file: interiorMain.lua.")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Interior\\interiorMain.lua")
+    end
+
+    if moduleAmbientPopulated then
+        mwse.log("[AURA "..version.."] Loading file: populatedMain.lua.")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Populated\\populatedMain.lua")
     end
 
     if moduleInteriorWeather then

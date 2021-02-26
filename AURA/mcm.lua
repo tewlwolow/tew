@@ -40,6 +40,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
+        label = "Enable Populated Ambient module?",
+        variable = registerVariable("moduleAmbientPopulated"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
         label = "Enable Interior Weather module?",
         variable = registerVariable("moduleInteriorWeather"),
         restartRequired=true
@@ -122,6 +127,19 @@ local template = mwse.mcm.createTemplate{
         label = "Enable natural, native music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod. Requires restart.",
         variable = registerVariable("interiorMusic"),
         restartRequired=true
+    }
+
+    local pagePA = template:createPage{label="Populated Ambient"}
+    pagePA:createCategory{
+        label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"
+    }
+    pagePA:createSlider{
+        label = "Changes % volume for Populated Ambient module. Default = 200%.\nRequires restart. Volume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("popVol")
     }
 
     local pageIW = template:createPage{label="Interior Weather"}
