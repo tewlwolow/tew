@@ -82,7 +82,9 @@ local function cellCheck()
     local typeCell = getTypeCell(5, cell)
     if typeCell ~= nil then
         local gameHour=tes3.worldController.hour.value
-        if gameHour < 5 or gameHour > 21 then
+        if typeCell~="Daedric" and
+        typeCell~="Dwemer" and
+        gameHour < 5 or gameHour > 21 then
             debugLog("Found appropriate cell at night. Playing populated night ambient sound.")
             path = popDir.."\\Night\\"..arrays["Night"][math.random(1, #arrays["Night"])]
             playPopulated()
