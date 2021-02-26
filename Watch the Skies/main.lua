@@ -15,16 +15,19 @@ local isOpenPlaza=tewLib.isOpenPlaza
 
 local particleAmount = {
     ["rain"] = {
+        50,
+        80,
         100,
+        150,
         250,
         400,
         500,
         1000,
         1200,
         1500,
-        2000
     },
     ["thunder"] = {
+        275,
         400,
         500,
         600,
@@ -32,9 +35,9 @@ local particleAmount = {
         1400,
         1700,
         2000,
-        2200,
     },
     ["snow"] = {
+        60,
         100,
         300,
         460,
@@ -42,7 +45,6 @@ local particleAmount = {
         1000,
         1200,
         1500,
-        1800
     }
 }
 
