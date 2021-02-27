@@ -1,5 +1,6 @@
 local weathers=require("tew\\Watch the Skies\\weathers")
 local config=require("tew\\Watch the Skies\\config")
+local seasonalChances=require("tew\\Watch the Skies\\seasonalChances")
 local debugLogOn=config.debugLogOn
 local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
@@ -177,6 +178,30 @@ local function onCellChanged(e)
     end
 end
 
+local function changeSeasonal()
+
+    local month = tes3.worldController.month.value
+
+    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+        region.weatherChanceClear = seasonalChances[region.name][month][1]
+        region.weatherChanceCloudy = seasonalChances[region.name][month][2]
+        region.weatherChanceFoggy = seasonalChances[region.name][month][3]
+        region.weatherChanceOvercast = seasonalChances[region.name][month][4]
+        region.weatherChanceRain = seasonalChances[region.name][month][5]
+        region.weatherChanceThunder = seasonalChances[region.name][month][6]
+        region.weatherChanceAsh = seasonalChances[region.name][month][7]
+        region.weatherChanceBlight = seasonalChances[region.name][month][8]
+        region.weatherChanceSnow = seasonalChances[region.name][month][9]
+        region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+    end
+
+end
+
+local function seasonalTimer()
+    changeSeasonal()
+    timer.start({duration=1, callback=changeSeasonal, iterations=-1, type=timer.game})
+end
+
 local function init()
     WtC=tes3.getWorldController().weatherController
     print("Watch the Skies version "..version.." initialised.")
@@ -214,13 +239,6 @@ local function init()
         WtC.hoursBetweenWeatherChanges=math.random(3,10)
     end
 
-    event.register("weatherChangedImmediate", skyChoice, {priority=-150})
-    event.register("weatherTransitionFinished", skyChoice, {priority=-150})
-
-    if interiorTransitions then
-        event.register("cellChanged", onCellChanged, {priority=-150})
-    end
-
     if randomiseParticles then
         changeMaxParticles()
     end
@@ -228,6 +246,29 @@ local function init()
     if randomiseCloudsSpeed then
         changeCloudsSpeed()
     end
+
+    if config.seasonalWeather then
+        event.register("loaded", seasonalTimer)
+    end
+
+    event.register("weatherChangedImmediate", skyChoice, {priority=-150})
+    event.register("weatherTransitionFinished", skyChoice, {priority=-150})
+
+    if interiorTransitions then
+        event.register("cellChanged", onCellChanged, {priority=-150})
+    end
+
+    -- Prints a lua-friendly table with weather chances per month --
+    --[[
+    local months = {0,1,2,3,4,5,6,7,8,9,10,11}
+    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+        print("[\""..region.name.."\"] = {")
+        for _, month in ipairs(months) do
+            print("["..month.."] = {"..region.weatherChanceClear..", "..region.weatherChanceCloudy..", "..region.weatherChanceFoggy..", "..region.weatherChanceOvercast..", "..region.weatherChanceRain..", "..region.weatherChanceThunder..", "..region.weatherChanceAsh..", "..region.weatherChanceBlight..", "..region.weatherChanceSnow..", "..region.weatherChanceBlizzard.."},")
+        end
+        print("},\n")
+    end]]
+
 end
 
 event.register("initialized", init, {priority=-150})

@@ -19,23 +19,24 @@ local template = mwse.mcm.createTemplate{
     page:createCategory{
         label = "Watch the Skies "..version.." by tewlwolow.\nLua-based sky randomiser.\n\nSettings:",
     }
-
     page:createYesNoButton{
         label = "Enable debug mode?",
         variable = registerVariable("debugLogOn"),
         restartRequired=true
     }
-
-
     page:createYesNoButton{
         label = "Enable randomised hours between weather changes?",
         variable = registerVariable("alterChanges"),
         restartRequired=true
     }
-
     page:createYesNoButton{
         label = "Enable weather changes in interiors?",
         variable = registerVariable("interiorTransitions"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
+        label = "Enable seasonal weather?",
+        variable = registerVariable("seasonalWeather"),
         restartRequired=true
     }
     page:createYesNoButton{
@@ -48,7 +49,6 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("randomiseCloudsSpeed"),
         restartRequired=true
     }
-
     page:createSlider{
         label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nChance %",
         min = 0,
