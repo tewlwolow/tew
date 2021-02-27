@@ -125,7 +125,8 @@ this.tavernNames = {
         "Elven Nations"
     },
     ["Imperial"] = {
-        "Ebonheart, Six Fishes"
+        "Ebonheart, Six Fishes",
+        "Arrille"
     },
     ["Nord"] = {
         "Skaal Village, The Greathall",
