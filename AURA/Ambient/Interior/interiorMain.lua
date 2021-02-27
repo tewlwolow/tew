@@ -164,18 +164,6 @@ local function cellCheck()
         return
     end
 
-    if getPopulatedCell(1, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
-    for cellType, nameTable in pairs(data.names) do
-        for _, pattern in pairs(nameTable) do
-            if findWholeWords(cell.name, pattern) then
-                debugLog("Found appropriate cell. Playing interior ambient sound.")
-                path = interiorDir..cellType.."\\"..arrays[cellType][math.random(1, #arrays[cellType])]
-                playInterior()
-                return
-            end
-        end
-    end
-
     if getPopulatedCell(3, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
     for race, _ in pairs(data.tavernNames) do
         for _, pattern in ipairs(data.tavernNames[race]) do
@@ -186,6 +174,18 @@ local function cellCheck()
                 playInterior()
 
                 playedFlag = 1
+                return
+            end
+        end
+    end
+
+    if getPopulatedCell(1, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+    for cellType, nameTable in pairs(data.names) do
+        for _, pattern in pairs(nameTable) do
+            if findWholeWords(cell.name, pattern) then
+                debugLog("Found appropriate cell. Playing interior ambient sound.")
+                path = interiorDir..cellType.."\\"..arrays[cellType][math.random(1, #arrays[cellType])]
+                playInterior()
                 return
             end
         end
