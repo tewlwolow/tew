@@ -134,7 +134,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"
     }
     pagePA:createSlider{
-        label = "Changes % volume for Populated Ambient module. Default = 200%.\nRequires restart. Volume %",
+        label = "Changes % volume for Populated Ambient module. Default = 150%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
