@@ -1,13 +1,15 @@
-local healthFlag, fatigueFlag, magickaFlag = 0, 0, 0
+local healthFlag, fatigueFlag, magickaFlag, diseaseFlag, blightFlag = 0, 0, 0, 0, 0
 
-local healthTimer, fatigueTimer, magickaTimer
-local g = ""
+local healthTimer, fatigueTimer, magickaTimer, diseaseTimer, blightTimer
+local genderFatigue, genderDisease, genderBlight = "", "", ""
 local player
 
 local config = require("tew\\AURA\\config")
 local PChealth = config.PChealth
 local PCfatigue = config.PCfatigue
 local PCmagicka = config.PCmagicka
+local PCDisease = config.PCDisease
+local PCBlight = config.PCBlight
 local vsVol = config.vsVol/200
 
 local function isPlayerUnderWater()
@@ -23,55 +25,107 @@ local function isPlayerUnderWater()
     return false
 end
 
-local function checkGender()
+local function onLoaded()
 
     if tes3.player.object.female then
-        g = "fatigue_f.wav"
+        genderFatigue = "fatigue_f.wav"
+        genderDisease = "disease_f.wav"
+        genderBlight = "blight_f.wav"
     else
-        g = "fatigue_m.wav"
+        genderFatigue = "fatigue_m.wav"
+        genderDisease = "disease_m.wav"
+        genderBlight = "blight_m.wav"
     end
 
     player = tes3.mobilePlayer
 
 end
 
+local function checkDisease(ref)
+    local disease
+
+    for spell in tes3.iterate(ref.object.spells.iterator) do
+        if (spell.castType == tes3.spellType.blight) then
+            disease = "Blight"
+        end
+    end
+
+    return disease
+end
+
+local function checkBlight(ref)
+    local blight
+
+    for spell in tes3.iterate(ref.object.spells.iterator) do
+        if (spell.castType == tes3.spellType.blight) then
+            blight = "Blight"
+        end
+    end
+
+    return blight
+end
+
+local function playDisease()
+    if diseaseFlag == 1 then return end
+    if not diseaseTimer then
+        diseaseTimer = timer.start{type=timer.real, duration=10, iterations=-1, callback=function()
+            tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderDisease, volume=0.5*vsVol}
+        end}
+    else
+        diseaseTimer:resume()
+    end
+    diseaseFlag = 1
+end
+
+local function playBlight()
+    if blightFlag == 1 then return end
+    if not blightTimer then
+        blightTimer = timer.start{type=timer.real, duration=20, iterations=-1, callback=function()
+            tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderBlight, volume=0.3*vsVol}
+        end}
+    else
+        blightTimer:resume()
+    end
+    blightFlag = 1
+end
+
+local function playHealth()
+    if healthFlag == 1 then return end
+    if not healthTimer then
+        healthTimer = timer.start{type=timer.real, duration=1.2, iterations=-1, callback=function()
+            tes3.playSound{soundPath="tew\\AURA\\PC\\health.wav", volume=0.7*vsVol}
+        end}
+    else
+        healthTimer:resume()
+    end
+    healthFlag = 1
+end
+
+local function playFatigue()
+    if fatigueFlag == 1 then return end
+    if not fatigueTimer then
+        fatigueTimer = timer.start{type=timer.real, duration=2.8, iterations=-1, callback=function()
+            tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderFatigue, volume=0.6*vsVol}
+        end}
+    else
+        fatigueTimer:resume()
+    end
+    fatigueFlag = 1
+end
+
+local function playMagicka()
+    if magickaFlag == 1 then return end
+    if not magickaTimer then
+        magickaTimer = timer.start{type=timer.real, duration=6, iterations=-1, callback=function()
+            tes3.playSound{soundPath="tew\\AURA\\PC\\magicka.wav", volume=0.6*vsVol, pitch=0.8}
+        end}
+    else
+        magickaTimer:resume()
+    end
+    magickaFlag = 1
+end
+
 local function playVitals()
-
-    local function playHealth()
-        if healthFlag == 1 then return end
-        if not healthTimer then
-            healthTimer = timer.start{type=timer.real, duration=1.2, iterations=-1, callback=function()
-                tes3.playSound{soundPath="tew\\AURA\\PC\\health.wav", reference=player, volume=0.7*vsVol}
-            end}
-        else
-            healthTimer:resume()
-        end
-        healthFlag = 1
-    end
-
-    local function playFatigue()
-        if fatigueFlag == 1 then return end
-        if not fatigueTimer then
-            fatigueTimer = timer.start{type=timer.real, duration=2.8, iterations=-1, callback=function()
-                tes3.playSound{soundPath="tew\\AURA\\PC\\"..g, reference=player, volume=0.6*vsVol}
-            end}
-        else
-            fatigueTimer:resume()
-        end
-        fatigueFlag = 1
-    end
-
-    local function playMagicka()
-        if magickaFlag == 1 then return end
-        if not magickaTimer then
-            magickaTimer = timer.start{type=timer.real, duration=4, iterations=-1, callback=function()
-                tes3.playSound{soundPath="tew\\AURA\\PC\\magicka.wav", reference=player, volume=0.6*vsVol, pitch=0.8}
-            end}
-        else
-            magickaTimer:resume()
-        end
-        magickaFlag = 1
-    end
 
     if PChealth then
 
@@ -126,6 +180,31 @@ local function playVitals()
         end
     end
 
+
+    if PCDisease then
+        local disease = checkDisease(player)
+        if disease == "Disease" then
+            playDisease()
+        else
+            if diseaseTimer then
+                diseaseTimer:pause()
+            end
+            diseaseFlag = 0
+        end
+    end
+
+    if PCBlight then
+        local blight = checkBlight(player)
+        if blight == "Blight" then
+            playBlight()
+        else
+            if blightTimer then
+                blightTimer:pause()
+            end
+            blightFlag = 0
+        end
+    end
+
 end
 
 local function positionCheck()
@@ -135,8 +214,14 @@ local function positionCheck()
         end
         fatigueFlag = 0
     end
+    if PCDisease then
+        if diseaseTimer then
+            diseaseTimer:pause()
+        end
+        diseaseFlag = 0
+    end
 end
 
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
-event.register("loaded", checkGender)
+event.register("loaded", onLoaded)
 event.register("simulate", playVitals)

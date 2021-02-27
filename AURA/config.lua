@@ -43,5 +43,7 @@ return mwse.loadConfig("AURA", {
     PChealth=true,
     PCfatigue=true,
     PCmagicka=true,
+    PCDisease=true,
+    PCBlight=true,
     interiorMusic=false
 })

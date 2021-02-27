@@ -212,8 +212,16 @@ local template = mwse.mcm.createTemplate{
         label = "Enable low magicka sounds?",
         variable = registerVariable("PCmagicka"),
     }
+    pagePC:createYesNoButton{
+        label = "Enable diseased sounds?",
+        variable = registerVariable("PCDisease"),
+    }
+    pagePC:createYesNoButton{
+        label = "Enable blighted sounds?",
+        variable = registerVariable("PCBlight"),
+    }
     pagePC:createSlider{
-        label = "Changes % volume for vital signs (health, fatigue, magicka). Default = 200%.\nRequires restart. Volume %",
+        label = "Changes % volume for vital signs (health, fatigue, magicka, disease, blight). Default = 200%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
