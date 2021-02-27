@@ -5,7 +5,7 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local popVol = config.popVol/200
 local popDir = "tew\\AURA\\Populated\\"
-local path, playedFlag
+local path, playedFlag, time, timeLast
 
 local function debugLog(string)
     if debugLogOn then
@@ -65,12 +65,24 @@ end
 local function cellCheck()
     local cell = tes3.getPlayerCell()
 
+    if not config.moduleAmbientInterior then
+        if playedFlag == 1 then
+            timer.start{duration=0.82, type=timer.real, callback=function()
+                debugLog("Removing sounds.")
+                tes3.removeSound{reference = tes3.player}
+                timeLast = nil
+                playedFlag = 0
+            end}
+        end
+    end
+
     if (not cell) or (not cell.name) or (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
         debugLog("Player in interior cell or in the wilderness. Returning.")
         if playedFlag == 1 then
             timer.start{duration=0.82, type=timer.real, callback=function()
                 debugLog("Removing sounds.")
                 tes3.removeSound{reference = tes3.player}
+                timeLast = nil
                 playedFlag = 0
             end}
         end
@@ -78,23 +90,32 @@ local function cellCheck()
         return
     end
 
+    local gameHour=tes3.worldController.hour.value
+    if gameHour < 5 or gameHour > 21 then time = "Night"
+    else time = "Day" end
+
 
     local typeCell = getTypeCell(5, cell)
     if typeCell ~= nil then
-        local gameHour=tes3.worldController.hour.value
         if typeCell~="Daedric" and
         typeCell~="Dwemer" and
-        gameHour < 5 or gameHour > 21 then
+        time == "Night"
+        and time ~= timeLast then
             debugLog("Found appropriate cell at night. Playing populated night ambient sound.")
             path = popDir.."\\Night\\"..arrays["Night"][math.random(1, #arrays["Night"])]
+            timeLast = "Night"
             playPopulated()
+            playedFlag = 1
             return
         end
-        debugLog("Found appropriate cell at day. Playing populated ambient day sound.")
-        path = popDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
-        playPopulated()
-        playedFlag = 1
-        return
+        if time ~= timeLast then
+            debugLog("Found appropriate cell at day. Playing populated ambient day sound.")
+            path = popDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
+            timeLast = "Day"
+            playPopulated()
+            playedFlag = 1
+            return
+        end
     end
 
     playedFlag = 0
