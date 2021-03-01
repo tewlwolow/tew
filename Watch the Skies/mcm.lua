@@ -40,6 +40,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
+        label = "Enable seasonal daytime hours?",
+        variable = registerVariable("daytime"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
         label = "Randomise max particles?",
         variable = registerVariable("randomiseParticles"),
         restartRequired=true
