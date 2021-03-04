@@ -1,7 +1,6 @@
 local weathers=require("tew\\Watch the Skies\\weathers")
 local config=require("tew\\Watch the Skies\\config")
 local seasonalChances=require("tew\\Watch the Skies\\seasonalChances")
-local daytimeData=require("tew\\Watch the Skies\\daytime")
 local debugLogOn=config.debugLogOn
 local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
 local vanChance=config.vanChance/100
@@ -11,7 +10,7 @@ local randomiseParticles=config.randomiseParticles
 local randomiseCloudsSpeed=config.randomiseCloudsSpeed
 local modversion = require("tew\\Watch the Skies\\version")
 local version = modversion.version
-local WtC, intWeatherTimer
+local WtC, intWeatherTimer, monthLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
@@ -148,44 +147,230 @@ local function changeInteriorWeather()
 end
 
 local function changeSeasonal()
-    -- TODO: check for journal entries --
-    -- all blight values to clear --
-    -- red mountain custom something --
-    -- mournhold machine --
-    local month = tes3.worldController.month.value + 1
 
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-        region.weatherChanceClear = seasonalChances[region.name][month][1]
-        region.weatherChanceCloudy = seasonalChances[region.name][month][2]
-        region.weatherChanceFoggy = seasonalChances[region.name][month][3]
-        region.weatherChanceOvercast = seasonalChances[region.name][month][4]
-        region.weatherChanceRain = seasonalChances[region.name][month][5]
-        region.weatherChanceThunder = seasonalChances[region.name][month][6]
-        region.weatherChanceAsh = seasonalChances[region.name][month][7]
-        region.weatherChanceBlight = seasonalChances[region.name][month][8]
-        region.weatherChanceSnow = seasonalChances[region.name][month][9]
-        region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+    local month = tes3.worldController.month.value + 1
+    if month == monthLast then debugLog("Same month. Returning.") return end
+
+    if tes3.getJournalIndex{id = "C3_DestroyDagoth"} < 20 then
+        debugLog("Dagoth Ur is alive. Using regular blight values.")
+        for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+            if region.id == "Red Mountain Region" then
+                debugLog("Setting full blight for Red Mountain Region.")
+                region.weatherChanceClear = 0
+                region.weatherChanceCloudy = 0
+                region.weatherChanceFoggy = 0
+                region.weatherChanceOvercast = 0
+                region.weatherChanceRain = 0
+                region.weatherChanceThunder = 0
+                region.weatherChanceAsh = 0
+                region.weatherChanceBlight = 100
+                region.weatherChanceSnow = 0
+                region.weatherChanceBlizzard = 0
+            elseif region.id == "Mournhold Region"
+            and tes3.findGlobal("MournWeather").value == 1
+            or tes3.findGlobal("MournWeather").value == 2
+            or tes3.findGlobal("MournWeather").value == 3
+            or tes3.findGlobal("MournWeather").value == 4
+            or tes3.findGlobal("MournWeather").value == 5
+            or tes3.findGlobal("MournWeather").value == 6
+            or tes3.findGlobal("MournWeather").value == 7 then
+                debugLog("Weather machine running: "..tes3.findGlobal("MournWeather").value)
+                region.weatherChanceClear = 0
+                region.weatherChanceCloudy = 0
+                region.weatherChanceFoggy = 0
+                region.weatherChanceOvercast = 0
+                region.weatherChanceRain = 0
+                region.weatherChanceThunder = 0
+                region.weatherChanceAsh = 0
+                region.weatherChanceBlight = 0
+                region.weatherChanceSnow = 0
+                region.weatherChanceBlizzard = 0
+                if tes3.findGlobal("MournWeather").value == 1 then
+                    region.weatherChanceClear = 100
+                elseif tes3.findGlobal("MournWeather").value == 2 then
+                    region.weatherChanceCloudy = 100
+                elseif tes3.findGlobal("MournWeather").value == 3 then
+                    region.weatherChanceFoggy = 100
+                elseif tes3.findGlobal("MournWeather").value == 4 then
+                    region.weatherChanceOvercast = 100
+                elseif tes3.findGlobal("MournWeather").value == 5 then
+                    region.weatherChanceRain = 100
+                elseif tes3.findGlobal("MournWeather").value == 6 then
+                    region.weatherChanceThunder = 100
+                elseif tes3.findGlobal("MournWeather").value == 7 then
+                    region.weatherChanceAsh = 100
+                end
+            else
+                region.weatherChanceClear = seasonalChances[region.name][month][1]
+                region.weatherChanceCloudy = seasonalChances[region.name][month][2]
+                region.weatherChanceFoggy = seasonalChances[region.name][month][3]
+                region.weatherChanceOvercast = seasonalChances[region.name][month][4]
+                region.weatherChanceRain = seasonalChances[region.name][month][5]
+                region.weatherChanceThunder = seasonalChances[region.name][month][6]
+                region.weatherChanceAsh = seasonalChances[region.name][month][7]
+                region.weatherChanceBlight = seasonalChances[region.name][month][8]
+                region.weatherChanceSnow = seasonalChances[region.name][month][9]
+                region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+            end
+        end
+    elseif tes3.getJournalIndex{id = "C3_DestroyDagoth"} >= 20 then
+        debugLog("Dagoth Ur is dead. Using zero blight values.")
+        for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+            if region.id == "Mournhold Region"
+            and tes3.findGlobal("MournWeather").value == 1
+            or tes3.findGlobal("MournWeather").value == 2
+            or tes3.findGlobal("MournWeather").value == 3
+            or tes3.findGlobal("MournWeather").value == 4
+            or tes3.findGlobal("MournWeather").value == 5
+            or tes3.findGlobal("MournWeather").value == 6
+            or tes3.findGlobal("MournWeather").value == 7 then
+                debugLog("Weather machine running.")
+                region.weatherChanceClear = 0
+                region.weatherChanceCloudy = 0
+                region.weatherChanceFoggy = 0
+                region.weatherChanceOvercast = 0
+                region.weatherChanceRain = 0
+                region.weatherChanceThunder = 0
+                region.weatherChanceAsh = 0
+                region.weatherChanceBlight = 0
+                region.weatherChanceSnow = 0
+                region.weatherChanceBlizzard = 0
+                if tes3.findGlobal("MournWeather").value == 1 then
+                    region.weatherChanceClear = 100
+                elseif tes3.findGlobal("MournWeather").value == 2 then
+                    region.weatherChanceCloudy = 100
+                elseif tes3.findGlobal("MournWeather").value == 3 then
+                    region.weatherChanceFoggy = 100
+                elseif tes3.findGlobal("MournWeather").value == 4 then
+                    region.weatherChanceOvercast = 100
+                elseif tes3.findGlobal("MournWeather").value == 5 then
+                    region.weatherChanceRain = 100
+                elseif tes3.findGlobal("MournWeather").value == 6 then
+                    region.weatherChanceThunder = 100
+                elseif tes3.findGlobal("MournWeather").value == 7 then
+                    region.weatherChanceAsh = 100
+                end
+            end
+            region.weatherChanceClear = seasonalChances[region.name][month][1] + seasonalChances[region.name][month][8]
+            region.weatherChanceCloudy = seasonalChances[region.name][month][2]
+            region.weatherChanceFoggy = seasonalChances[region.name][month][3]
+            region.weatherChanceOvercast = seasonalChances[region.name][month][4]
+            region.weatherChanceRain = seasonalChances[region.name][month][5]
+            region.weatherChanceThunder = seasonalChances[region.name][month][6]
+            region.weatherChanceAsh = seasonalChances[region.name][month][7]
+            region.weatherChanceBlight = 0
+            region.weatherChanceSnow = seasonalChances[region.name][month][9]
+            region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+        end
+    end
+    monthLast = month
+
+    if debugLogOn then
+        local region = tes3.getRegion()
+        debugLog("Current chances for region: "..region.name..": "..region.weatherChanceClear..", "..region.weatherChanceCloudy..", "..region.weatherChanceFoggy..", "..region.weatherChanceOvercast..", "..region.weatherChanceRain..", "..region.weatherChanceThunder..", "..region.weatherChanceAsh..", "..region.weatherChanceBlight..", "..region.weatherChanceSnow..", "..region.weatherChanceBlizzard)
     end
 
 end
 
 local function changeDaytime()
-    local region = tes3.getRegion({useDoors=true}).name
-    local month = tes3.worldController.month.value + 1
-    print(WtC.sunriseHour)
-    print(WtC.sunsetHour)
-    for _, regionName in pairs(daytimeData["cold regions"]) do
-        if region == regionName then
+
+    local month = tes3.worldController.month.value
+    local day = tes3.worldController.day.value
+
+    ---
+    local southY=-400000
+    local northY=225000
+    local minDaytime=4.0
+    local solsticeSunrise=6.0
+    local solsticeSunset=18.0
+    local durSunrise=2.0
+    local durSunset=2.0
+    local playerY = tes3.player.position.y
+    local adjustedSunrise, adjustedSunset, l1, f1, f2, f3
+
+
+
+    l1 =  (((( month * 3042) / 100) + day) + 9)
+	if (l1 > 365) then
+		l1 = (l1 - 365)
+	end
+    l1 = (l1 - 182)
+	if (l1 < 0) then
+		l1 = (0 - l1)
+	end
+
+	f1 = ((l1 - 91.0 ) / 91.0)
+	if (f1 < -1.0) then
+		f1 = -1.0
+	elseif (f1 > 1.0) then
+		f1 = 1.0
+	end
+
+	f2 = ((playerY - southY) / (northY - southY))
+	if (f2 < 0.0) then
+		f2 = 0.0
+	elseif (f2 > 1.0) then
+		f2 = 1.0
+	end
+
+	f3 = ((solsticeSunset - solsticeSunrise )) -- -0.0 [???]
+	if (minDaytime > f3) then
+		minDaytime = f3
+	end
+
+    f3 = ( 0.0 - (f1 * f2 ))
+    f1 = ((solsticeSunset - solsticeSunrise) - minDaytime)
+    f1 = ((( f1  * f3) + solsticeSunset) - solsticeSunrise)
+	if (f1 < minDaytime) then
+		f1 = minDaytime
+	end
+
+	f2 = (24.0 - minDaytime)
+	if (f1 > f2) then
+		f1 = f2
+	end
+
+	f2 = (solsticeSunset - solsticeSunrise)
+	adjustedSunrise = (solsticeSunrise - ((f1 - f2) / 2))
+	adjustedSunset = (solsticeSunset + ((f1 - f2) / 2))
+    adjustedSunset = (adjustedSunset - durSunset)
+
+    debugLog("Previous values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
+    WtC.sunriseHour = math.ceil(adjustedSunrise)
+    WtC.sunsetHour = math.ceil(adjustedSunset)
+    WtC.sunriseDuration = math.ceil(durSunrise)
+    WtC.sunsetDuration = math.ceil(durSunset)
+    debugLog("Current values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
+
+    ---
+
+    --[[
+    if region == regionLast and month == monthLast then debugLog("No change in daytime conditions. Returning.") return end
+    debugLog("Daytime hours before change: "..WtC.sunriseHour.." - ".. WtC.sunsetHour)
+    for _, northRegion in pairs(daytimeData["cold regions"]) do
+        if region == northRegion then
+            debugLog("Using northern latitude values.")
             WtC.sunriseHour = daytimeData["northern"]["sunrise"][month]
             WtC.sunsetHour = daytimeData["northern"]["sunset"][month]
+            local horizonTime = math.abs((WtC.sunsetHour - WtC.sunriseHour)/4)
+            if horizonTime > 3 then horizonTime = 3 end
+            WtC.sunriseDuration = horizonTime
+            WtC.sunsetDuration = horizonTime
             break
         else
             WtC.sunriseHour = daytimeData["regular"]["sunrise"][month]
             WtC.sunsetHour = daytimeData["regular"]["sunset"][month]
+            local horizonTime = math.abs((WtC.sunsetHour - WtC.sunriseHour)/4)
+            if horizonTime > 3 then horizonTime = 3 end
+            WtC.sunriseDuration = horizonTime
+            WtC.sunsetDuration = horizonTime
         end
     end
-    print(WtC.sunriseHour)
-    print(WtC.sunsetHour)
+    regionLast = region
+    monthLast = month
+    debugLog("Daytime hours after change: "..WtC.sunriseHour.." - ".. WtC.sunsetHour)
+    --]]
+
 end
 
 local function onCellChanged(e)
@@ -201,10 +386,12 @@ local function onCellChanged(e)
     end
 
     if config.seasonalWeather then
+        monthLast = nil
         changeSeasonal()
     end
 
     if config.daytime then
+        monthLast = nil
         changeDaytime()
     end
 
@@ -224,48 +411,52 @@ local function onCellChanged(e)
             type=timer.game,
             iterations=-1
         }
-        debugLog("Player in interior. Resuming interior timer. Time to weather change: "..WtC.hoursBetweenWeatherChanges)
+        debugLog("Player in interior. Resuming interior timer. Hours to weather change: "..WtC.hoursBetweenWeatherChanges)
     end
 end
 
 local function seasonalTimer()
+    monthLast = nil
     changeSeasonal()
-    timer.start({duration=1, callback=changeSeasonal, iterations=-1, type=timer.game})
+    timer.start({duration=7, callback=changeSeasonal, iterations=-1, type=timer.game})
 end
 
 local function daytimeTimer()
+    monthLast = nil
     changeDaytime()
-    timer.start({duration=1, callback=changeDaytime, iterations=-1, type=timer.game})
+    timer.start({duration=6, callback=changeDaytime, iterations=-1, type=timer.game})
 end
 
 local function init()
-    WtC=tes3.getWorldController().weatherController
-    print("Watch the Skies version "..version.." initialised.")
-    for weather, index in pairs(tes3.weather) do
-        debugLog("Weather: "..weather)
-        for sky in lfs.dir(WtSdir..weather) do
-            if sky ~= ".." and sky ~= "." then
-                debugLog("Found file: "..sky)
-                if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
-                    table.insert(weathers[index], sky)
-                    debugLog("Adding file: "..sky)
+    if config.alterClouds then
+        WtC=tes3.getWorldController().weatherController
+        print("Watch the Skies version "..version.." initialised.")
+        for weather, index in pairs(tes3.weather) do
+            debugLog("Weather: "..weather)
+            for sky in lfs.dir(WtSdir..weather) do
+                if sky ~= ".." and sky ~= "." then
+                    debugLog("Found file: "..sky)
+                    if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
+                        table.insert(weathers[index], sky)
+                        debugLog("Adding file: "..sky)
+                    end
                 end
             end
         end
-    end
-    for _, weather in pairs(WtC.weathers) do
-        for index, _ in pairs(weathers) do
-            if weather.index==index then
-                local texPath
-                for w, i in pairs(tes3.weather) do
-                    if index==i then
-                        texPath=w
-                        break
+        for _, weather in pairs(WtC.weathers) do
+            for index, _ in pairs(weathers) do
+                if weather.index==index then
+                    local texPath
+                    for w, i in pairs(tes3.weather) do
+                        if index==i then
+                            texPath=w
+                            break
+                        end
                     end
-                end
-                if texPath~=nil and weathers[index][1]~=nil then
-                    weather.cloudTexture=WtSdir..texPath.."\\"..weathers[index][math.random(1, #weathers[index])]
-                    debugLog("Cloud texture path set to: "..weather.cloudTexture)
+                    if texPath~=nil and weathers[index][1]~=nil then
+                        weather.cloudTexture=WtSdir..texPath.."\\"..weathers[index][math.random(1, #weathers[index])]
+                        debugLog("Cloud texture path set to: "..weather.cloudTexture)
+                    end
                 end
             end
         end
@@ -291,8 +482,10 @@ local function init()
         event.register("loaded", daytimeTimer)
     end
 
-    event.register("weatherChangedImmediate", skyChoice, {priority=-150})
-    event.register("weatherTransitionFinished", skyChoice, {priority=-150})
+    if config.alterClouds then
+        event.register("weatherChangedImmediate", skyChoice, {priority=-150})
+        event.register("weatherTransitionFinished", skyChoice, {priority=-150})
+    end
 
     if interiorTransitions then
         event.register("cellChanged", onCellChanged, {priority=-150})
@@ -303,7 +496,7 @@ local function init()
     ----------------------------------------------------
     -- Beneath you can find some useful functions to automatically generate varied weather --
 --[[
-    -- Prints a lua-friendly table with weather chances per month (vanilla) --    
+    -- Prints a lua-friendly table with weather chances per month (vanilla - same base values for all months) --
     local months = {1,2,3,4,5,6,7,8,9,10,11,12}
     for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
         print("[\""..region.name.."\"] = {")
@@ -554,7 +747,7 @@ local function init()
         end
     end
 
-    -- Prints a lua-friendly table with weather chances per month (adjusted) --
+    -- Prints a lua-friendly table with weather chances per month (adjusted - each month has different value) --
     for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
         print("[\""..region.name.."\"] = {")
         for month, chanceArray in ipairs(seasonalChances[region.name]) do

@@ -25,6 +25,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
+        label = "Enable randomised cloud textures?",
+        variable = registerVariable("alterClouds"),
+        restartRequired=true
+    }
+    page:createYesNoButton{
         label = "Enable randomised hours between weather changes?",
         variable = registerVariable("alterChanges"),
         restartRequired=true
