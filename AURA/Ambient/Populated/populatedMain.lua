@@ -5,7 +5,7 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local popVol = config.popVol/200
 local popDir = "tew\\AURA\\Populated\\"
-local path, playedFlag, time, timeLast
+local path, playedFlag, time, timeLast, typeCellLast
 
 local function debugLog(string)
     if debugLogOn then
@@ -65,22 +65,11 @@ end
 local function cellCheck()
     local cell = tes3.getPlayerCell()
 
-    if not config.moduleAmbientInterior then
-        if playedFlag == 1 then
-            timer.start{duration=0.82, type=timer.real, callback=function()
-                debugLog("Removing sounds.")
-                tes3.removeSound{reference = tes3.player}
-                timeLast = nil
-                playedFlag = 0
-            end}
-        end
-    end
-
     if (not cell) or (not cell.name) or (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
         debugLog("Player in interior cell or in the wilderness. Returning.")
         if playedFlag == 1 then
             timer.start{duration=0.82, type=timer.real, callback=function()
-                debugLog("Removing sounds.")
+                debugLog("Inappropriate cell. Removing sounds.")
                 tes3.removeSound{reference = tes3.player}
                 timeLast = nil
                 playedFlag = 0
@@ -90,29 +79,55 @@ local function cellCheck()
         return
     end
 
+    if not config.moduleAmbientInterior then
+        if playedFlag == 1 then
+            timer.start{duration=0.82, type=timer.real, callback=function()
+                debugLog("Not using IA module. Removing sounds.")
+                tes3.removeSound{reference = tes3.player}
+                timeLast = nil
+                playedFlag = 0
+            end}
+        end
+    end
+
     local gameHour=tes3.worldController.hour.value
-    if gameHour < 5 or gameHour > 21 then time = "Night"
+    if gameHour < 6 or gameHour > 21 then time = "Night"
     else time = "Day" end
 
-
     local typeCell = getTypeCell(5, cell)
+
+    if typeCell == typeCellLast
+    and time == timeLast then
+        debugLog("Same conditions. Returning.")
+        return
+    end
+
+    if playedFlag == 1 then
+        timer.start{duration=0.82, type=timer.real, callback=function()
+            debugLog("Different time. Removing sounds.")
+            tes3.removeSound{reference = tes3.player}
+            timeLast = nil
+            playedFlag = 0
+        end}
+    end
+
     if typeCell ~= nil then
         if typeCell~="Daedric" and
         typeCell~="Dwemer" and
-        time == "Night"
-        and time ~= timeLast then
+        time == "Night" then
             debugLog("Found appropriate cell at night. Playing populated night ambient sound.")
             path = popDir.."\\Night\\"..arrays["Night"][math.random(1, #arrays["Night"])]
-            timeLast = "Night"
             playPopulated()
+            timeLast = time
+            typeCellLast = typeCell
             playedFlag = 1
             return
-        end
-        if time ~= timeLast then
+        else
             debugLog("Found appropriate cell at day. Playing populated ambient day sound.")
             path = popDir..typeCell.."\\"..arrays[typeCell][math.random(1, #arrays[typeCell])]
-            timeLast = "Day"
             playPopulated()
+            timeLast = time
+            typeCellLast = typeCell
             playedFlag = 1
             return
         end
@@ -122,6 +137,13 @@ local function cellCheck()
     debugLog("No appropriate cell detected.")
 end
 
+local function populatedTimer()
+    timeLast = nil
+    typeCellLast = nil
+    timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
+end
+
 
 event.register("cellChanged", cellCheck, { priority = -190 })
+event.register("loaded", populatedTimer)
 
