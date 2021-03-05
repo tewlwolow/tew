@@ -10,6 +10,7 @@ return mwse.loadConfig("AURA", {
     vsVol=200,
     intVol=150,
     popVol=150,
+    tVol=200,
     moduleAmbientOutdoor=true,
     moduleAmbientInterior=true,
     moduleAmbientPopulated=true,
@@ -27,6 +28,7 @@ return mwse.loadConfig("AURA", {
     playYurtFlap=true,
     debugLogOn=false,
     calmChance=30,
+    tauntChance=100,
     serviceTravel=true,
     serviceRepair=true,
     serviceSpells=true,
@@ -45,5 +47,6 @@ return mwse.loadConfig("AURA", {
     PCmagicka=true,
     PCDisease=true,
     PCBlight=true,
+    PCtaunts=true,
     interiorMusic=false
 })

@@ -220,6 +220,10 @@ local template = mwse.mcm.createTemplate{
         label = "Enable blighted sounds?",
         variable = registerVariable("PCBlight"),
     }
+    pagePC:createYesNoButton{
+        label = "Enable player combat taunts?",
+        variable = registerVariable("PCtaunts"),
+    }
     pagePC:createSlider{
         label = "Changes % volume for vital signs (health, fatigue, magicka, disease, blight). Default = 200%.\nRequires restart. Volume %",
         min = 0,
@@ -227,6 +231,22 @@ local template = mwse.mcm.createTemplate{
         step = 1,
         jump = 10,
         variable=registerVariable("vsVol")
+    }
+    pagePC:createSlider{
+        label = "Changes % chance for a battle taunt to play. Default = 50%.\nRequires restart. Chance %",
+        min = 0,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("tauntChance")
+    }
+    pagePC:createSlider{
+        label = "Changes % volume for player battle taunts. Default = 200%.\nRequires restart. Volume %",
+        min = 0,
+        max = 200,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("tVol")
     }
 
     local pageC = template:createPage{label="Containers"}

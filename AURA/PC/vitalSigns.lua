@@ -1,7 +1,7 @@
 local healthFlag, fatigueFlag, magickaFlag, diseaseFlag, blightFlag = 0, 0, 0, 0, 0
 
 local healthTimer, fatigueTimer, magickaTimer, diseaseTimer, blightTimer
-local genderFatigue, genderDisease, genderBlight = "", "", ""
+local genderFatigue, genderDisease = "", ""
 local player
 
 local config = require("tew\\AURA\\config")
@@ -219,6 +219,13 @@ local function positionCheck()
             diseaseTimer:pause()
         end
         diseaseFlag = 0
+    end
+
+    if PCBlight then
+        if blightTimer then
+            blightTimer:pause()
+        end
+        blightFlag = 0
     end
 end
 
