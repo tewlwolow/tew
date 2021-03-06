@@ -491,8 +491,6 @@ local function init()
         event.register("cellChanged", onCellChanged, {priority=-150})
     end
 
-
-
     ----------------------------------------------------
     -- Beneath you can find some useful functions to automatically generate varied weather --
 --[[
@@ -696,8 +694,8 @@ local function init()
     end
 
     -- Adjusts values to give 100% weather chances sum per month --
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-        for _, chanceArray in ipairs(seasonalChances[region.name]) do
+    for _, month in pairs(seasonalChances) do
+        for _, chanceArray in pairs(month) do
             local sum = 0
             local diff
             for _, chance in ipairs(chanceArray) do
@@ -706,7 +704,11 @@ local function init()
             if sum > 100 then
                 diff = sum - 100
                 chanceArray[2] = chanceArray[2] - diff
-                if chanceArray[2] < 5 then chanceArray[2] = 5 end
+                if chanceArray[2] < 5 then
+                    diff = 5 - chanceArray[2]
+                    chanceArray[2] = 5
+                    chanceArray[1] = chanceArray[1] + diff
+                end
                 sum = 0
                 for _, chance in ipairs(chanceArray) do
                     sum = sum + chance
@@ -729,9 +731,9 @@ local function init()
     end
 
     -- Ensures there are no negative values --
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+    for _, month in pairs(seasonalChances) do
         local added = 0
-        for _, chanceArray in ipairs(seasonalChances[region.name]) do
+        for _, chanceArray in pairs(month) do
             for index, chance in ipairs(chanceArray) do
                 if chance < 0 then
                     added = math.abs(2*chance)
@@ -755,7 +757,32 @@ local function init()
         end
         print("},\n")
     end
---]]
+
+    -- Check if all chances are 100% --
+    local flag = 0
+    print("Starting weather chances check.")
+    for region, month in pairs(seasonalChances) do
+        for monthIndex, array in pairs(month) do
+            local sum = 0
+            for _, num in pairs(array) do
+                sum = sum + num
+            end
+            if sum ~= 100 then
+                flag = 1
+                print("\nWARNING! Month chances doesn't add up to 100.")
+                print("Sum: "..sum)
+                print("Region: "..region)
+                print("Month: "..monthIndex.."\n")
+            end
+        end
+    end
+    print("Chances check finished.")
+    if flag == 1 then
+        print("Process finished with errors. See above.")
+    else
+        print("No problems detected.")
+    end
+    ]]
 
 end
 
