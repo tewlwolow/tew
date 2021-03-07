@@ -66,7 +66,7 @@ end
 
 local function combatCheck(e)
 
-    if playedTaunt == 1 then return end
+    if playedTaunt == 1 then debugLog("Flag on. Returning.") return end
 
     local player = tes3.mobilePlayer
     if e.target == player or e.actor == player
@@ -76,19 +76,28 @@ local function combatCheck(e)
 
         if tauntChance<math.random() then debugLog("Dice roll failed. Returning.") return end
 
-        playedTaunt = 1
+        local taunt
 
-        local foe, foeRace, taunt
-        if e.target ~= player then
-            foe = e.target
-        else
-            foe = e.actor
+        if e.target.object.objectType ~= tes3.objectType.creature
+        and e.actor.object.objectType ~= tes3.objectType.creature then
+            local foe, foeRace
+            if e.target ~= player then
+                foe = e.target
+            else
+                foe = e.actor
+            end
+            foeRace = foe.object.race.id
+            debugLog("Foe race: "..foe.object.race.id)
+            local raceTaunts = tauntsData.raceTaunts
+            if raceTaunts[playerRace]
+            and raceTaunts[playerRace][playerSex]
+            and raceTaunts[playerRace][playerSex][foeRace] then
+                taunt = raceTaunts[playerRace][playerSex][foeRace]
+            end
+            if taunt ~= nil then
+                debugLog("Race-based taunt: "..taunt)
+            end
         end
-        foeRace = foe.object.race.id
-        print(foe.object.race.id)
-        local raceTaunts = tauntsData.raceTaunts
-        taunt = raceTaunts[playerRace][playerSex][foeRace]
-        print(taunt)
 
         if taunt == nil then
             local taunts = tauntsData.taunts
@@ -101,11 +110,16 @@ local function combatCheck(e)
             reference=player
         }
 
+        playedTaunt = 1
         debugLog("Played battle taunt: "..taunt)
 
-        timer.start{type=timer.real, duration=8, callback=function()
+        timer.start{type=timer.real, duration=3, callback=function()
             playedTaunt = 0
         end}
+    else
+        debugLog("Could not determine battle situation.")
+        debugLog(e.target.object.id)
+        debugLog(e.actor.object.id)
     end
 
 end
