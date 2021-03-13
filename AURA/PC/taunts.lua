@@ -20,7 +20,7 @@ end
 
     local VDir = "Data Files\\Sound\\Vo"
 
-    print("local taunts = {\n")
+    print("this.NPCtaunts = {\n")
     for race in lfs.dir(VDir) do
         if race ~= "." and race ~= ".." then
             for _, v in pairs(raceNames) do
@@ -30,7 +30,32 @@ end
                         if gender ~= "." and gender ~= ".." then
                             print("[\""..gender.."\"]".." = {")
                             for file in lfs.dir(VDir.."\\"..v.."\\"..gender) do
-                                if string.find(file, "Atk") then
+                                if string.startswith(file, "Atk") then
+                                    print("\""..file.."\",")
+                                end
+                            end
+                            print("\n},")
+                        end
+                    end
+                    print("\n},")
+                end
+            end
+        end
+    end
+    print("\n}")
+
+    print("this.Crtaunts = {\n")
+    for race in lfs.dir(VDir) do
+        if race ~= "." and race ~= ".." then
+            for _, v in pairs(raceNames) do
+                if race == v then
+                    print("[\""..v.."\"]".." = {")
+                    for gender in lfs.dir(VDir.."\\"..v) do
+                        if gender ~= "." and gender ~= ".." then
+                            print("[\""..gender.."\"]".." = {")
+                            for file in lfs.dir(VDir.."\\"..v.."\\"..gender) do
+                                if string.startswith(file, "CrAtk")
+                                or string.startswith(file, "bAtk") then
                                     print("\""..file.."\",")
                                 end
                             end
@@ -97,12 +122,17 @@ local function combatCheck(e)
             if taunt ~= nil then
                 debugLog("Race-based taunt: "..taunt)
             end
+            if taunt == nil then
+                local taunts = tauntsData.NPCtaunts
+                taunt = taunts[playerRace][playerSex][math.random(1, #taunts[playerRace][playerSex])]
+                debugLog("NPC taunt: "..taunt)
+            end
+        else
+            local taunts = tauntsData.Crtaunts
+            taunt = taunts[playerRace][playerSex][math.random(1, #taunts[playerRace][playerSex])]
+            debugLog("Creature taunt: "..taunt)
         end
 
-        if taunt == nil then
-            local taunts = tauntsData.taunts
-            taunt = taunts[playerRace][playerSex][math.random(1, #taunts[playerRace][playerSex])]
-        end
 
         tes3.say{
             volume=0.9*tVol,

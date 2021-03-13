@@ -45,12 +45,13 @@ this.cellTypesSmall={
     "in_de_shack_",
     "s12_v_plaza",
     "rp_v_arena",
-    "in_nord_house_04"
+    "in_nord_house_04",
+    "t_rea_set_i_house_"
 }
 
 this.cellTypesTent={
     "in_ashl_tent_0",
-    "Drs_Tnt",
+    "drs_tnt",
 }
 
 --[[this.cellTypesCaves={

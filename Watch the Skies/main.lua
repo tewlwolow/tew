@@ -289,7 +289,6 @@ local function changeDaytime()
     local adjustedSunrise, adjustedSunset, l1, f1, f2, f3
 
 
-
     l1 =  (((( month * 3042) / 100) + day) + 9)
 	if (l1 > 365) then
 		l1 = (l1 - 365)
