@@ -9,10 +9,10 @@ this.statics = {
         "t_ayl_dngruin",
         "t_bre_dngruin",
         "t_de_dngrtrongh",
-        "t_he_dngrirenni",
+        "t_he_dngdirenni",
         "t_imp_dngruincyr",
         "t_imp_dngsewers",
-        "in_om_"
+        "in_om_",
     },
     ["Caves"] = {
         "in_moldcave",
