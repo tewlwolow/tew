@@ -116,7 +116,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.\n\nSettings:"
     }
     pageIA:createSlider{
-        label = "Changes % volume for Interior Ambient module. Default = 150%.\nRequires restart. Volume %",
+        label = "Changes % volume for Interior Ambient module. Default = 100%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
@@ -134,7 +134,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"
     }
     pagePA:createSlider{
-        label = "Changes % volume for Populated Ambient module. Default = 150%.\nRequires restart. Volume %",
+        label = "Changes % volume for Populated Ambient module. Default = 100%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,
@@ -312,7 +312,7 @@ local template = mwse.mcm.createTemplate{
         variable=registerVariable("splashVol")
     }
     pageMisc:createYesNoButton{
-        label = "Enable yurt door sound?",
+        label = "Enable door sounds for yurts and pelt entrances?",
         variable = registerVariable("playYurtFlap"),
     }
     pageMisc:createSlider{
