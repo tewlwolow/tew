@@ -40,9 +40,9 @@ local function getPopulatedCell(maxCount, cell)
         if (npc.object.mobile) and (not npc.object.mobile.isDead) then
             count = count + 1
         end
-        if count >= maxCount then debugLog("Enough people in a cell. Count :"..count) return true end
+        if count >= maxCount then --[[debugLog("Enough people in a cell. Count: "..count)]] return true end
     end
-    if count < maxCount then debugLog("Too few people in a cell. Count: "..count) return false end
+    if count < maxCount then --[[debugLog("Too few people in a cell. Count: "..count)]] return false end
 end
 
 local arrays = {
@@ -164,7 +164,7 @@ local function cellCheck()
         return
     end
 
-    if getPopulatedCell(3, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+    if getPopulatedCell(2, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
     for race, _ in pairs(data.tavernNames) do
         for _, pattern in ipairs(data.tavernNames[race]) do
             if string.find(cell.name, pattern) then
