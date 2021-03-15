@@ -17,7 +17,7 @@ local template = mwse.mcm.createTemplate{
 
     local page = template:createPage{label="Main Settings", noScroll=true}
     page:createCategory{
-        label = "Watch the Skies "..version.." by tewlwolow.\nLua-based sky randomiser.\n\nSettings:",
+        label = "Watch the Skies "..version.." by tewlwolow.\nLua-based weather overhaul.\n\nSettings:",
     }
     page:createYesNoButton{
         label = "Enable debug mode?",
