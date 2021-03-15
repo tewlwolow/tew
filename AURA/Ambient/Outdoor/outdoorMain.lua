@@ -241,7 +241,7 @@ local function cellCheck()
    debugLog("Different conditions detected. Resetting sounds.")
    tes3.removeSound{reference=cell}
 
-   if not moduleInteriorWeather and windoors~={} and weatherNow<4 or weatherNow==8 then
+   if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
       for _, windoor in ipairs(windoors) do
          tes3.removeSound{reference=windoor}
      end

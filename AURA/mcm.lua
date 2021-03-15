@@ -116,7 +116,7 @@ local template = mwse.mcm.createTemplate{
         label = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.\n\nSettings:"
     }
     pageIA:createSlider{
-        label = "Changes % volume for Interior Ambient module. Default = 100%.\nRequires restart. Volume %",
+        label = "Changes % volume for Interior Ambient module. Default = 150%.\nRequires restart. Volume %",
         min = 0,
         max = 200,
         step = 1,

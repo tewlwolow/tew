@@ -23,6 +23,17 @@ local arrays = {
     ["Night"] = {}
 }
 
+local function getPopulatedCell(maxCount, cell)
+    local count = 0
+    for npc in cell:iterateReferences(tes3.objectType.NPC) do
+        if (npc.object.mobile) and (not npc.object.mobile.isDead) then
+            count = count + 1
+        end
+        if count >= maxCount then debugLog("Enough people in a cell. Count: "..count) return true end
+    end
+    if count < maxCount then debugLog("Too few people in a cell. Count: "..count) return false end
+end
+
 local function getTypeCell(maxCount, cell)
     local count = 0
     local typeCell
@@ -111,7 +122,7 @@ local function cellCheck()
         end}
     end
 
-    if typeCell ~= nil then
+    if typeCell ~= nil and getPopulatedCell(3, cell) == true then
         if typeCell~="Daedric" and
         typeCell~="Dwemer" and
         time == "Night" then

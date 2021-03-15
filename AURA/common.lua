@@ -68,6 +68,7 @@ this.windows={
     "swin",
     "palacewin",
     "triwin",
+    "_windowin_"
 }
 
 -- Getting region on loaded save in interior. Taken from Provincial Music --
