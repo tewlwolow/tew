@@ -251,16 +251,18 @@ local function changeSeasonal()
                     region.weatherChanceAsh = 100
                 end
             end
-            region.weatherChanceClear = seasonalChances[region.name][month][1] + seasonalChances[region.name][month][8]
-            region.weatherChanceCloudy = seasonalChances[region.name][month][2]
-            region.weatherChanceFoggy = seasonalChances[region.name][month][3]
-            region.weatherChanceOvercast = seasonalChances[region.name][month][4]
-            region.weatherChanceRain = seasonalChances[region.name][month][5]
-            region.weatherChanceThunder = seasonalChances[region.name][month][6]
-            region.weatherChanceAsh = seasonalChances[region.name][month][7]
-            region.weatherChanceBlight = 0
-            region.weatherChanceSnow = seasonalChances[region.name][month][9]
-            region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+            if seasonalChances[region.name] then
+                region.weatherChanceClear = seasonalChances[region.name][month][1] + seasonalChances[region.name][month][8]
+                region.weatherChanceCloudy = seasonalChances[region.name][month][2]
+                region.weatherChanceFoggy = seasonalChances[region.name][month][3]
+                region.weatherChanceOvercast = seasonalChances[region.name][month][4]
+                region.weatherChanceRain = seasonalChances[region.name][month][5]
+                region.weatherChanceThunder = seasonalChances[region.name][month][6]
+                region.weatherChanceAsh = seasonalChances[region.name][month][7]
+                region.weatherChanceBlight = 0
+                region.weatherChanceSnow = seasonalChances[region.name][month][9]
+                region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+            end
         end
     end
     monthLast = month
