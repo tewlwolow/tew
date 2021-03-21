@@ -2,8 +2,6 @@ local modversion = require("tew\\Heat Haze\\version")
 local version = modversion.version
 local config = require("tew.Heat Haze.config")
 
-local hazeStartHour = config.hazeStartHour
-local hazeEndHour = config.hazeEndHour
 local heatRegions = config.heatRegions
 
 local tewLib = require("tew\\tewLib\\tewLib")
@@ -147,6 +145,15 @@ local function startHaze()
         distanceTimer:pause()
         removeHeatShader()
         return
+    end
+
+    local hazeStartHour, hazeEndHour
+    if config.overrideHours then
+        hazeStartHour = config.hazeStartHour
+        hazeEndHour = config.hazeEndHour
+    else
+        hazeStartHour = WtC.sunriseHour + 1
+        hazeEndHour = WtC.sunsetHour - 1
     end
 
     local gameHour=tes3.worldController.hour.value

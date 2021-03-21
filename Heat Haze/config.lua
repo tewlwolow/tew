@@ -1,5 +1,6 @@
 return mwse.loadConfig("Heat Haze", {
     debugLogOn=false,
+    overrideHours=false,
     hazeStartHour=6,
     hazeEndHour=21,
     heatRegions={

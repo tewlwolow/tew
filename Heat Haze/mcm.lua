@@ -26,6 +26,11 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+    page:createYesNoButton{
+        label = "Override start and end hours? Not recommended if you use mods that alter sunrise and sunset hours.",
+        variable = registerVariable("overrideHours"),
+    }
+
     page:createSlider{
         label = "Changes start hour for heat shader.\nDefault = 6. Hour",
         min = 0,
