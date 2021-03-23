@@ -68,7 +68,7 @@ end
 local function playDisease()
     if diseaseFlag == 1 then return end
     if not diseaseTimer then
-        diseaseTimer = timer.start{type=timer.real, duration=10, iterations=-1, callback=function()
+        diseaseTimer = timer.start{type=timer.real, duration=20, iterations=-1, callback=function()
             tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderDisease, volume=0.7*vsVol, reference=player}
         end}
     else
@@ -80,7 +80,7 @@ end
 local function playBlight()
     if blightFlag == 1 then return end
     if not blightTimer then
-        blightTimer = timer.start{type=timer.real, duration=20, iterations=-1, callback=function()
+        blightTimer = timer.start{type=timer.real, duration=35, iterations=-1, callback=function()
             tes3.playSound{soundPath="tew\\AURA\\PC\\blight.wav", volume=0.9*vsVol, reference=player}
         end}
     else
