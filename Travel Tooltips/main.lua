@@ -1,5 +1,3 @@
--- Travel Tooltips (by tewlwolow)) --
---- v 1.1.0 ---
 event.register("modConfigReady", function()
     dofile("Data Files\\MWSE\\mods\\tew\\Travel Tooltips\\mcm.lua")
 end)
@@ -10,10 +8,19 @@ local descriptionTable=data.descriptionTable
 local gondoliersTable=data.gondoliersTable
 local useFallback=config.useFallback
 local headers
+local vehkTable = {}
+
+local modversion = require("tew\\Travel Tooltips\\version")
+local version = modversion.version
+local debugLogOn = config.debugLogOn
+local function debugLog(string)
+    if debugLogOn then
+       mwse.log("[Travel Tooltips "..version.."] "..string.format("%s", string))
+    end
+end
 
 local vehkDir = "Data Files\\Textures\\tew\\Travel Tooltips\\Vehk's Ink\\"
 
-local version="1.1.0"
 local mapColour=nil
 local mapColours={
     ["Indoril"] = {1.0, 1.0, 1.0},
@@ -33,6 +40,17 @@ local function getColour()
     for k, v in pairs(mapColours) do
         if k==config.mapColour then
             mapColour=v
+        end
+    end
+end
+
+local function getVehkHeaders()
+    debugLog("Creating arrays for vehk type headers.")
+    vehkTable = {}
+    for city, maps in pairs(data.headers_vehk) do
+        if maps[1] then
+            local map = maps[math.random(1, #maps)]
+            vehkTable[city] = map
         end
     end
 end
@@ -62,16 +80,12 @@ local function createTooltip(e)
     end
 
     local function updateTooltip()
-        if not e.newlyCreated then
-            return
-        end
+        if not e.newlyCreated then return end
         for _, trDestination in pairs(destinationList) do
             trDestination:register("help", function()
 
-                local description, headerPath="", ""
-                local trDestinationText=string.sub(trDestination.text, 1, -7)
-
-                if string.find(trDestinationText, "Old Ebonheart") then return end
+            ------------------------------------
+                local headerPath = ""
 
                 headers=config.headers
                 if headers == "headers_ComradeRaven" then
@@ -82,20 +96,17 @@ local function createTooltip(e)
                     headers=data.headers_vehk
                 end
 
-                if headers ~= data.headers_vehk then
-                    for kHead, vHead in pairs(headers) do
-                        if string.find(trDestinationText, kHead) then
-                            headerPath=vHead
-                            break
+                if headers == data.headers_vehk then
+                    debugLog("Getting vehk header.")
+                    for city, map in pairs(vehkTable) do
+                        if string.startswith(trDestination.text, city) then
+                            headerPath = vehkDir..city.."\\"..map
                         end
                     end
-                elseif headers == data.headers_vehk then
-                    for city, maps in pairs(headers) do
-                        if string.find(trDestinationText, city) then
-                            if maps ~= nil and city ~= nil then
-                                headerPath=vehkDir..city.."\\"..maps[math.random(1, #maps)]
-                                break
-                            end
+                else
+                    for kHead, vHead in pairs(headers) do
+                        if string.startswith(trDestination.text, kHead) then
+                            headerPath=vHead
                         end
                     end
                 end
@@ -105,24 +116,26 @@ local function createTooltip(e)
                 elseif headerPath == "" and useFallback then
                     headers=data.headers_Stuporstar
                     for kHead, vHead in pairs(headers) do
-                        if string.find(trDestinationText, kHead) then
+                        if string.startswith(trDestination.text, kHead) then
                             headerPath=vHead
-                            break
                         end
                     end
                 end
-
                 if headerPath == "" then return end
+            ------------------------------------
+
+            local destinationName = string.sub(trDestination.text, 1, -7)
+            local description = ""
 
                 if npc.class.id == "Gondolier" and config.showGondola then
                     for kDest, vDescr in pairs(gondoliersTable) do
-                        if string.find(trDestinationText, kDest) then
+                        if string.find(destinationName, kDest) then
                             description=vDescr
                         end
                     end
                 else
                     for kDest, vDescr in pairs(descriptionTable) do
-                        if string.find(trDestinationText, kDest) then
+                        if string.startswith(destinationName, kDest) then
                             description=vDescr
                         end
                     end
@@ -141,7 +154,7 @@ local function createTooltip(e)
                     destBlock.paddingBottom = 8*scale
 
                     local destLabel=destBlock:createLabel{id=tes3ui.registerID("twl_Travel_Tooltip"),
-                    text=trDestinationText}
+                    text=destinationName}
                     destLabel.justifyText="center"
                     destLabel.wrapText = true
                     destLabel.font=config.fontLabel
@@ -181,7 +194,7 @@ local function createTooltip(e)
                     destBlock.paddingBottom = 8*scale
 
                     local destLabel=destBlock:createLabel{id=tes3ui.registerID("twl_Travel_Tooltip"),
-                    text=trDestinationText}
+                    text=destinationName}
                     destLabel.justifyText="center"
                     destLabel.wrapText = true
                     destLabel.font=config.fontLabel
@@ -264,11 +277,16 @@ local function init()
                 for map in lfs.dir(vehkDir..folder) do
                     if string.endswith(map, ".dds") or string.endswith(map, ".tga") then
                         table.insert(maps, map)
-                        print("[Travel Tooltips] Vehk's Ink: Adding file: '"..map.."' to array: '"..city.."'.")
+                        debugLog("Vehk's Ink: Adding file: '"..map.."' to array: '"..city.."'.")
                     end
                 end
             end
         end
+    end
+
+    if config.headers == "headers_vehk" then
+        getVehkHeaders()
+        event.register("cellChanged", getVehkHeaders)
     end
 
     event.register("uiActivated", createTravelMap, {filter="MenuDialog"})
@@ -276,7 +294,7 @@ local function init()
     mwse.log("[Travel Tooltips] Version "..version.." initialised.")
 
     -- Old version deleter --
-    if lfs.dir("Data Files\\MWSE\\mods\\Travel Tooltips\\") then
+    if lfs.dir("Data Files\\MWSE\\mods\\Travel Tooltips\\") == true then
         lfs.rmdir("Data Files\\MWSE\\mods\\Travel Tooltips\\", true)
         mwse.log("[Travel Tooltips "..version.."]: Old mod folder found and deleted.")
     end

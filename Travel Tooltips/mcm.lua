@@ -1,5 +1,6 @@
 local config = require("tew\\Travel Tooltips\\config")
-local version="1.1.0"
+local modversion = require("tew\\Travel Tooltips\\version")
+local version = modversion.version
 
 local function registerVariable(id)
     return mwse.mcm.createTableVariable{
@@ -16,6 +17,12 @@ local template = mwse.mcm.createTemplate{
 
     page:createCategory{
         label = "Travel Tooltips version "..version.." by tewlwolow.\nHovering over a destination in the 'Travel' tab (and, optionally, on 'Travel' button itself) will now display an appropriate map and a short description.\nAvailable map packs:\n* Stuporstar's - wonderful and HQ art\n* ComradeRaven's - beautifully redone vanilla artwork\n* Vehk's Ink [tewlwolow/AI Gahaku] - awe-inspiring ink-style paintings (AI-processed screenshots)\n\nSettings:",
+    }
+
+    page:createYesNoButton{
+        label = "Enable debug mode?",
+        variable = registerVariable("debugLogOn"),
+        restartRequired=true
     }
 
     page:createYesNoButton{

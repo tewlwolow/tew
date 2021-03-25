@@ -7,6 +7,7 @@ return mwse.loadConfig("Travel Tooltips", {
         scale=100,
         size="Wide",
         showGondola=true,
-        headers="headers_Stuporstar",
+        headers="headers_vehk",
         useFallback=false,
+        debugLogOn=false,
     })
