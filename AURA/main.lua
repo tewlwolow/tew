@@ -1,18 +1,11 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 
-local function volumeAdjust()
-    tes3.game.volumeEffect=245
-    tes3.game.volumeMaster=245
-    tes3.game.volumeEffect=250
-    tes3.game.volumeMaster=250
-end
-
 local function warning(e)
     if not e.newlyCreated then
         return
     end
-    tes3.messageBox("[AURA]: Do NOT adjust MASTER or EFFECTS slider!")
+    tes3.messageBox("[AURA]: Master and effect channels should be set to max for the mod to work as intended.")
 end
 
 local function init()
@@ -29,13 +22,8 @@ local function init()
     local moduleUI = config.moduleUI
     local moduleMisc = config.moduleMisc
     local modulePC = config.modulePC
-    local volumeFix = config.volumeFix
 
-    if volumeFix then
-        volumeAdjust()
-        event.register("uiActivated", warning, {filter="MenuAudio"})
-        event.register("cellChanged", volumeAdjust, {priority=-200})
-    end
+    event.register("uiActivated", warning, {filter="MenuAudio"})
 
     if moduleAmbientOutdoor then
         mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")

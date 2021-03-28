@@ -1,5 +1,4 @@
 return mwse.loadConfig("AURA", {
-    volumeFix=true,
     OAvol=100,
     IWvol=150,
     yurtVol=200,

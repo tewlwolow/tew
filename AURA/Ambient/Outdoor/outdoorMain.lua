@@ -263,7 +263,7 @@ local function cellCheck()
             debugLog("Bad weather detected and windy option on.")
             getPathWindy()
          else
-            debugLog("Bad weather detected and no windy option on. Removing sounds")
+            debugLog("Bad weather detected and no windy option on. Returning.")
             return
          end
       elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
