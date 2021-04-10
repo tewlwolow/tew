@@ -414,7 +414,8 @@ end
 
 local function teleportMenu(e)
     if UICreated == 0 and
-    e.keyCode == config.summonKey.keyCode and not tes3.menuMode() and (not isAvniDead()) then
+    e.keyCode == config.summonKey.keyCode and (not tes3.menuMode()) and (not isAvniDead())
+    and tes3.getJournalIndex{id = "tew_Avni"} == 100 then
         local useColors = config.useColors
         local messageBoxId = tes3ui.registerID("tew_AvniTelMenu_Box")
         local menuAvniTel = tes3ui.createMenu{ id = messageBoxId, fixedFrame = true }
