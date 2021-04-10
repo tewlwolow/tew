@@ -170,6 +170,7 @@ local function createTooltip(e)
                     destHeader.borderBottom = 2*scale
                     destHeader.borderTop = 2*scale
                     destHeader.justifyText="center"
+                    --TO DO: update path
                     if headerPath=="\\Textures\\Travel Tooltips\\Sheogorad_regionmap.tga" then
                         destHeader.imageScaleX=1*scale
                         destHeader.imageScaleY=1*scale
