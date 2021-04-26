@@ -345,33 +345,6 @@ local function changeDaytime()
 
     ---
 
-    --[[
-    if region == regionLast and month == monthLast then debugLog("No change in daytime conditions. Returning.") return end
-    debugLog("Daytime hours before change: "..WtC.sunriseHour.." - ".. WtC.sunsetHour)
-    for _, northRegion in pairs(daytimeData["cold regions"]) do
-        if region == northRegion then
-            debugLog("Using northern latitude values.")
-            WtC.sunriseHour = daytimeData["northern"]["sunrise"][month]
-            WtC.sunsetHour = daytimeData["northern"]["sunset"][month]
-            local horizonTime = math.abs((WtC.sunsetHour - WtC.sunriseHour)/4)
-            if horizonTime > 3 then horizonTime = 3 end
-            WtC.sunriseDuration = horizonTime
-            WtC.sunsetDuration = horizonTime
-            break
-        else
-            WtC.sunriseHour = daytimeData["regular"]["sunrise"][month]
-            WtC.sunsetHour = daytimeData["regular"]["sunset"][month]
-            local horizonTime = math.abs((WtC.sunsetHour - WtC.sunriseHour)/4)
-            if horizonTime > 3 then horizonTime = 3 end
-            WtC.sunriseDuration = horizonTime
-            WtC.sunsetDuration = horizonTime
-        end
-    end
-    regionLast = region
-    monthLast = month
-    debugLog("Daytime hours after change: "..WtC.sunriseHour.." - ".. WtC.sunsetHour)
-    --]]
-
 end
 
 local function onCellChanged(e)
@@ -494,6 +467,7 @@ local function init()
 
     ----------------------------------------------------
     -- Beneath you can find some useful functions to automatically generate varied weather --
+    -- Note that this is super wonky lol I suck at maths --
 --[[
     -- Prints a lua-friendly table with weather chances per month (vanilla - same base values for all months) --
     local months = {1,2,3,4,5,6,7,8,9,10,11,12}
