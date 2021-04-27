@@ -60,7 +60,7 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createSlider{
-        label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nChance %",
+        label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nDefault - 0%.\nChance %",
         min = 0,
         max = 100,
         step = 1,
