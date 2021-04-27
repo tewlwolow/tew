@@ -10,9 +10,19 @@ local randomiseParticles=config.randomiseParticles
 local randomiseCloudsSpeed=config.randomiseCloudsSpeed
 local modversion = require("tew\\Watch the Skies\\version")
 local version = modversion.version
-local WtC, intWeatherTimer, monthLast
+local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
+
+local vvRegions = {"Bitter Coast Region", "Azura's Coast Region", "Molag Mar Region", "Ashlands Region", "West Gash Region", "Ascadian Isles Region", "Grazelands Region", "Sheogorad"}
+
+local function checkVv(region)
+    for _, v in ipairs(vvRegions) do
+        if region == v then
+            return true
+        end
+    end
+end
 
 local particleAmount = {
     ["rain"] = {
@@ -48,6 +58,55 @@ local particleAmount = {
         1500,
     }
 }
+
+local function getMQState()
+
+-- This I got from Creeping Blight by Necrolesian --
+
+    -- Receiving index 20 for this quest changes the weather at Red Mountain. Also resets questStage to 0.
+    local endGameIndex = tes3.getJournalIndex{ id = "C3_DestroyDagoth" }
+
+    -- Give the Dwemer Puzzle Box to Hasphat Antabolis. Triggers questStage 1.
+    local antabolisIndex = tes3.getJournalIndex{ id = "A1_2_AntabolisInformant" }
+
+    -- Receive notes on the Ashlanders from Hassour Zainsubani. Triggers questStage 2.
+    local zainsubaniIndex = tes3.getJournalIndex{ id = "A1_11_ZainsubaniInformant" }
+
+    -- Defeat Dagoth Gares. Triggers questStage 3.
+    local garesIndex = tes3.getJournalIndex{ id = "A2_2_6thHouse" }
+
+    -- Take the cure from Divayth Fyr. Triggers questStage 4.
+    local cureIndex = tes3.getJournalIndex{ id = "A2_3_CorprusCure" }
+
+    -- Receive Moon-and-Star from Azura. Triggers questStage 5.
+    local incarnateIndex = tes3.getJournalIndex{ id = "A2_6_Incarnate" }
+
+    -- Receive a working Wraithguard from Vivec or Yagrum Bagarn. Triggers questStage 6.
+    local vivecIndex = tes3.getJournalIndex{ id = "B8_MeetVivec" }
+    local backPathIndex = tes3.getJournalIndex{ id = "CX_BackPath" }
+
+    local questStage
+
+    -- Determine the current stage of the Main Quest.
+    if endGameIndex >= 20 then
+        questStage = 0
+    elseif vivecIndex >= 50 or backPathIndex >= 50 then
+        questStage = 6
+    elseif incarnateIndex >= 50 then
+        questStage = 5
+    elseif cureIndex >= 50 then
+        questStage = 4
+    elseif garesIndex >= 50 then
+        questStage = 3
+    elseif zainsubaniIndex >= 50 then
+        questStage = 2
+    elseif antabolisIndex >= 10 then
+        questStage = 1
+    else
+        questStage = 0
+    end
+    return questStage
+end
 
 local function debugLog(string)
     if debugLogOn then
@@ -149,13 +208,16 @@ end
 local function changeSeasonal()
 
     local month = tes3.worldController.month.value + 1
-    if month == monthLast then debugLog("Same month. Returning.") return end
+    local regionNow = tes3.getRegion({useDoors=true})
+    if (month == monthLast) and (regionNow == regionLast) then debugLog("Same month and region. Returning.") return end
 
-    if tes3.getJournalIndex{id = "C3_DestroyDagoth"} < 20 then
-        debugLog("Dagoth Ur is alive. Using regular blight values.")
-        for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-            if region.id == "Red Mountain Region" then
-                debugLog("Setting full blight for Red Mountain Region.")
+    local questStage = getMQState()
+    debugLog("Main quest stage: "..questStage)
+
+    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
+        if region.id == "Red Mountain Region" then
+            if tes3.getJournalIndex{id = "C3_DestroyDagoth"} < 20 then
+                debugLog("Dagoth Ur is alive. Using full blight values for Red Mountain.")
                 region.weatherChanceClear = 0
                 region.weatherChanceCloudy = 0
                 region.weatherChanceFoggy = 0
@@ -166,111 +228,84 @@ local function changeSeasonal()
                 region.weatherChanceBlight = 100
                 region.weatherChanceSnow = 0
                 region.weatherChanceBlizzard = 0
-            elseif region.id == "Mournhold Region"
-            and tes3.findGlobal("MournWeather").value == 1
-            or tes3.findGlobal("MournWeather").value == 2
-            or tes3.findGlobal("MournWeather").value == 3
-            or tes3.findGlobal("MournWeather").value == 4
-            or tes3.findGlobal("MournWeather").value == 5
-            or tes3.findGlobal("MournWeather").value == 6
-            or tes3.findGlobal("MournWeather").value == 7 then
-                debugLog("Weather machine running: "..tes3.findGlobal("MournWeather").value)
-                region.weatherChanceClear = 0
-                region.weatherChanceCloudy = 0
-                region.weatherChanceFoggy = 0
-                region.weatherChanceOvercast = 0
-                region.weatherChanceRain = 0
-                region.weatherChanceThunder = 0
-                region.weatherChanceAsh = 0
-                region.weatherChanceBlight = 0
-                region.weatherChanceSnow = 0
-                region.weatherChanceBlizzard = 0
-                if tes3.findGlobal("MournWeather").value == 1 then
-                    region.weatherChanceClear = 100
-                elseif tes3.findGlobal("MournWeather").value == 2 then
-                    region.weatherChanceCloudy = 100
-                elseif tes3.findGlobal("MournWeather").value == 3 then
-                    region.weatherChanceFoggy = 100
-                elseif tes3.findGlobal("MournWeather").value == 4 then
-                    region.weatherChanceOvercast = 100
-                elseif tes3.findGlobal("MournWeather").value == 5 then
-                    region.weatherChanceRain = 100
-                elseif tes3.findGlobal("MournWeather").value == 6 then
-                    region.weatherChanceThunder = 100
-                elseif tes3.findGlobal("MournWeather").value == 7 then
-                    region.weatherChanceAsh = 100
-                end
             else
-                region.weatherChanceClear = seasonalChances[region.name][month][1]
-                region.weatherChanceCloudy = seasonalChances[region.name][month][2]
-                region.weatherChanceFoggy = seasonalChances[region.name][month][3]
-                region.weatherChanceOvercast = seasonalChances[region.name][month][4]
-                region.weatherChanceRain = seasonalChances[region.name][month][5]
-                region.weatherChanceThunder = seasonalChances[region.name][month][6]
-                region.weatherChanceAsh = seasonalChances[region.name][month][7]
-                region.weatherChanceBlight = seasonalChances[region.name][month][8]
-                region.weatherChanceSnow = seasonalChances[region.name][month][9]
-                region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+                debugLog("Dagoth Ur is dead. Reverting to regular RM weather. Removing blight cloud.")
+                region.weatherChanceClear = seasonalChances[region.id][month][1]
+                region.weatherChanceCloudy = seasonalChances[region.id][month][2]
+                region.weatherChanceFoggy = seasonalChances[region.id][month][3]
+                region.weatherChanceOvercast = seasonalChances[region.id][month][4]
+                region.weatherChanceRain = seasonalChances[region.id][month][5]
+                region.weatherChanceThunder = seasonalChances[region.id][month][6]
+                region.weatherChanceAsh = seasonalChances[region.id][month][7]
+                region.weatherChanceBlight = seasonalChances[region.id][month][8]
+                region.weatherChanceSnow = seasonalChances[region.id][month][9]
+                region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
+                mwscript.disable{reference="blight cloud"}
             end
-        end
-    elseif tes3.getJournalIndex{id = "C3_DestroyDagoth"} >= 20 then
-        debugLog("Dagoth Ur is dead. Using zero blight values.")
-        for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-            if region.id == "Mournhold Region"
-            and tes3.findGlobal("MournWeather").value == 1
-            or tes3.findGlobal("MournWeather").value == 2
-            or tes3.findGlobal("MournWeather").value == 3
-            or tes3.findGlobal("MournWeather").value == 4
-            or tes3.findGlobal("MournWeather").value == 5
-            or tes3.findGlobal("MournWeather").value == 6
-            or tes3.findGlobal("MournWeather").value == 7 then
-                debugLog("Weather machine running.")
-                region.weatherChanceClear = 0
-                region.weatherChanceCloudy = 0
-                region.weatherChanceFoggy = 0
-                region.weatherChanceOvercast = 0
-                region.weatherChanceRain = 0
-                region.weatherChanceThunder = 0
-                region.weatherChanceAsh = 0
-                region.weatherChanceBlight = 0
-                region.weatherChanceSnow = 0
-                region.weatherChanceBlizzard = 0
-                if tes3.findGlobal("MournWeather").value == 1 then
-                    region.weatherChanceClear = 100
-                elseif tes3.findGlobal("MournWeather").value == 2 then
-                    region.weatherChanceCloudy = 100
-                elseif tes3.findGlobal("MournWeather").value == 3 then
-                    region.weatherChanceFoggy = 100
-                elseif tes3.findGlobal("MournWeather").value == 4 then
-                    region.weatherChanceOvercast = 100
-                elseif tes3.findGlobal("MournWeather").value == 5 then
-                    region.weatherChanceRain = 100
-                elseif tes3.findGlobal("MournWeather").value == 6 then
-                    region.weatherChanceThunder = 100
-                elseif tes3.findGlobal("MournWeather").value == 7 then
-                    region.weatherChanceAsh = 100
-                end
+        elseif region.id == "Mournhold Region"
+        and tes3.findGlobal("MournWeather").value == 1
+        or tes3.findGlobal("MournWeather").value == 2
+        or tes3.findGlobal("MournWeather").value == 3
+        or tes3.findGlobal("MournWeather").value == 4
+        or tes3.findGlobal("MournWeather").value == 5
+        or tes3.findGlobal("MournWeather").value == 6
+        or tes3.findGlobal("MournWeather").value == 7 then
+            debugLog("Weather machine running: "..tes3.findGlobal("MournWeather").value)
+            region.weatherChanceClear = 0
+            region.weatherChanceCloudy = 0
+            region.weatherChanceFoggy = 0
+            region.weatherChanceOvercast = 0
+            region.weatherChanceRain = 0
+            region.weatherChanceThunder = 0
+            region.weatherChanceAsh = 0
+            region.weatherChanceBlight = 0
+            region.weatherChanceSnow = 0
+            region.weatherChanceBlizzard = 0
+            if tes3.findGlobal("MournWeather").value == 1 then
+                region.weatherChanceClear = 100
+            elseif tes3.findGlobal("MournWeather").value == 2 then
+                region.weatherChanceCloudy = 100
+            elseif tes3.findGlobal("MournWeather").value == 3 then
+                region.weatherChanceFoggy = 100
+            elseif tes3.findGlobal("MournWeather").value == 4 then
+                region.weatherChanceOvercast = 100
+            elseif tes3.findGlobal("MournWeather").value == 5 then
+                region.weatherChanceRain = 100
+            elseif tes3.findGlobal("MournWeather").value == 6 then
+                region.weatherChanceThunder = 100
+            elseif tes3.findGlobal("MournWeather").value == 7 then
+                region.weatherChanceAsh = 100
             end
-            if seasonalChances[region.name] then
-                region.weatherChanceClear = seasonalChances[region.name][month][1] + seasonalChances[region.name][month][8]
-                region.weatherChanceCloudy = seasonalChances[region.name][month][2]
-                region.weatherChanceFoggy = seasonalChances[region.name][month][3]
-                region.weatherChanceOvercast = seasonalChances[region.name][month][4]
-                region.weatherChanceRain = seasonalChances[region.name][month][5]
-                region.weatherChanceThunder = seasonalChances[region.name][month][6]
-                region.weatherChanceAsh = seasonalChances[region.name][month][7]
-                region.weatherChanceBlight = 0
-                region.weatherChanceSnow = seasonalChances[region.name][month][9]
-                region.weatherChanceBlizzard = seasonalChances[region.name][month][10]
+        else
+            if checkVv(region.id) == true then
+                region.weatherChanceClear = (seasonalChances[region.id][month][1]) - questStage
+                region.weatherChanceCloudy = seasonalChances[region.id][month][2]
+                region.weatherChanceFoggy = seasonalChances[region.id][month][3]
+                region.weatherChanceOvercast = seasonalChances[region.id][month][4]
+                region.weatherChanceRain = seasonalChances[region.id][month][5]
+                region.weatherChanceThunder = seasonalChances[region.id][month][6]
+                region.weatherChanceAsh = seasonalChances[region.id][month][7]
+                region.weatherChanceBlight = (seasonalChances[region.id][month][8]) + questStage
+                region.weatherChanceSnow = seasonalChances[region.id][month][9]
+                region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
+            else
+                region.weatherChanceClear = seasonalChances[region.id][month][1]
+                region.weatherChanceCloudy = seasonalChances[region.id][month][2]
+                region.weatherChanceFoggy = seasonalChances[region.id][month][3]
+                region.weatherChanceOvercast = seasonalChances[region.id][month][4]
+                region.weatherChanceRain = seasonalChances[region.id][month][5]
+                region.weatherChanceThunder = seasonalChances[region.id][month][6]
+                region.weatherChanceAsh = seasonalChances[region.id][month][7]
+                region.weatherChanceBlight = seasonalChances[region.id][month][8]
+                region.weatherChanceSnow = seasonalChances[region.id][month][9]
+                region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
             end
         end
     end
     monthLast = month
+    regionLast = regionNow
 
-    if debugLogOn then
-        local region = tes3.getRegion()
-        debugLog("Current chances for region: "..region.name..": "..region.weatherChanceClear..", "..region.weatherChanceCloudy..", "..region.weatherChanceFoggy..", "..region.weatherChanceOvercast..", "..region.weatherChanceRain..", "..region.weatherChanceThunder..", "..region.weatherChanceAsh..", "..region.weatherChanceBlight..", "..region.weatherChanceSnow..", "..region.weatherChanceBlizzard)
-    end
+    debugLog("Current chances for region: "..regionNow.name..": "..regionNow.weatherChanceClear..", "..regionNow.weatherChanceCloudy..", "..regionNow.weatherChanceFoggy..", "..regionNow.weatherChanceOvercast..", "..regionNow.weatherChanceRain..", "..regionNow.weatherChanceThunder..", "..regionNow.weatherChanceAsh..", "..regionNow.weatherChanceBlight..", "..regionNow.weatherChanceSnow..", "..regionNow.weatherChanceBlizzard)
 
 end
 
@@ -337,14 +372,18 @@ local function changeDaytime()
     adjustedSunset = (adjustedSunset - durSunset)
 
     debugLog("Previous values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
-    WtC.sunriseHour = math.ceil(adjustedSunrise)
-    WtC.sunsetHour = math.ceil(adjustedSunset)
-    WtC.sunriseDuration = math.ceil(durSunrise)
-    WtC.sunsetDuration = math.ceil(durSunset)
-    debugLog("Current values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
-
-    ---
-
+    if  WtC.sunriseHour == math.ceil(adjustedSunrise) and
+        WtC.sunsetHour == math.ceil(adjustedSunset) and
+        WtC.sunriseDuration == math.ceil(durSunrise) and
+        WtC.sunsetDuration == math.ceil(durSunset) then
+            debugLog("No change needed. Returning.")
+    else
+        WtC.sunriseHour = math.ceil(adjustedSunrise)
+        WtC.sunsetHour = math.ceil(adjustedSunset)
+        WtC.sunriseDuration = math.ceil(durSunrise)
+        WtC.sunsetDuration = math.ceil(durSunset)
+        debugLog("Current values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
+    end
 end
 
 local function onCellChanged(e)
@@ -365,7 +404,6 @@ local function onCellChanged(e)
     end
 
     if config.daytime then
-        monthLast = nil
         changeDaytime()
     end
 
@@ -464,300 +502,6 @@ local function init()
     if interiorTransitions then
         event.register("cellChanged", onCellChanged, {priority=-150})
     end
-
-    ----------------------------------------------------
-    -- Beneath you can find some useful functions to automatically generate varied weather --
-    -- Note that this is super wonky lol I suck at maths --
---[[
-    -- Prints a lua-friendly table with weather chances per month (vanilla - same base values for all months) --
-    local months = {1,2,3,4,5,6,7,8,9,10,11,12}
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-        print("[\""..region.name.."\"] = {")
-        for _, month in ipairs(months) do
-            print("["..month.."] = {"..region.weatherChanceClear..", "..region.weatherChanceCloudy..", "..region.weatherChanceFoggy..", "..region.weatherChanceOvercast..", "..region.weatherChanceRain..", "..region.weatherChanceThunder..", "..region.weatherChanceAsh..", "..region.weatherChanceBlight..", "..region.weatherChanceSnow..", "..region.weatherChanceBlizzard.."},")
-        end
-        print("},\n")
-    end
-
-    -- Adjusts value per month --
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-        for month, chanceArray in ipairs(seasonalChances[region.name]) do
-            if month ==  1 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*15/100)
-                chanceArray[2] = math.ceil(chanceArray[2] - chanceArray[2]*20/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*50/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*20/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*15/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*12/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 0
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*10/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*10/100)
-                end
-            elseif month == 2 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*20/100)
-                chanceArray[2] = math.ceil(chanceArray[2] - chanceArray[2]*30/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*60/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*15/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*20/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*10/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 0
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*16/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*4/100)
-                end
-            elseif month == 3 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*25/100)
-                chanceArray[2] = math.ceil(chanceArray[2] - chanceArray[2]*5/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*20/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*25/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*50/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*120/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*4/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 0
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*28/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*12/100)
-                end
-            elseif month == 4 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*40/100)
-                chanceArray[2] = math.ceil(chanceArray[2] - chanceArray[2]*12/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*40/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*20/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*170/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*70/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*25/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 10
-                    chanceArray[6] = 5
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*12/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*18/100)
-                end
-            elseif month == 5 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*80/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*30/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*20/100)
-                chanceArray[4] = math.ceil(chanceArray[4] - chanceArray[4]*30/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*75/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*30/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] + chanceArray[7]*25/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[9] = 0
-                    chanceArray[10] = 0
-                end
-            elseif month == 6 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*150/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*80/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*40/100)
-                chanceArray[4] = math.ceil(chanceArray[4] - chanceArray[4]*25/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*25/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*30/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] + chanceArray[7]*35/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[9] = 0
-                    chanceArray[10] = 0
-                end
-            elseif month == 7 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*120/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*70/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*50/100)
-                chanceArray[4] = math.ceil(chanceArray[4] - chanceArray[4]*15/100)
-                chanceArray[5] = math.ceil(chanceArray[5] - chanceArray[5]*16/100)
-                chanceArray[6] = math.ceil(chanceArray[6] - chanceArray[6]*12/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] + chanceArray[7]*30/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[9] = 0
-                    chanceArray[10] = 0
-                end
-            elseif month == 8 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*90/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*150/100)
-                chanceArray[3] = math.ceil(chanceArray[3] - chanceArray[3]*35/100)
-                chanceArray[4] = math.ceil(chanceArray[4] - chanceArray[4]*15/100)
-                chanceArray[5] = math.ceil(chanceArray[5] - chanceArray[5]*16/100)
-                chanceArray[6] = math.ceil(chanceArray[6] - chanceArray[6]*28/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] + chanceArray[7]*20/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[9] = 0
-                    chanceArray[10] = 0
-                end
-            elseif month == 9 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*70/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*100/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*50/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*30/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*25/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*10/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] + chanceArray[7]*16/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 10
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*10/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*10/100)
-                end
-            elseif month == 10 then
-                chanceArray[1] = math.ceil(chanceArray[1] + chanceArray[1]*40/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*80/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*70/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*60/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*15/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*17/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*10/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 5
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*30/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*15/100)
-                end
-            elseif month == 11 then
-                chanceArray[1] = math.ceil(chanceArray[1] - chanceArray[1]*20/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*60/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*100/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*70/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*28/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*4/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*16/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 0
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*105/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*15/100)
-                end
-            elseif month == 12 then
-                chanceArray[1] = math.ceil(chanceArray[1] - chanceArray[1]*40/100)
-                chanceArray[2] = math.ceil(chanceArray[2] + chanceArray[2]*60/100)
-                chanceArray[3] = math.ceil(chanceArray[3] + chanceArray[3]*120/100)
-                chanceArray[4] = math.ceil(chanceArray[4] + chanceArray[4]*150/100)
-                chanceArray[5] = math.ceil(chanceArray[5] + chanceArray[5]*28/100)
-                chanceArray[6] = math.ceil(chanceArray[6] + chanceArray[6]*12/100)
-                if chanceArray[7]~=0 then
-                    chanceArray[7] = math.ceil(chanceArray[7] - chanceArray[7]*10/100)
-                end
-                if chanceArray[9]~=0 then
-                    chanceArray[5] = 0
-                    chanceArray[6] = 0
-                    chanceArray[9] = math.ceil(chanceArray[9] + chanceArray[9]*18/100)
-                    chanceArray[10] = math.ceil(chanceArray[10] + chanceArray[10]*15/100)
-                end
-            end
-        end
-    end
-
-    -- Adjusts values to give 100% weather chances sum per month --
-    for _, month in pairs(seasonalChances) do
-        for _, chanceArray in pairs(month) do
-            local sum = 0
-            local diff
-            for _, chance in ipairs(chanceArray) do
-                sum = sum + chance
-            end
-            if sum > 100 then
-                diff = sum - 100
-                chanceArray[2] = chanceArray[2] - diff
-                if chanceArray[2] < 5 then
-                    diff = 5 - chanceArray[2]
-                    chanceArray[2] = 5
-                    chanceArray[1] = chanceArray[1] + diff
-                end
-                sum = 0
-                for _, chance in ipairs(chanceArray) do
-                    sum = sum + chance
-                end
-                if sum > 100 then
-                    diff = sum - 100
-                    local valueMax = math.max(unpack(chanceArray))
-                    for index, chance in ipairs(chanceArray) do
-                        if chance == valueMax then
-                            chanceArray[index] = chanceArray[index] - diff
-                        end
-                    end
-                end
-            end
-            if sum < 100 then
-                diff = 100 - sum
-                chanceArray[1] = chanceArray[1] + diff
-            end
-        end
-    end
-
-    -- Ensures there are no negative values --
-    for _, month in pairs(seasonalChances) do
-        local added = 0
-        for _, chanceArray in pairs(month) do
-            for index, chance in ipairs(chanceArray) do
-                if chance < 0 then
-                    added = math.abs(2*chance)
-                    chanceArray[index] = added
-                end
-            end
-            local valueMax = math.max(unpack(chanceArray))
-            for index, chance in ipairs(chanceArray) do
-                if chance == valueMax then
-                    chanceArray[index] = chanceArray[index] - added
-                end
-            end
-        end
-    end
-
-    -- Prints a lua-friendly table with weather chances per month (adjusted - each month has different value) --
-    for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
-        print("[\""..region.name.."\"] = {")
-        for month, chanceArray in ipairs(seasonalChances[region.name]) do
-            print("["..month.."] = {"..chanceArray[1]..", "..chanceArray[2]..", "..chanceArray[3]..", "..chanceArray[4]..", "..chanceArray[5]..", "..chanceArray[6]..", "..chanceArray[7]..", "..chanceArray[8]..", "..chanceArray[9]..", "..chanceArray[10].."},")
-        end
-        print("},\n")
-    end
-
-    -- Check if all chances are 100% --
-    local flag = 0
-    print("Starting weather chances check.")
-    for region, month in pairs(seasonalChances) do
-        for monthIndex, array in pairs(month) do
-            local sum = 0
-            for _, num in pairs(array) do
-                sum = sum + num
-            end
-            if sum ~= 100 then
-                flag = 1
-                print("\nWARNING! Month chances doesn't add up to 100.")
-                print("Sum: "..sum)
-                print("Region: "..region)
-                print("Month: "..monthIndex.."\n")
-            end
-        end
-    end
-    print("Chances check finished.")
-    if flag == 1 then
-        print("Process finished with errors. See above.")
-    else
-        print("No problems detected.")
-    end
-    ]]
 
 end
 
