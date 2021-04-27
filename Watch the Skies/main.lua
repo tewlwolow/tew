@@ -9,6 +9,13 @@ local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
+
+local function debugLog(string)
+    if debugLogOn then
+       mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
+    end
+end
+
 -- Define regions affected by the Blight --
 local vvRegions = {"Bitter Coast Region", "Azura's Coast Region", "Molag Mar Region", "Ashlands Region", "West Gash Region", "Ascadian Isles Region", "Grazelands Region", "Sheogorad"}
 
@@ -58,7 +65,7 @@ local particleAmount = {
     }
 }
 
--- Determine current MQ sArraytate --
+-- Determine current MQ state --
 -- This I got from Creeping Blight by Necrolesian --
 -- The values control Blight percent chance for all Vvardenfell regions --
 local function getMQState()
@@ -108,12 +115,6 @@ local function getMQState()
     return questStage
 end
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
-    end
-end
-
 -- Randomise particle amount --
 local function changeMaxParticles()
     WtC.weathers[5].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
@@ -148,9 +149,9 @@ local function skyChoice(e)
     -- Check against config chances, do nothing if dice roll determines we should use vanilla instead --
     debugLog("Starting cloud texture randomisation.")
     local vanChance=config.vanChance/100
+    local texPath
     if vanChance<math.random() then
-        local sArray=weathers[e.to.index]
-        local texPath
+        local sArray=weathers.customWeathers[e.to.index]
         for weather, index in pairs(tes3.weather) do
             if e.to.index==index then
                 texPath=weather
@@ -161,7 +162,9 @@ local function skyChoice(e)
             debugLog("Cloud texture path set to: "..e.to.cloudTexture)
         end
     else
-        debugLog("Using vanilla texture.")
+        texPath = weathers.vanillaWeathers[e.to.index]
+        e.to.cloudTexture = "Data Files\\Textures\\"..texPath
+            debugLog("Using vanilla texture: "..e.to.cloudTexture)
     end
 
     -- Change hours between weather changes --
@@ -313,7 +316,7 @@ local function changeSeasonal()
                 region.weatherChanceBlight = (seasonalChances[region.id][month][8]) + questStage
                 region.weatherChanceSnow = seasonalChances[region.id][month][9]
                 region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
-            else
+            elseif seasonalChances[region.id] then
             -- Otherwise just use regular stored values --
                 region.weatherChanceClear = seasonalChances[region.id][month][1]
                 region.weatherChanceCloudy = seasonalChances[region.id][month][2]
@@ -403,13 +406,13 @@ local function changeDaytime()
     adjustedSunset = (adjustedSunset - durSunset)
 
     -- Adjust values only if we need to, i.e. if different from current values --
-    debugLog("Previous values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
     if  WtC.sunriseHour == math.ceil(adjustedSunrise) and
         WtC.sunsetHour == math.ceil(adjustedSunset) and
         WtC.sunriseDuration == math.ceil(durSunrise) and
         WtC.sunsetDuration == math.ceil(durSunset) then
-            debugLog("No change needed. Returning.")
+        debugLog("No change in daytime hours. Returning.")
     else
+        debugLog("Previous values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
         WtC.sunriseHour = math.ceil(adjustedSunrise)
         WtC.sunsetHour = math.ceil(adjustedSunset)
         WtC.sunriseDuration = math.ceil(durSunrise)
@@ -480,7 +483,8 @@ end
 
 -- Change values also on initialised to ensure we won't end up with vanilla on load --
 local function init()
-    -- Initially shuffle the cloud textures --
+
+    -- Populate data tables --
     if config.alterClouds then
         WtC=tes3.getWorldController().weatherController
         print("Watch the Skies version "..version.." initialised.")
@@ -488,30 +492,40 @@ local function init()
             debugLog("Weather: "..weather)
             for sky in lfs.dir(WtSdir..weather) do
                 if sky ~= ".." and sky ~= "." then
-                    debugLog("Found file: "..sky)
                     if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
-                        table.insert(weathers[index], sky)
-                        debugLog("Adding file: "..sky)
+                        table.insert(weathers.customWeathers[index], sky)
+                        debugLog("File added: "..sky)
                     end
                 end
             end
         end
-        for _, weather in pairs(WtC.weathers) do
-            for index, _ in pairs(weathers) do
+    end
+
+    -- Initially shuffle the cloud textures --
+    local vanChance=config.vanChance/100
+    local texPath, sArray
+
+    for _, weather in pairs(WtC.weathers) do
+        if vanChance<math.random() then
+            for index, _ in pairs(weathers.customWeathers) do
                 if weather.index==index then
-                    local texPath
                     for w, i in pairs(tes3.weather) do
                         if index==i then
+                            sArray=weathers.customWeathers[weather.index]
                             texPath=w
                             break
                         end
                     end
-                    if texPath~=nil and weathers[index][1]~=nil then
-                        weather.cloudTexture=WtSdir..texPath.."\\"..weathers[index][math.random(1, #weathers[index])]
-                        debugLog("Cloud texture path set to: "..weather.cloudTexture)
-                    end
                 end
             end
+            if texPath~=nil and sArray[1]~=nil then
+                weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+                debugLog("Cloud texture path set to: "..weather.cloudTexture)
+            end
+        else
+            texPath = weathers.vanillaWeathers[weather.index]
+            weather.cloudTexture = "Data Files\\Textures\\"..texPath
+            debugLog("Using vanilla texture: "..weather.cloudTexture)
         end
     end
 
