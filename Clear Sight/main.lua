@@ -59,6 +59,7 @@ local function coolDown()
 end
 
 local function onWeaponReadied()
+    stopTimer()
     debugLog("Weapon readied. Showing HUD.")
     showHUD()
     spellFlag = 0
@@ -67,6 +68,7 @@ end
 
 local function onWeaponUnreadied()
     if spellFlag == 0 then
+        stopTimer()
         debugLog("Weapon unreadied. Hiding HUD in a bit.")
         coolDown()
         weaponFlag = 0
@@ -114,7 +116,7 @@ local function onKeyDown(e)
     end
 
    for _, key in pairs(keys) do
-        if isKeyDown(key) and toggleFlag == 0 and spellFlag == 0 then
+        if isKeyDown(key) and toggleFlag == 0 and spellFlag == 0 and weaponFlag == 0 then
             debugLog("Action key down. Showing HUD for a bit.")
             stopTimer()
             showHUD()
@@ -141,6 +143,21 @@ local function onKeyDown(e)
 
 end
 
+local function onAttacked(e)
+    if e.target == tes3.player then
+        debugLog("Player attacked. Showing HUD.")
+        stopTimer()
+        showHUD()
+    end
+end
+
+local function onCombatStopped(e)
+    if e.actor == tes3.player then
+        debugLog("Player out of combat. Hiding HUD in a bit.")
+        stopTimer()
+        coolDown()
+    end
+end
 
 local function init()
     event.register("menuExit", onMenuExit)
@@ -154,6 +171,9 @@ local function init()
     event.register("weaponUnreadied", onWeaponUnreadied)
 
     event.register("spellCast", onSpellCast)
+
+    event.register("combatStarted", onAttacked)
+    event.register("combatStop", onCombatStopped)
 end
 
 event.register("initialized", init)
