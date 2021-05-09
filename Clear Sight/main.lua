@@ -4,8 +4,9 @@ local modversion = require("tew\\Clear Sight\\version")
 local version = modversion.version
 
 local menuMulti, coolDownTimer
-local stateFlag = 0
+local spellFlag = 0
 local toggleFlag = 0
+local weaponFlag = 0
 
 local function debugLog(string)
     if debugLogOn then
@@ -20,14 +21,8 @@ local keys = {
     tes3.keybind.nextWeapon
 }
 
-local stateKeys = {
-    tes3.keybind.readyWeapon,
-    tes3.keybind.readyMagic,
-    tes3.keybind.readyMagicMCP
-}
-
 local function stopTimer()
-    if coolDownTimer then
+    if coolDownTimer ~= nil then
         coolDownTimer:pause()
         coolDownTimer:cancel()
         coolDownTimer = nil
@@ -35,30 +30,65 @@ local function stopTimer()
 end
 
 local function hideHUD()
-    menuMulti.visible = false
+    if menuMulti then
+        menuMulti.visible = false
+    end
 end
+
+local function showHUD()
+    if menuMulti then
+        menuMulti.visible = true
+    end
+end
+
 
 local function onLoaded()
     timer.delayOneFrame(function()
         menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+        debugLog("Game loaded. Hiding HUD.")
         hideHUD()
     end)
 end
 
-local function getMenu(e)
-
-    if not e.newlyCreated then return end
-
-end
-
-local function coolDown(menu)
+local function coolDown()
     coolDownTimer = timer.start{
         type = timer.simulate,
         duration = config.cooldownDuration,
-        callback=function()
-            menu.visible = false
-        end
+        callback = hideHUD
     }
+end
+
+local function onWeaponReadied()
+    debugLog("Weapon readied. Showing HUD.")
+    showHUD()
+    spellFlag = 0
+    weaponFlag = 1
+end
+
+local function onWeaponUnreadied()
+    if spellFlag == 0 then
+        debugLog("Weapon unreadied. Hiding HUD in a bit.")
+        coolDown()
+        weaponFlag = 0
+    end
+end
+
+local function onSpellCast()
+    if spellFlag == 0 and weaponFlag == 0 then
+        debugLog("Spell cast. Showing HUD for a bit.")
+        stopTimer()
+        showHUD()
+        coolDown()
+    end
+end
+
+local function onMenuExit()
+    if toggleFlag == 0 and spellFlag == 0 and weaponFlag == 0 then
+        timer.delayOneFrame(function()
+            hideHUD()
+            debugLog("Exiting menu mode. Hiding HUD.")
+        end)
+    end
 end
 
 local function isKeyDown(key)
@@ -66,38 +96,46 @@ local function isKeyDown(key)
     return inputController:keybindTest(key)
 end
 
-local function showHUD(e)
+local function onKeyDown(e)
 
     if tes3.worldController.inputController:isKeyDown(config.toggleKey.keyCode) and e.isAltDown then
+        stopTimer()
         if toggleFlag == 0 then
-            menuMulti.visible = true
+            debugLog("Toggle key down. Showing HUD.")
+            showHUD()
             toggleFlag = 1
+            return
         else
-            menuMulti.visible = false
+            debugLog("Toggle key down. Hiding HUD.")
+            hideHUD()
             toggleFlag = 0
+            return
         end
     end
 
    for _, key in pairs(keys) do
-        if isKeyDown(key) then
+        if isKeyDown(key) and toggleFlag == 0 and spellFlag == 0 then
+            debugLog("Action key down. Showing HUD for a bit.")
             stopTimer()
-            menuMulti.visible = true
-            coolDown(menuMulti)
-            break
+            showHUD()
+            coolDown()
+            return
         end
     end
 
-    for _, key in pairs(stateKeys) do
-        if isKeyDown(key) then
-            stopTimer()
-            if stateFlag == 0 then
-                menuMulti.visible = true
-                stateFlag = 1
-            else
-                coolDown(menuMulti)
-                stateFlag = 0
-            end
-            break
+    if isKeyDown(tes3.keybind.readyMagicMCP) then
+        stopTimer()
+        if spellFlag == 0 then
+            debugLog("Ready Magic key down. Showing HUD.")
+            showHUD()
+            spellFlag = 1
+            return
+        else
+            debugLog("Ready Magic key down. Hiding HUD in a bit.")
+            spellFlag = 0
+            weaponFlag = 0
+            coolDown()
+            return
         end
     end
 
@@ -105,10 +143,17 @@ end
 
 
 local function init()
-    event.register("uiActivated", getMenu, { filter = "MenuStat" })
-    event.register("keyDown", showHUD)
+    event.register("menuExit", onMenuExit)
+    event.register("keyDown", onKeyDown)
     event.register("loaded", onLoaded)
-    mwse.log("[Clear Sight "..version.."] loaded.")
+
+    mwse.log("Clear Sight "..version.." loaded.")
+
+    -- Additional logic --
+    event.register("weaponReadied", onWeaponReadied)
+    event.register("weaponUnreadied", onWeaponUnreadied)
+
+    event.register("spellCast", onSpellCast)
 end
 
 event.register("initialized", init)
