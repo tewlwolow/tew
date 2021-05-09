@@ -143,9 +143,9 @@ local function onKeyDown(e)
 
 end
 
-local function onAttacked(e)
+local function onCombatStarted(e)
     if e.target == tes3.player then
-        debugLog("Player attacked. Showing HUD.")
+        debugLog("Player entered combat. Showing HUD.")
         stopTimer()
         showHUD()
     end
@@ -155,6 +155,15 @@ local function onCombatStopped(e)
     if e.actor == tes3.player then
         debugLog("Player out of combat. Hiding HUD in a bit.")
         stopTimer()
+        coolDown()
+    end
+end
+
+local function onAttacked(e)
+    if e.target == tes3.player then
+        debugLog("Player attacked. Showing HUD for a bit.")
+        stopTimer()
+        showHUD()
         coolDown()
     end
 end
@@ -172,8 +181,10 @@ local function init()
 
     event.register("spellCast", onSpellCast)
 
-    event.register("combatStarted", onAttacked)
+    event.register("combatStarted", onCombatStarted)
     event.register("combatStop", onCombatStopped)
+
+    event.register("attack", onAttacked)
 end
 
 event.register("initialized", init)
