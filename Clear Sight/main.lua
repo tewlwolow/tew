@@ -3,10 +3,8 @@ local debugLogOn = config.debugLogOn
 local modversion = require("tew\\Clear Sight\\version")
 local version = modversion.version
 
-local menuMulti, coolDownTimer
-local spellFlag = 0
-local toggleFlag = 0
-local weaponFlag = 0
+local menuMulti, coolDownTimer, player
+local vitalsFlag, toggleFlag, spellFlag, weaponFlag = 0, 0, 0, 0
 
 local function debugLog(string)
     if debugLogOn then
@@ -48,6 +46,7 @@ local function onLoaded()
         debugLog("Game loaded. Hiding HUD.")
         hideHUD()
     end)
+    player = tes3.mobilePlayer
 end
 
 local function coolDown()
@@ -67,7 +66,7 @@ local function onWeaponReadied()
 end
 
 local function onWeaponUnreadied()
-    if spellFlag == 0 then
+    if spellFlag == 0 and vitalsFlag == 0 then
         stopTimer()
         debugLog("Weapon unreadied. Hiding HUD in a bit.")
         coolDown()
@@ -76,7 +75,7 @@ local function onWeaponUnreadied()
 end
 
 local function onSpellCast()
-    if spellFlag == 0 and weaponFlag == 0 then
+    if spellFlag == 0 and weaponFlag == 0 and vitalsFlag == 0 then
         debugLog("Spell cast. Showing HUD for a bit.")
         stopTimer()
         showHUD()
@@ -85,7 +84,7 @@ local function onSpellCast()
 end
 
 local function onMenuExit()
-    if toggleFlag == 0 and spellFlag == 0 and weaponFlag == 0 then
+    if toggleFlag == 0 and spellFlag == 0 and weaponFlag == 0 and vitalsFlag == 0 then
         timer.delayOneFrame(function()
             hideHUD()
             debugLog("Exiting menu mode. Hiding HUD.")
@@ -114,6 +113,8 @@ local function onKeyDown(e)
             return
         end
     end
+
+    if vitalsFlag == 1 then return end
 
    for _, key in pairs(keys) do
         if isKeyDown(key) and toggleFlag == 0 and spellFlag == 0 and weaponFlag == 0 then
@@ -152,7 +153,7 @@ local function onCombatStarted(e)
 end
 
 local function onCombatStopped(e)
-    if e.actor == tes3.player then
+    if e.actor == tes3.player and vitalsFlag == 0 then
         debugLog("Player out of combat. Hiding HUD in a bit.")
         stopTimer()
         coolDown()
@@ -160,7 +161,7 @@ local function onCombatStopped(e)
 end
 
 local function onAttacked(e)
-    if e.target == tes3.player then
+    if e.target == tes3.player and vitalsFlag == 0 then
         debugLog("Player attacked. Showing HUD for a bit.")
         stopTimer()
         showHUD()
@@ -168,18 +169,46 @@ local function onAttacked(e)
     end
 end
 
+local function checkVitals()
+
+    local maxHealth = player.health.base
+    local currentHealth = player.health.current
+
+    local maxFatigue = player.fatigue.base
+    local currentFatigue = player.fatigue.current
+
+    local maxMagicka = player.magicka.base
+    local currentMagicka = player.magicka.current
+
+    if (currentHealth < maxHealth/2
+    or currentFatigue < maxFatigue/2
+    or currentMagicka < maxMagicka/2)
+    and (vitalsFlag == 0) then
+        stopTimer()
+        showHUD()
+        vitalsFlag = 1
+    elseif vitalsFlag == 1 then
+        stopTimer()
+        coolDown()
+        vitalsFlag = 0
+    end
+
+end
+
 local function init()
+    mwse.log("Clear Sight "..version.." loaded.")
+
     event.register("menuExit", onMenuExit)
     event.register("keyDown", onKeyDown)
     event.register("loaded", onLoaded)
 
-    mwse.log("Clear Sight "..version.." loaded.")
 
-    -- Additional logic --
     event.register("weaponReadied", onWeaponReadied)
     event.register("weaponUnreadied", onWeaponUnreadied)
 
     event.register("spellCast", onSpellCast)
+
+    event.register("simulate", checkVitals)
 
     event.register("combatStarted", onCombatStarted)
     event.register("combatStop", onCombatStopped)
