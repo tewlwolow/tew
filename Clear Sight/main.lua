@@ -36,6 +36,10 @@ end
 local function showHUD()
     if menuMulti then
         menuMulti.visible = true
+        if config.hideMap then
+            local map = menuMulti:findChild(tes3ui.registerID("MenuMap_panel"))
+            map.visible = false
+        end
     end
 end
 
@@ -89,6 +93,10 @@ local function onMenuExit()
             hideHUD()
             debugLog("Exiting menu mode. Hiding HUD.")
         end)
+    end
+    if config.hideMap then
+        local map = menuMulti:findChild(tes3ui.registerID("MenuMap_panel"))
+        map.visible = false
     end
 end
 
@@ -171,6 +179,8 @@ end
 
 local function checkVitals()
 
+    local threshold = (config.vitalPerc - 2)/100
+
     local maxHealth = player.health.base
     local currentHealth = player.health.current
 
@@ -180,9 +190,10 @@ local function checkVitals()
     local maxMagicka = player.magicka.base
     local currentMagicka = player.magicka.current
 
-    if (currentHealth < maxHealth/2
-    or currentFatigue < maxFatigue/2
-    or currentMagicka < maxMagicka/2)
+
+    if (currentHealth < maxHealth*threshold
+    or currentFatigue < maxFatigue*threshold
+    or currentMagicka < maxMagicka*threshold)
     and (vitalsFlag == 0) then
         stopTimer()
         showHUD()

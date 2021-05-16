@@ -26,12 +26,27 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+    page:createYesNoButton{
+        label = "Hide HUD minimap at all times?",
+        variable = registerVariable("hideMap"),
+    }
+
     page:createSlider({
         label = "Cooldown duration (in seconds)",
+        min = 1,
         max = 25,
         description = "Cooldown to hide the HUD after it is shown.\nDefault = 7",
         variable = registerVariable("cooldownDuration")
-      })
+    })
+
+    page:createSlider{
+        label = "This threshold controls when the HUD is hidden relative to health, magicka, and fatigue levels.\nFor example, setting this to 100 won't hide HUD unless all vitals are full.\nVitals %",
+        min = 1,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("vitalPerc")
+    }
 
     page:createKeyBinder{
         label = "This key, when pressed with alt, will toggle between visible/invisible HUD.\nDefault = H.",
