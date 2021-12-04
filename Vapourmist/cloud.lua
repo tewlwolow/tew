@@ -171,7 +171,7 @@ local function addCloud(e)
 
         local counter = 0
 
-            if counter > config.CLOUD_LIMIT then debugLog("Limit reached.") break end
+            if counter >= config.CLOUD_LIMIT then debugLog("Limit reached.") break end
 
             if config.CLOUD_DENSITY/100 > math.random() then
 
@@ -180,7 +180,7 @@ local function addCloud(e)
                 local statPosition = stat.position:copy()
                 statPosition.x = statPosition.x + math.random(-20,100)
                 statPosition.y = statPosition.y + math.random(-50,100)
-                statPosition.z = statPosition.z + math.random(2500,4000)
+                statPosition.z = statPosition.z + math.random(2400,3500)
                 local mistPosition = statPosition
 
                 tes3.createReference{
@@ -198,7 +198,7 @@ local function addCloud(e)
 
                     statPosition.x = statPosition.x - math.random(25,200)
                     statPosition.y = statPosition.y - math.random(10,300)
-                    statPosition.z = statPosition.z - math.random(150,500)
+                    statPosition.z = statPosition.z - math.random(500,1000)
                     mistPosition = statPosition
 
                     tes3.createReference{
