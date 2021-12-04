@@ -180,21 +180,14 @@ local function addCloud(e)
                 local statPosition = stat.position:copy()
                 statPosition.x = statPosition.x + math.random(-20,100)
                 statPosition.y = statPosition.y + math.random(-50,100)
-                statPosition.z = statPosition.z + math.random(1000,3000)
+                statPosition.z = statPosition.z + math.random(2500,4000)
                 local mistPosition = statPosition
-
-                local statOrientation = stat.position:copy()
-                statOrientation.x = statOrientation.x + math.random(-5, 10)
-                statOrientation.y = statOrientation.y + math.random(-5, 10)
-                statOrientation.z = statOrientation.z + math.random(-5, 10)
-                local cloudOrientation = statOrientation
 
                 tes3.createReference{
                     object = cloud,
                     position = mistPosition,
-                    orientation = cloudOrientation,
                     cell = cell,
-                    scale = math.random(6,10)/10
+                    scale = math.random(7,10)/10
                 }
 
                 debugLog("First level cloud added.")
@@ -203,22 +196,16 @@ local function addCloud(e)
 
                     debugLog("Second check passed.")
 
-                    statPosition.x = statPosition.x - math.random(100,500)
-                    statPosition.y = statPosition.y - math.random(100,500)
-                    statPosition.z = statPosition.z - math.random(100,500)
+                    statPosition.x = statPosition.x - math.random(25,200)
+                    statPosition.y = statPosition.y - math.random(10,300)
+                    statPosition.z = statPosition.z - math.random(150,500)
                     mistPosition = statPosition
-
-                    statOrientation.x = statOrientation.x + math.random(-5, 10)
-                    statOrientation.y = statOrientation.y + math.random(-5, 10)
-                    statOrientation.z = statOrientation.z + math.random(-5, 10)
-                    cloudOrientation = statOrientation
 
                     tes3.createReference{
                         object = cloud,
                         position = mistPosition,
-                        orientation = cloudOrientation,
                         cell = cell,
-                        scale = math.random(3,6)/10
+                        scale = math.random(4,6)/10
                     }
 
                     debugLog("Second level cloud added.")
@@ -244,7 +231,7 @@ local function moveCloud()
 
                 stat.sceneNode.translation.x = stat.sceneNode.translation.x + math.random(10,50)*config.MOVE_SPEED/700
                 stat.sceneNode.translation.y = stat.sceneNode.translation.y + math.random(30,70)*config.MOVE_SPEED/700
-                stat.sceneNode.translation.z = stat.sceneNode.translation.z + math.random(-50,50)*config.MOVE_SPEED/700
+                stat.sceneNode.translation.z = stat.sceneNode.translation.z + math.random(-10,15)*config.MOVE_SPEED/700
 
                 stat.sceneNode:update()
 
