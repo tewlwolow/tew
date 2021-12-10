@@ -17,7 +17,7 @@ local template = mwse.mcm.createTemplate{
 
     local page = template:createPage{label="Main Settings", noScroll=true}
     page:createCategory{
-        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nWarning! Some of the higher settings can bottleneck your performance or freeze your game. Use with caution. Stick to defaults if you're not running a high-end PC.\nSettings:",
+        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nWarning! Some of the higher settings can bottleneck your performance or freeze your game. Use with caution. Stick to defaults if you're not running a high-end PC.\nSettings:\n",
     }
     page:createYesNoButton{
         label = "Enable debug mode?",
@@ -54,7 +54,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createSlider{
-        label = "Changes cloud speed. Default = 20.\nRequires changing cell or weather. Cloud speed",
+        label = "Changes cloud speed. Default = 20.\nCloud speed",
         min = 0,
         max = 100,
         step = 1,
