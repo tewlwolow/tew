@@ -1,6 +1,6 @@
-// TODO: add more stuff to wear
-// TODO: grab RSA logic for selling/dropping etc.
-// TODO: utilities/logging/comments/MCM/logo
+-- TODO: add more stuff to wear
+-- TODO: grab RSA logic for selling/dropping etc.
+-- TODO: utilities/logging/comments/MCM/logo
 local data = require("tew\\Wearables\\data")
 
 local persisting
