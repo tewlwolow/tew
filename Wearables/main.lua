@@ -1,5 +1,4 @@
 -- TODO: add more stuff to wear
--- TODO: grab RSA logic for selling/dropping etc.
 -- TODO: utilities/logging/comments/MCM/logo
 local data = require("tew\\Wearables\\data")
 
@@ -105,9 +104,29 @@ local function equipCheck(e)
     end
 end
 
+local function onBarterOffer(e)
+    if persisting.equipped ~= nil and
+    #e.selling > 0 and e.success == true then
+        for _, tile in ipairs(e.selling) do
+            if tile.item.id == persisting.equipped then
+                unequip(tes3.player)
+            end
+        end
+    end
+end
+
+local function onItemDropped(e)
+    if persisting.equipped ~= nil and
+    e.reference.id == persisting.equipped then
+        unequip(tes3.player)
+    end
+end
+
 local function init()
     event.register("equip", equipCheck)
     event.register("loaded", persist, {priority = 49})
+    event.register("itemDropped", onItemDropped)
+    event.register("barterOffer", onBarterOffer)
 end
 
 event.register("initialized", init)
