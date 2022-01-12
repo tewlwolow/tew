@@ -292,7 +292,7 @@ local function cellCheck()
       else
          if common.getCellType(cell, common.cellTypesSmall)==true
          or common.getCellType(cell, common.cellTypesTent)==true then
-            playInteriorSmall(cell, weatherNow)
+            playInteriorSmall(cell)
             debugLog("Found small interior cell. Playing interior loops.")
          else
             windoors=nil
