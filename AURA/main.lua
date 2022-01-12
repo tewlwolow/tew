@@ -71,11 +71,11 @@ local function init()
     end
 
     -- Old version deleter --
-    if lfs.dir("Data Files\\MWSE\\mods\\AURA") then
+    if lfs.directoryexists("Data Files\\MWSE\\mods\\AURA") then
         lfs.rmdir("Data Files\\MWSE\\mods\\AURA", true)
         mwse.log("[AURA "..version.."]: Old mod folder found and deleted.")
     end
-    if lfs.dir("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua") then
+    if lfs.directoryexists("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua") then
         os.remove("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua")
         mwse.log("[AURA "..version.."]: Old 'travelFee.lua' file found and deleted.")
     end
