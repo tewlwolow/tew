@@ -184,10 +184,10 @@ local function cellCheck()
 		debugLog("Clearing windoors.")
 	end
 	
-	-- Getting appropriate paths per conditions detected --
+	-- Playing appropriate track per conditions detected --
 	if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 	and weatherNow==weatherLast and climateNow==climateLast then
-		-- New in 2.0.1; using same soundpath when entering int/ext in same area; time/weather change will randomise path again --
+		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 		sounds.playImmediate{last = true, volume = OAvol}
 	else
 		if not cell.isInterior
