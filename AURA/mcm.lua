@@ -100,11 +100,6 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("playWindy"),
         restartRequired=true
     }
-    pageOA:createYesNoButton{
-        label = "Enable transition sounds?",
-        variable = registerVariable("playTransSounds"),
-        restartRequired=true
-    }
 
     local pageIA = template:createPage{label="Interior Ambient"}
     pageIA:createCategory{

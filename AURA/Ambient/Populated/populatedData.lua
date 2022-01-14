@@ -1,13 +1,13 @@
 local this = {}
 
 this.statics = {
-    ["Ashlander"] = {
+    ["ash"] = {
         "ex_ashl_"
     },
-    ["Daedric"] = {
+    ["dae"] = {
         "ex_dae_"
     },
-    ["Dark Elf"] = {
+    ["dar"] = {
         "mal_balmora_",
         "ex_hlaalu_",
         "ex_de_shack",
@@ -17,14 +17,14 @@ this.statics = {
         "ex_velothi",
         "ex_vivec",
     },
-    ["Dwemer"] = {
+    ["dwe"] = {
         "ex_dwrv_"
     },
-    ["Imperial"] = {
+    ["imp"] = {
         "ex_common_",
         "ex_imp",
     },
-    ["Nord"] = {
+    ["nor"] = {
         "ex_nord_",
         "ex_s_",
         "t_rga_setreach"

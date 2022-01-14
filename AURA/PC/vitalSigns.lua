@@ -69,7 +69,7 @@ local function playDisease()
     if diseaseFlag == 1 then return end
     if not diseaseTimer then
         diseaseTimer = timer.start{type=timer.real, duration=20, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderDisease, volume=0.7*vsVol, reference=player}
+            tes3.playSound{soundPath="tew\\A\\PC\\"..genderDisease, volume=0.7*vsVol, reference=player}
         end}
     else
         diseaseTimer:resume()
@@ -81,7 +81,7 @@ local function playBlight()
     if blightFlag == 1 then return end
     if not blightTimer then
         blightTimer = timer.start{type=timer.real, duration=35, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\AURA\\PC\\blight.wav", volume=0.9*vsVol, reference=player}
+            tes3.playSound{soundPath="tew\\A\\PC\\blight.wav", volume=0.9*vsVol, reference=player}
         end}
     else
         blightTimer:resume()
@@ -93,7 +93,7 @@ local function playHealth()
     if healthFlag == 1 then return end
     if not healthTimer then
         healthTimer = timer.start{type=timer.real, duration=1.2, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\AURA\\PC\\health.wav", volume=0.7*vsVol, reference=player}
+            tes3.playSound{soundPath="tew\\A\\PC\\health.wav", volume=0.7*vsVol, reference=player}
         end}
     else
         healthTimer:resume()
@@ -105,7 +105,7 @@ local function playFatigue()
     if fatigueFlag == 1 then return end
     if not fatigueTimer then
         fatigueTimer = timer.start{type=timer.real, duration=2.8, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\AURA\\PC\\"..genderFatigue, volume=0.6*vsVol, reference=player}
+            tes3.playSound{soundPath="tew\\A\\PC\\"..genderFatigue, volume=0.6*vsVol, reference=player}
         end}
     else
         fatigueTimer:resume()
@@ -117,7 +117,7 @@ local function playMagicka()
     if magickaFlag == 1 then return end
     if not magickaTimer then
         magickaTimer = timer.start{type=timer.real, duration=6, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\AURA\\PC\\magicka.wav", volume=0.6*vsVol, pitch=0.8, reference=player}
+            tes3.playSound{soundPath="tew\\A\\PC\\magicka.wav", volume=0.6*vsVol, pitch=0.8, reference=player}
         end}
     else
         magickaTimer:resume()

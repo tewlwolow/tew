@@ -1,7 +1,7 @@
 local this = {}
 
 this.statics = {
-    ["Abandoned"] = {
+    ["aba"] = {
         "in_stronghold",
         "in_strong",
         "in_strongruin",
@@ -14,7 +14,7 @@ this.statics = {
         "t_imp_dngsewers",
         "in_om_",
     },
-    ["Caves"] = {
+    ["cav"] = {
         "in_moldcave",
         "in_mudcave",
         "in_lavacave",
@@ -31,43 +31,43 @@ this.statics = {
         "t_mw_cave",
         "t_sky_cave"
     },
-    ["Daedric"] = {
+    ["dae"] = {
         "in_dae_hall",
         "in_dae_room",
         "in_dae_pillar",
         "t_dae_dngruin"
     },
-    ["Dwemer"]= {
+    ["dwe"]= {
         "in_dwrv_hall",
         "in_dwrv_corr",
         "in_dwe_corr",
         "in_dwe_archway",
         "t_dwe_dngruin",
     },
-    ["Ice Caves"] = {
+    ["ice"] = {
         "bm_ic_",
         "bm_ka",
     },
 }
 
 this.names = {
-    ["Alchemist"] = {
+    ["alc"] = {
         "Alchemist",
         "Apothecary",
         "Tel Uvirith, Omavel's House",
         "Healer",
     },
-    ["Mages"] = {
+    ["mag"] = {
         "Mages Guild",
         "Mage's Guild",
         "Guild of Mages"
     },
-    ["Fighters"] = {
+    ["fig"] = {
         "Fighters Guild",
         "Fighter's Guild",
         "Guild of Fighters",
     },
-    ["Temple"] = {
+    ["tem"] = {
         "Temple",
         "Maar Gan, Shrine",
         "Vos Chapel",
@@ -75,12 +75,12 @@ this.names = {
         "Fane of the Ancestors",
         "Tiriramannu",
     },
-    ["Library"] = {
+    ["lib"] = {
         "Library",
         "Bookseller",
         "Books"
     },
-    ["Smith"] = {
+    ["smi"] = {
         "Smith",
         "Armorer",
         "Weapons",
@@ -90,7 +90,7 @@ this.names = {
         "Armors",
         "Blacksmith",
     },
-    ["Trader"] = {
+    ["tra"] = {
         "Trader",
         "Pawnbroker",
         "Merchandise",
@@ -102,11 +102,11 @@ this.names = {
         "Tradehouse",
         "Hostel",
     },
-    ["Clothier"] = {
+    ["clo"] = {
         "Clothier",
         "Tailors",
     },
-    ["Tomb"]= {
+    ["tom"]= {
         "Tomb",
         "Burial",
         "Crypt",
@@ -116,7 +116,7 @@ this.names = {
 }
 
 this.tavernNames = {
-    ["Dark Elf"] = {
+    ["dar"] = {
         --[["Cornerclub",
         "Corner Club",
         "Tradehouse",]]
@@ -124,11 +124,11 @@ this.tavernNames = {
         "House of Earthly Delights",
         "Elven Nations"
     },
-    ["Imperial"] = {
+    ["imp"] = {
         "Ebonheart, Six Fishes",
         "Arrille"
     },
-    ["Nord"] = {
+    ["nor"] = {
         "Skaal Village, The Greathall",
         "Solstheim, Thirsk"
     }
