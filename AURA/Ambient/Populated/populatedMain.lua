@@ -4,7 +4,7 @@ local debugLogOn = config.debugLogOn
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local popVol = config.popVol/200
-local popDir = "tew\\AURA\\Populated\\"
+local popDir = "tew\\A\\P\\"
 local path, playedFlag, time, timeLast, typeCellLast
 
 local function debugLog(string)

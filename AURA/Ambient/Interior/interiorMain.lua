@@ -8,7 +8,7 @@ local findWholeWords = tewLib.findWholeWords
 local intVol = config.intVol/200
 local interiorMusic = config.interiorMusic
 
-local interiorDir = "tew\\AURA\\Interior\\"
+local interiorDir = "tew\\A\\I\\"
 local path, playedFlag, musicPath, lastMusicPath
 
 local function debugLog(string)
