@@ -39,9 +39,20 @@ local quiet = {}
 local warm = {}
 local cold = {}
 
--- Only need those for outdoorMain actually
-local trackOld
-local trackNew
+local modules = {
+	["outdoor"] = {
+		old = nil,
+		new = nil
+	},
+	["populated"] = {
+		old = nil,
+		new = nil
+	},
+	["interior"] = {
+		old = nil,
+		new = nil
+	},
+}
 
 -- Building tables --
 
@@ -115,9 +126,9 @@ local function buildMisc()
 end
 
 -- Play/Stop handling --
-local function fadeIn(ref, volume)
+local function fadeIn(ref, volume, track, module)
 	debugLog("Running fader - fade in.")
-	if not trackNew then return end
+	if not track then return end
 
 	local TIME = math.ceil((volume/STEP)*TICK)
 	local ITERS = math.ceil(volume/STEP)
@@ -126,19 +137,19 @@ local function fadeIn(ref, volume)
 	local function fader()
 		local incremented = STEP*runs
 
-		if not tes3.getSoundPlaying{sound = trackNew} then
-			debugLog("In not playing: "..trackNew.id)
+		if not tes3.getSoundPlaying{sound = track} then
+			debugLog("In not playing: "..track.id)
 			return
 		end
 
-		tes3.adjustSoundVolume{sound = trackNew, volume = incremented, reference = ref}
+		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
 		debugLog("Adjusting volume in: "..tostring(incremented))
 		runs = runs + 1
 	end
 
 	local function queuer()
-		trackOld = trackNew
-		debugLog("Fade in for "..trackNew.id.." finished in: "..tostring(TIME).." s.")
+		modules[module].old = track
+		debugLog("Fade in for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
 
 	debugLog("Iterations: "..tostring(ITERS))
@@ -157,7 +168,7 @@ local function fadeIn(ref, volume)
 	}
 end
 
-local function fadeOut(ref, volume, track)
+local function fadeOut(ref, volume, track, module)
 	debugLog("Running fader - fade out.")
 	if not track then return end
 
@@ -179,7 +190,7 @@ local function fadeOut(ref, volume, track)
 	end
 
 	local function queuer()
-		trackOld = track
+		modules[module].old = track
 		tes3.removeSound{sound = track, reference = ref}
 		debugLog("Fade out for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
@@ -200,64 +211,40 @@ local function fadeOut(ref, volume, track)
 	}
 end
 
-local function crossFade(ref, volume)
-	fadeOut(ref, volume, trackOld)
-	fadeIn(ref, volume)
+local function crossFade(ref, volume, trackOld, trackNew, module)
+	fadeOut(ref, volume, trackOld, module)
+	fadeIn(ref, volume, trackNew, module)
 end
 
 function this.removeImmediate(options)
-
-	if not options then
-		local ref = tes3.player
-		local track = trackNew
-		tes3.removeSound{sound = track, reference = ref}
-		return
-	end
-
 	local ref = options.reference or tes3.player
-	local track = options.track or trackNew
-	
+	local track = options.track or modules[options.module].new
 	tes3.removeSound{sound = track, reference = ref}
 end
 
-function this.removeSound(options)
-
-	if not options then
-		local ref = tes3.player
-		local volume = MAX
-		local track = trackNew
-		fadeOut(ref, volume, track)
-		return
-	end
-
+function this.remove(options)
 	local ref = options.reference or tes3.player
 	local volume = options.volume or MAX
-	local track = options.track or trackNew
-
-	fadeOut(ref, volume, track)
+	local track = options.track or modules[options.module].new
+	fadeOut(ref, volume, track, options.module)
 end
 
 function this.playImmediate(options)
-	
-	local volume = options.volume or MAX
-	-- Check for ref, use player if not specified
 	local ref = options.reference or tes3.player
+	local volume = options.volume or MAX
 
 	if options.last then
-		tes3.removeSound{sound = trackNew, reference = ref}
-		debugLog("Immediately removing: "..trackNew.id)
+		tes3.removeSound{sound = modules[options.module].new, reference = ref}
+		debugLog("Immediately removing: "..modules[options.module].new.id)
 		tes3.playSound {
-			sound = trackNew,
+			sound = modules[options.module].new,
 			loop = true,
 			reference = ref,
 			volume = volume,
 			pitch = options.pitch or MAX
 		}
-		trackOld = trackNew
+		modules[options.module].old = modules[options.module].new
 	else
-		-- Check for ref, use player if not specified
-		local ref = options.reference or tes3.player
-
 		-- Determine which table to use --
 		local table
 		if not options.climate or not options.time then
@@ -274,32 +261,30 @@ function this.playImmediate(options)
 			table = clear[climate][time]
 		end
 
-		trackNew = table[math.random(1, #table)]
-		if not trackOld then
+		modules[options.module].new = table[math.random(1, #table)]
+		if not modules[options.module].old then
 			debugLog("Old track: none")
 		else
-			debugLog("Old track: "..trackOld.id)
+			debugLog("Old track: "..modules[options.module].old.id)
 		end
-		debugLog("New track: "..trackNew.id)
+		debugLog("New track: "..modules[options.module].new.id)
 
 		tes3.playSound {
-			sound = trackNew,
+			sound = modules[options.module].new,
 			loop = true,
 			reference = ref,
 			volume = volume,
 			pitch = options.pitch or MAX
 		}
 	end
-
 end
 
 -- Supporting kwargs here
 function this.play(options)
 
-	-- Check for ref, use player if not specified
 	local ref = options.reference or tes3.player
+	local volume = options.volume or MAX
 
-	-- Determine which table to use --
 	local table
 	if not options.climate or not options.time then
 		if options.type == "quiet" then
@@ -315,29 +300,27 @@ function this.play(options)
 		table = clear[climate][time]
 	end
 
-	trackOld = trackNew
-	trackNew = table[math.random(1, #table)]
-	if not trackOld then
+	modules[options.module].new = table[math.random(1, #table)]
+
+	if not modules[options.module].old then
 		debugLog("Old track: none")
 	else
-		debugLog("Old track: "..trackOld.id)
+		debugLog("Old track: "..modules[options.module].old.id)
 	end
-	debugLog("New track: "..trackNew.id)
-
-	local volume = options.volume or MAX
+	debugLog("New track: "..modules[options.module].new.id)
 
 	tes3.playSound {
-		sound = trackNew,
+		sound = modules[options.module].new,
 		loop = true,
 		reference = ref,
 		volume = MIN,
 		pitch = options.pitch or MAX
 	}
 
-	if not trackOld then
-		fadeIn(ref, volume)
+	if not modules[options.module].old then
+		fadeIn(ref, volume, modules[options.module].new, options.module)
 	else
-		crossFade(ref, volume)
+		crossFade(ref, volume, modules[options.module].old, modules[options.module].new, options.module)
 	end
 
 end

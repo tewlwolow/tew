@@ -7,6 +7,8 @@ local popVol = config.popVol/200
 local popDir = "tew\\A\\P\\"
 local path, playedFlag, time, timeLast, typeCellLast
 
+local moduleName = "populated"
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[AURA "..version.."] PA: "..string.format("%s", string))

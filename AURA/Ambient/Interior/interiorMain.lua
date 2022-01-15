@@ -11,6 +11,8 @@ local interiorMusic = config.interiorMusic
 local interiorDir = "tew\\A\\I\\"
 local path, playedFlag, musicPath, lastMusicPath
 
+local moduleName = "interior"
+
 local function debugLog(string)
     if debugLogOn then
        mwse.log("[AURA "..version.."] IA: "..string.format("%s", string))
