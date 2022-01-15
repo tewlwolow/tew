@@ -28,8 +28,8 @@ local warmDir = "w"
 local coldDir = "c"
 
 -- Constants
-local STEP = 0.05
-local TICK = 0.4
+local STEP = 0.01
+local TICK = 0.1
 local MAX = 1
 local MIN = 0
 
@@ -73,11 +73,11 @@ local function buildClearSounds()
 								debugLog("Adding file: "..rSoundfile)
 								debugLog("File id: "..objectId)
 								debugLog("Filename: "..filename.."\n---------------")
-								local sound = tes3.createObject({
+								local sound = tes3.createObject{
 									id = objectId,
 									objectType = tes3.objectType.sound,
 									filename = filename,
-								})
+								}
 								table.insert(clear[climate][time], sound)
 							end
 						end
@@ -98,11 +98,11 @@ local function buildContextSounds(dir, array)
 			debugLog("Adding file: "..soundFile)
 			debugLog("File id: "..objectId)
 			debugLog("Filename: "..filename.."\n---------------")
-			local sound = tes3.createObject({
+			local sound = tes3.createObject{
 				id = objectId,
 				objectType = tes3.objectType.sound,
 				filename = filename,
-			})
+			}
 			table.insert(array, sound)
 		end
 	end
@@ -111,17 +111,17 @@ end
 local function buildMisc()
 	debugLog("|---------------------- Creating misc sound objects. ----------------------|\n")
 	
-	tes3.createObject({
+	tes3.createObject{
 		id = "splash_lrg",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_lrg.wav",
-	})
+	}
 
-	tes3.createObject({
+	tes3.createObject{
 		id = "splash_sml",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_sml.wav",
-	})
+	}
 
 end
 
@@ -218,15 +218,15 @@ end
 
 function this.removeImmediate(options)
 	local ref = options.reference or tes3.player
-	local track = options.track or modules[options.module].new
-	tes3.removeSound{sound = track, reference = ref}
+	tes3.removeSound{sound = modules[options.module].old, reference = ref}
+	tes3.removeSound{sound = modules[options.module].new, reference = ref}
 end
 
 function this.remove(options)
 	local ref = options.reference or tes3.player
 	local volume = options.volume or MAX
-	local track = options.track or modules[options.module].new
-	fadeOut(ref, volume, track, options.module)
+	fadeOut(ref, volume, modules[options.module].old, options.module)
+	fadeOut(ref, volume, modules[options.module].new, options.module)
 end
 
 function this.playImmediate(options)
@@ -235,7 +235,7 @@ function this.playImmediate(options)
 
 	if options.last then
 		tes3.removeSound{sound = modules[options.module].new, reference = ref}
-		debugLog("Immediately removing: "..modules[options.module].new.id)
+		debugLog("Immediately restaring: "..modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
 			loop = true,
@@ -262,11 +262,10 @@ function this.playImmediate(options)
 		end
 
 		modules[options.module].new = table[math.random(1, #table)]
-		if not modules[options.module].old then
-			debugLog("Old track: none")
-		else
-			debugLog("Old track: "..modules[options.module].old.id)
-		end
+
+		local msg = modules[options.module].old.id or "none"
+		debugLog("Old track: "..msg)
+
 		debugLog("New track: "..modules[options.module].new.id)
 
 		tes3.playSound {
