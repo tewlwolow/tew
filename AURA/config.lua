@@ -25,7 +25,7 @@ return mwse.loadConfig("AURA", {
     playInteriorWeather=true,
     playYurtFlap=true,
     debugLogOn=false,
-    calmChance=30,
+    quietChance=30,
     tauntChance=100,
     serviceTravel=true,
     serviceRepair=true,

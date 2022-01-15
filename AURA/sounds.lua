@@ -121,7 +121,7 @@ local function fadeIn(ref, volume)
 
 	local function queuer()
 		trackOld = trackNew
-		debugLog("Fade in finished in: "..tostring(TIME).." s.")
+		debugLog("Fade in for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
 
 	debugLog("Iterations: "..tostring(ITERS))
@@ -163,7 +163,8 @@ local function fadeOut(ref, volume, track)
 
 	local function queuer()
 		trackOld = track
-		debugLog("Fade out finished in: "..tostring(TIME).." s.")
+		tes3.removeSound{sound = track, reference = ref}
+		debugLog("Fade out for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
 
 	debugLog("Iterations: "..tostring(ITERS))
@@ -183,19 +184,35 @@ local function fadeOut(ref, volume, track)
 end
 
 local function crossFade(ref, volume)
-	fadeOut(ref, volume, trackNew)
+	fadeOut(ref, volume, trackOld)
 	fadeIn(ref, volume)
 end
 
 function this.removeSoundImmediate(options)
+
+	if not options then
+		local ref = tes3.player
+		local track = trackNew
+		tes3.removeSound{sound = track, reference = ref}
+		return
+	end
+
 	local ref = options.reference or tes3.player
 	local track = options.track or trackNew
 	
 	tes3.removeSound{sound = track, reference = ref}
-	trackOld = trackNew
 end
 
 function this.removeSound(options)
+
+	if not options then
+		local ref = tes3.player
+		local volume = MAX
+		local track = trackNew
+		fadeOut(ref, volume, track)
+		return
+	end
+
 	local ref = options.reference or tes3.player
 	local volume = options.volume or MAX
 	local track = options.track or trackNew
@@ -206,25 +223,11 @@ end
 function this.playImmediate(options)
 	
 	local volume = options.volume or MAX
-
-	-- if options.module == "outdoor"
-	if options.last then
-		tes3.playSound {
-			sound = trackNew,
-			loop = true,
-			reference = options.reference,
-			volume = volume,
-			pitch = options.pitch or MAX
-		}
-	end
-
 	-- Check for ref, use player if not specified
 	local ref = options.reference or tes3.player
 
-	if options.type == "last" then
-		tes3.removeSound{sound = trackNew, reference = options.previousRef or ref}
-		trackOld = trackNew
-
+	-- if options.module == "outdoor"
+	if options.last then
 		tes3.playSound {
 			sound = trackNew,
 			loop = true,
@@ -232,6 +235,19 @@ function this.playImmediate(options)
 			volume = volume,
 			pitch = options.pitch or MAX
 		}
+	end
+
+	if options.last then
+		tes3.removeSound{sound = trackNew, reference = options.previousRef or ref}
+		debugLog("Immediately removing: "..trackNew.id)
+		tes3.playSound {
+			sound = trackNew,
+			loop = true,
+			reference = ref,
+			volume = volume,
+			pitch = options.pitch or MAX
+		}
+		trackOld = trackNew
 	else
 		-- Check for ref, use player if not specified
 		local ref = options.reference or tes3.player
@@ -252,7 +268,6 @@ function this.playImmediate(options)
 			table = clear[climate][time]
 		end
 
-		trackOld = trackNew
 		trackNew = table[math.random(1, #table)]
 		if not trackOld then
 			debugLog("Old track: none")

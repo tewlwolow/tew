@@ -83,12 +83,12 @@ local template = mwse.mcm.createTemplate{
         variable=registerVariable("OAvol")
     }
     pageOA:createSlider{
-        label = "Changes % chance for a calm track to play instead of the regular one. Default = 30%.\nRequires restart. Chance %",
+        label = "Changes % chance for a quiet track to play instead of the regular one. Default = 30%.\nRequires restart. Chance %",
         min = 0,
         max = 100,
         step = 1,
         jump = 10,
-        variable=registerVariable("calmChance")
+        variable=registerVariable("quietChance")
     }
     pageOA:createYesNoButton{
         label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each interior door leading to an exterior. The sound will stop if you're far enough from such door.",
