@@ -97,6 +97,23 @@ local function buildContextSounds(dir, array)
 	end
 end
 
+local function buildMisc()
+	debugLog("|---------------------- Creating misc sound objects. ----------------------|\n")
+	
+	tes3.createObject({
+		id = "splash_lrg",
+		objectType = tes3.objectType.sound,
+		filename = "Fx\\envrn\\splash_lrg.wav",
+	})
+
+	tes3.createObject({
+		id = "splash_sml",
+		objectType = tes3.objectType.sound,
+		filename = "Fx\\envrn\\splash_sml.wav",
+	})
+
+end
+
 -- Play/Stop handling --
 local function fadeIn(ref, volume)
 	debugLog("Running fader - fade in.")
@@ -330,6 +347,7 @@ function this.build()
 	buildContextSounds(quietDir, quiet)
 	buildContextSounds(warmDir, warm)
 	buildContextSounds(coldDir, cold)
+	buildMisc()
 
 	debugLog("|---------------------- Finished building sound objects. ----------------------|\n")
 end

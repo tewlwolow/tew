@@ -262,7 +262,7 @@ local function positionCheck(e)
 		sounds.playImmediate{last = true, volume = 0.4*OAvol, pitch=0.5, reference = cell}
 	end
 	if playSplash and moduleAmbientOutdoor then
-		tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*splashVol, pitch=0.6}
+		tes3.playSound{sound="splash_lrg", volume=0.5*splashVol, pitch=0.6}
 	end
 	element:register("destroy", function()
 		debugLog("Player above water level. Resetting AURA sounds.")
@@ -272,7 +272,7 @@ local function positionCheck(e)
 		end
 		timer.start({duration=1, callback=cellCheck, type=timer.real})
 		if playSplash and moduleAmbientOutdoor then
-			tes3.playSound{soundPath="Fx\\envrn\\splash_sml.wav", volume=0.6*splashVol, pitch=0.7}
+			tes3.playSound{sound="splash_sml", volume=0.6*splashVol, pitch=0.7}
 		end
 	end)
 end
