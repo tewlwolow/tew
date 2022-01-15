@@ -210,7 +210,8 @@ local function cellCheck()
 		debugLog("Clearing windoors.")
 	end
 	
-	-- TODO: move the check to sounds.lua
+	-- TODO: move the check to sounds.lua maybe?
+	-- Seems too complicated for new implementation. Consider dropping.
 	-- Playing appropriate track per conditions detected --
 	-- if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 	-- and weatherNow==weatherLast and climateNow==climateLast then
