@@ -30,17 +30,76 @@ local function debugLog(string)
 	end
 end
 
-local function playInteriorBig(windoor)
-	timer.start{duration=0.62, type=timer.real, callback=function()
-		if windoor==nil then debugLog("Dodging an empty ref.") return end
-		if cellLast and pathLast and not cellLast.isInterior then
-			debugLog("Playing interior ambient sounds for big interiors using last path. File: "..pathLast)
-			tes3.playSound{soundPath=pathLast, reference=windoor, loop=true, volume=0.35*OAvol, pitch=0.8}
+local function weatherParser(options)
+
+	local volume, pitch, ref, immediate
+
+	if not options then
+		volume = OAvol
+		pitch = 1
+		ref = tes3.player
+		immediate = false
+	else
+		volume = options.volume or OAvol
+		pitch = options.pitch or 1
+		ref = options.reference or tes3.player
+		immediate = options.immediate or false
+	end
+
+	if weatherNow >= 0 and weatherNow <4 then
+		if quietChance<math.random() then
+			debugLog("Playing regular weather track.")
+			if immediate then
+				sounds.playImmediate{reference = ref, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+			else
+				sounds.play{reference = ref, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+			end
 		else
-			debugLog("Playing interior ambient sounds for big interiors using new path. File: "..pathNow)
-			tes3.playSound{soundPath=pathNow, reference=windoor, loop=true, volume=0.35*OAvol, pitch=0.8}
+			debugLog("Playing quiet weather track.")
+			if immediate then
+				sounds.playImmediate{reference = ref, volume = volume, type = "quiet", pitch = pitch}
+			else
+				sounds.play{reference = ref, volume = volume, type = "quiet", pitch = pitch}
+			end
 		end
-	end}
+	elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
+		if playWindy then
+			debugLog("Bad weather detected and windy option on.")
+			if weatherNow == 3 or weatherNow == 4 then
+				debugLog("Found warm weather, using warm wind loops.")
+				if immediate then
+					sounds.playImmediate{reference = ref, volume = volume, type = "warm", pitch = pitch}
+				else
+					sounds.play{reference = ref, volume = volume, type = "warm", pitch = pitch}
+				end
+			elseif weatherNow == 8 or weatherNow == 5 then
+				debugLog("Found cold weather, using cold wind loops.")
+				if immediate then
+					sounds.playImmediate{reference = ref, volume = volume, type = "cold", pitch = pitch}
+				else
+					sounds.play{reference = ref, volume = volume, type = "cold", pitch = pitch}
+				end
+			end
+		else
+			debugLog("Bad weather detected and no windy option on. Returning.")
+			return
+		end
+	elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
+		debugLog("Extreme weather detected.")
+		sounds.remove()
+		return
+	end
+end
+
+local function playInteriorBig(windoor)
+	if windoor==nil then debugLog("Dodging an empty ref.") return end
+	if cellLast and not cellLast.isInterior then
+		debugLog("Playing interior ambient sounds for big interiors using old track.")
+		sounds.playImmediate{last = true, reference = windoor, volume = 0.35*OAvol, pitch=0.8}
+	else
+		debugLog("Playing interior ambient sounds for big interiors using new track.")
+		weatherParser{reference = windoor, volume = 0.35*OAvol, pitch = 0.8, immediate = true}
+	end
 end
 
 local function updateInteriorBig()
@@ -54,16 +113,14 @@ local function updateInteriorBig()
 	end
 end
 
-local function playInteriorSmall(cell)
-	timer.start{duration=0.62, type=timer.real, callback=function()
-		if cellLast and pathLast and not cellLast.isInterior then
-			debugLog("Playing interior ambient sounds for small interiors using last path. File: "..pathLast)
-			tes3.playSound{soundPath=pathLast, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
-		else
-			debugLog("Playing interior ambient sounds for small interiors using new path. File: "..pathNow)
-			tes3.playSound{soundPath=pathNow, reference=cell, loop=true, volume=0.3*OAvol, pitch=0.8}
-		end
-	end}
+local function playInteriorSmall()
+	if cellLast and not cellLast.isInterior then
+		debugLog("Playing interior ambient sounds for small interiors using old track.")
+		sounds.playImmediate{last = true, volume = 0.3*OAvol, pitch=0.8}
+	else
+		debugLog("Playing interior ambient sounds for small interiors using new track.")
+		weatherParser{volume = 0.3*OAvol, pitch = 0.8, immediate = true}
+	end
 end
 
 local function cellCheck()
@@ -163,33 +220,7 @@ local function cellCheck()
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
 		debugLog("Found exterior cell.")
-		if weatherNow >= 0 and weatherNow <4 then
-			if quietChance<math.random() then
-				debugLog("Playing regular weather track.")
-				sounds.play{climate = climateNow, time = timeNow, volume = OAvol}
-			else
-				debugLog("Playing quiet weather track.")
-				sounds.play{volume = OAvol, type = "quiet"}
-			end
-		elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
-			if playWindy then
-				debugLog("Bad weather detected and windy option on.")
-				if weatherNow == 3 or weatherNow == 4 then
-					debugLog("Found warm weather, using warm wind loops.")
-					sounds.play{volume = OAvol, type = "warm"}
-				elseif weatherNow == 8 or weatherNow == 5 then
-					debugLog("Found cold weather, using cold wind loops.")
-					sounds.play{volume = OAvol, type = "cold"}
-				end
-			else
-				debugLog("Bad weather detected and no windy option on. Returning.")
-				return
-			end
-		elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
-			debugLog("Extreme weather detected.")
-			sounds.removeSound()
-			return
-		end
+		weatherParser()
 	elseif cell.isInterior then
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
 			debugLog("Found interior cell. Removing sounds.")
@@ -197,9 +228,11 @@ local function cellCheck()
 		else
 			if common.getCellType(cell, common.cellTypesSmall)==true
 			or common.getCellType(cell, common.cellTypesTent)==true then
-				playInteriorSmall(cell)
+				sounds.removeImmediate()
+				playInteriorSmall()
 				debugLog("Found small interior cell. Playing interior loops.")
 			else
+				sounds.removeImmediate()
 				windoors=nil
 				windoors=common.getWindoors(cell)
 				if windoors ~= nil then

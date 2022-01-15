@@ -121,7 +121,7 @@ local function fadeIn(ref, volume)
 
 	local function queuer()
 		trackOld = trackNew
-		debugLog("Fade in for "..track.id.." finished in: "..tostring(TIME).." s.")
+		debugLog("Fade in for "..trackNew.id.." finished in: "..tostring(TIME).." s.")
 	end
 
 	debugLog("Iterations: "..tostring(ITERS))
@@ -188,7 +188,7 @@ local function crossFade(ref, volume)
 	fadeIn(ref, volume)
 end
 
-function this.removeSoundImmediate(options)
+function this.removeImmediate(options)
 
 	if not options then
 		local ref = tes3.player
@@ -226,19 +226,8 @@ function this.playImmediate(options)
 	-- Check for ref, use player if not specified
 	local ref = options.reference or tes3.player
 
-	-- if options.module == "outdoor"
 	if options.last then
-		tes3.playSound {
-			sound = trackNew,
-			loop = true,
-			reference = ref,
-			volume = volume,
-			pitch = options.pitch or MAX
-		}
-	end
-
-	if options.last then
-		tes3.removeSound{sound = trackNew, reference = options.previousRef or ref}
+		tes3.removeSound{sound = trackNew, reference = ref}
 		debugLog("Immediately removing: "..trackNew.id)
 		tes3.playSound {
 			sound = trackNew,
