@@ -8,7 +8,7 @@ local findWholeWords = tewLib.findWholeWords
 
 local path = ""
 local flag = 0
-local containersData = require("tew\\AURA\\N\\containersData")
+local containersData = require("tew\\AURA\\Containers\\containersData")
 
 local function debugLog(string)
     if debugLogOn then
