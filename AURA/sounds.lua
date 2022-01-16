@@ -23,9 +23,11 @@ local AURAdir = "Data Files\\Sound\\tew\\A"
 local soundDir = "tew\\A"
 local climDir = "\\C\\"
 local comDir = "\\S\\"
+local popDir = "\\P\\"
 local quietDir = "q"
 local warmDir = "w"
 local coldDir = "c"
+
 
 -- Constants
 local STEP = 0.01
@@ -38,6 +40,16 @@ local clear = {}
 local quiet = {}
 local warm = {}
 local cold = {}
+
+local populated = {
+    ["ash"] = {},
+    ["dae"] = {},
+    ["dar"] = {},
+    ["dwe"] = {},
+    ["imp"] = {},
+    ["nor"] = {},
+    ["n"] = {}
+}
 
 local modules = {
 	["outdoor"] = {
@@ -65,12 +77,12 @@ local function buildClearSounds()
 			for time in lfs.dir(AURAdir..climDir..climate) do
 				if time ~= ".." and time ~= "." then
 					clear[climate][time]={}
-					for rSoundfile in lfs.dir(AURAdir..climDir..climate.."\\"..time) do
-						if rSoundfile ~= ".." and rSoundfile ~= "." then
-							if string.endswith(rSoundfile, ".wav") then
-								local objectId = string.sub(climate.."_"..time.."_"..rSoundfile, 1, -5)
-								local filename = soundDir..climDir..climate.."\\"..time.."\\"..rSoundfile
-								debugLog("Adding file: "..rSoundfile)
+					for soundfile in lfs.dir(AURAdir..climDir..climate.."\\"..time) do
+						if soundfile ~= ".." and soundfile ~= "." then
+							if string.endswith(soundfile, ".wav") then
+								local objectId = string.sub(climate.."_"..time.."_"..soundfile, 1, -5)
+								local filename = soundDir..climDir..climate.."\\"..time.."\\"..soundfile
+								debugLog("Adding file: "..soundfile)
 								debugLog("File id: "..objectId)
 								debugLog("Filename: "..filename.."\n---------------")
 								local sound = tes3.createObject{
@@ -91,11 +103,11 @@ end
 -- Weather-specific --
 local function buildContextSounds(dir, array)
 	debugLog("|---------------------- Building '"..dir.."' weather table. ----------------------|\n")
-	for soundFile in lfs.dir(AURAdir..comDir..dir) do
-		if string.endswith(soundFile, ".wav") then
-			local objectId = string.sub("S".."_"..dir.."_"..soundFile, 1, -5)
-			local filename = soundDir..comDir.."\\"..dir.."\\"..soundFile
-			debugLog("Adding file: "..soundFile)
+	for soundfile in lfs.dir(AURAdir..comDir..dir) do
+		if string.endswith(soundfile, ".wav") then
+			local objectId = string.sub("S_"..dir.."_"..soundfile, 1, -5)
+			local filename = soundDir..comDir.."\\"..dir.."\\"..soundfile
+			debugLog("Adding file: "..soundfile)
 			debugLog("File id: "..objectId)
 			debugLog("Filename: "..filename.."\n---------------")
 			local sound = tes3.createObject{
@@ -108,6 +120,29 @@ local function buildContextSounds(dir, array)
 	end
 end
 
+-- Populated --
+local function buildPopulatedSounds()
+	for populatedType, _ in pairs(populated) do
+		for soundfile in lfs.dir(AURAdir..popDir..populatedType) do
+			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
+
+				local objectId = string.sub("P_"..populatedType.."_"..soundfile, 1, -5)
+				local filename = soundDir..popDir..populatedType.."\\"..soundfile
+				debugLog("Adding file: "..soundfile)
+				debugLog("File id: "..objectId)
+				debugLog("Filename: "..filename.."\n---------------")
+				local sound = tes3.createObject{
+					id = objectId,
+					objectType = tes3.objectType.sound,
+					filename = filename,
+				}
+				table.insert(populated[populatedType], sound)
+				debugLog("Adding populated file: "..soundfile)
+			end
+		end
+	end
+end
+
 local function buildMisc()
 	debugLog("|---------------------- Creating misc sound objects. ----------------------|\n")
 	
@@ -116,14 +151,22 @@ local function buildMisc()
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_lrg.wav",
 	}
+	debugLog("Adding misc file: splash_lrg)")
 
 	tes3.createObject{
 		id = "splash_sml",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_sml.wav",
 	}
+	debugLog("Adding misc file: splash_sml)")
 
 end
+
+-- TODO: Build container sounds
+
+----------------------------------------------------------------------------------------------------------
+--//////////////////////////////////////////////////////////////////////////////////////////////////////--
+----------------------------------------------------------------------------------------------------------
 
 -- Play/Stop handling --
 local function fadeIn(ref, volume, track, module)
@@ -284,22 +327,34 @@ function this.play(options)
 	local ref = options.reference or tes3.player
 	local volume = options.volume or MAX
 
+	-- TODO: interior
 	local table
-	if not options.climate or not options.time then
-		if options.type == "quiet" then
-			table = quiet
-		elseif options.type == "warm" then
-			table = warm
-		elseif options.type == "cold" then
-			table = cold
+
+	if options.module == "outdoor" then
+		if not options.climate or not options.time then
+			if options.type == "quiet" then
+				table = quiet
+			elseif options.type == "warm" then
+				table = warm
+			elseif options.type == "cold" then
+				table = cold
+			end
+		else
+			local climate = options.climate
+			local time = options.time
+			table = clear[climate][time]
 		end
-	else
-		local climate = options.climate
-		local time = options.time
-		table = clear[climate][time]
+	elseif options.module == "populated" then
+		if options.type == "night" then
+			table = populated["n"]
+		elseif options.type == "day" then
+			table = populated[options.typeCell]
+		end
 	end
 
-	modules[options.module].new = table[math.random(1, #table)]
+	while modules[options.module].new == modules[options.module].old do
+		modules[options.module].new = table[math.random(1, #table)]
+	end
 
 	if not modules[options.module].old then
 		debugLog("Old track: none")
@@ -329,6 +384,7 @@ function this.build()
 	buildContextSounds(quietDir, quiet)
 	buildContextSounds(warmDir, warm)
 	buildContextSounds(coldDir, cold)
+	buildPopulatedSounds()
 	buildMisc()
 
 	debugLog("|---------------------- Finished building sound objects. ----------------------|\n")
