@@ -35,28 +35,29 @@ local function weatherParser(options)
 	if not options then
 		volume = OAvol
 		pitch = 1
-		ref = tes3.player
 		immediate = false
+		ref = tes3.mobilePlayer.reference
 	else
 		volume = options.volume or OAvol
 		pitch = options.pitch or 1
 		immediate = options.immediate or false
+		ref = options.reference or tes3.mobilePlayer.reference
 	end
 
 	if weatherNow >= 0 and weatherNow <4 then
 		if quietChance<math.random() then
 			debugLog("Playing regular weather track.")
 			if immediate then
-				sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+				sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
 			else
-				sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+				sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
 			end
 		else
 			debugLog("Playing quiet weather track.")
 			if immediate then
-				sounds.playImmediate{module = moduleName, volume = volume, type = "quiet", pitch = pitch}
+				sounds.playImmediate{module = moduleName, volume = volume, type = "quiet", pitch = pitch, reference = ref}
 			else
-				sounds.play{module = moduleName, volume = volume, type = "quiet", pitch = pitch}
+				sounds.play{module = moduleName, volume = volume, type = "quiet", pitch = pitch, reference = ref}
 			end
 		end
 	elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
@@ -65,16 +66,16 @@ local function weatherParser(options)
 			if weatherNow == 3 or weatherNow == 4 then
 				debugLog("Found warm weather, using warm wind loops.")
 				if immediate then
-					sounds.playImmediate{module = moduleName, volume = volume, type = "warm", pitch = pitch}
+					sounds.playImmediate{module = moduleName, volume = volume, type = "warm", pitch = pitch, reference = ref}
 				else
-					sounds.play{module = "outdoor", volume = volume, type = "warm", pitch = pitch}
+					sounds.play{module = "outdoor", volume = volume, type = "warm", pitch = pitch, reference = ref}
 				end
 			elseif weatherNow == 8 or weatherNow == 5 then
 				debugLog("Found cold weather, using cold wind loops.")
 				if immediate then
-					sounds.playImmediate{module = moduleName, volume = volume, type = "cold", pitch = pitch}
+					sounds.playImmediate{module = moduleName, volume = volume, type = "cold", pitch = pitch, reference = ref}
 				else
-					sounds.play{module = "outdoor", volume = volume, type = "cold", pitch = pitch}
+					sounds.play{module = "outdoor", volume = volume, type = "cold", pitch = pitch, reference = ref}
 				end
 			end
 		else
@@ -83,7 +84,7 @@ local function weatherParser(options)
 		end
 	elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
 		debugLog("Extreme weather detected.")
-		sounds.remove{module = moduleName}
+		sounds.remove{module = moduleName, reference = ref}
 		return
 	end
 end
