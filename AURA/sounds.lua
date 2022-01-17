@@ -370,15 +370,41 @@ end
 
 function this.removeImmediate(options)
 	local ref = options.reference or tes3.mobilePlayer.reference
-	if modules[options.module].old and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} then tes3.removeSound{sound = modules[options.module].old, reference = ref} end
-	if modules[options.module].new and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
+
+	if
+		modules[options.module].old
+		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
+	then
+		tes3.removeSound{sound = modules[options.module].old, reference = ref}
+	end
+	
+	if
+		modules[options.module].new
+		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
+		and not modules[options.module].new == modules[options.module].old
+	then
+		tes3.removeSound{sound = modules[options.module].new, reference = ref}
+	end
 end
 
 function this.remove(options)
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
-	fadeOut(ref, volume, modules[options.module].old, options.module)
-	fadeOut(ref, volume, modules[options.module].new, options.module)
+
+	if
+		modules[options.module].old
+		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
+	then
+		fadeOut(ref, volume, modules[options.module].old, options.module)
+	end
+	
+	if
+		modules[options.module].new
+		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
+		and not modules[options.module].new == modules[options.module].old
+	then
+		fadeOut(ref, volume, modules[options.module].new, options.module)
+	end
 end
 
 local function getTrack(options)
