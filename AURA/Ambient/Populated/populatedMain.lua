@@ -51,10 +51,14 @@ local function cellCheck()
     if (not cell) or (not cell.name) then
         debugLog("Player in the wilderness. Returning.")
         sounds.remove{module = moduleName, volume = popVol}
+        timeLast = nil
+        typeCellLast = nil
         return
     elseif (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
-         debugLog("Player in interior cell. Returning.")
+        debugLog("Player in interior cell. Returning.")
         sounds.removeImmediate{module = moduleName, volume = popVol}
+        timeLast = nil
+        typeCellLast = nil
         return
     end
 
@@ -65,6 +69,8 @@ local function cellCheck()
     if (weatherNow >= 4 and weatherNow <= 7) or (weatherNow == 8) and weatherNow ~= weatherLast then
         debugLog("Bad weather detected. Removing sounds.")
         sounds.remove{module = moduleName, volume = popVol}
+        timeLast = nil
+        typeCellLast = nil
         return
     end
 
