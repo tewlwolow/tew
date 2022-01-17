@@ -341,7 +341,7 @@ local function fadeOut(ref, volume, track, module)
 
 	local function queuer()
 		modules[module].old = track
-		tes3.removeSound{sound = track, reference = ref}
+		if tes3.getSoundPlaying{sound = track, reference = ref} then tes3.removeSound{sound = track, reference = ref} end
 		debugLog("Fade out for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
 
@@ -370,8 +370,8 @@ end
 
 function this.removeImmediate(options)
 	local ref = options.reference or tes3.mobilePlayer.reference
-	if modules[options.module].old then tes3.removeSound{sound = modules[options.module].old, reference = ref} end
-	if modules[options.module].new then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
+	if modules[options.module].old and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} then tes3.removeSound{sound = modules[options.module].old, reference = ref} end
+	if modules[options.module].new and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
 end
 
 function this.remove(options)
@@ -442,7 +442,7 @@ function this.playImmediate(options)
 	local volume = options.volume or MAX
 
 	if options.last and modules[options.module].new then
-		tes3.removeSound{sound = modules[options.module].new, reference = tes3.mobilePlayer.reference}
+		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
 		debugLog("Immediately restaring: "..modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
