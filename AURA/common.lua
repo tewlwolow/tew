@@ -1,5 +1,20 @@
 local this={}
 
+local config = require("tew.AURA.config")
+local debugLogOn = config.debugLogOn
+local modversion = require("tew.AURA.version")
+local version = modversion.version
+
+function this.debugLog(string)
+    if debugLogOn then
+        local info = debug.getinfo(2, "Sl")
+        local module = info.short_src:match("^.+\\(.+).lua$")
+        local prepend = ("[AURA.%s.%s:%s]:"):format(version, module, info.currentline)
+        local aligned = ("%-36s"):format(prepend)
+        mwse.log(aligned.." -- "..string.format("%s", string))
+    end
+end
+
 this.thunArray={
 	"Thunder0",
 	"Thunder1",

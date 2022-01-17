@@ -1,20 +1,14 @@
 local data = require("tew.AURA.Ambient.Populated.populatedData")
 local config = require("tew.AURA.config")
 local sounds = require("tew.AURA.sounds")
-local debugLogOn = config.debugLogOn
-local modversion = require("tew.AURA.version")
-local version = modversion.version
+local common=require("tew\\AURA\\common")
 local popVol = config.popVol/200
 
 local time, timeLast, typeCellLast, weatherNow, weatherLast
 
 local moduleName = "populated"
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] PA: "..string.format("%s", string))
-    end
-end
+local debugLog = common.debugLog
 
 local function getPopulatedCell(maxCount, cell)
     local count = 0
@@ -48,15 +42,19 @@ local function cellCheck()
 	-- Gets messy otherwise
 	if tes3.mobilePlayer.waiting then
 		debugLog("Player waiting. Returning.")
-		timer.start({duration=3, callback=cellCheck, type=timer.real})
+		timer.delayOneFrame(function() cellCheck() end)
 		return
 	end
 
     local cell = tes3.getPlayerCell()
 
-    if (not cell) or (not cell.name) or (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
-        debugLog("Player in interior cell or in the wilderness. Returning.")
+    if (not cell) or (not cell.name) then
+        debugLog("Player in the wilderness. Returning.")
         sounds.remove{module = moduleName}
+        return
+    elseif (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
+         debugLog("Player in interior cell. Returning.")
+        sounds.removeImmediate{module = moduleName}
         return
     end
 

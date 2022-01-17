@@ -1,8 +1,5 @@
-local modversion = require("tew\\AURA\\version")
-local version = modversion.version
 local config = require("tew\\AURA\\config")
-local debugLogOn=config.debugLogOn
-
+local common = require("tew.AURA.common")
 local tewLib = require("tew\\tewLib\\tewLib")
 local findWholeWords = tewLib.findWholeWords
 
@@ -10,12 +7,7 @@ local path = ""
 local flag = 0
 local containersData = require("tew\\AURA\\Containers\\containersData")
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] C: "..string)
-    end
-end
-
+local debugLog = common.debugLog
 
 local function getVolume(containerType)
     if not containerType then return 1.0 end

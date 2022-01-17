@@ -26,11 +26,7 @@ local climateNow, weatherNow, timeNow
 
 local windoors, interiorTimer
 
-local function debugLog(string)
-	if debugLogOn then
-		mwse.log("[AURA "..version.."] OA: "..string.format("%s", string))
-	end
-end
+local debugLog = common.debugLog
 
 local function weatherParser(options)
 
@@ -44,7 +40,6 @@ local function weatherParser(options)
 	else
 		volume = options.volume or OAvol
 		pitch = options.pitch or 1
-		ref = options.reference or tes3.player
 		immediate = options.immediate or false
 	end
 
@@ -52,16 +47,16 @@ local function weatherParser(options)
 		if quietChance<math.random() then
 			debugLog("Playing regular weather track.")
 			if immediate then
-				sounds.playImmediate{module = moduleName, reference = ref, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+				sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
 			else
-				sounds.play{module = moduleName, reference = ref, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
+				sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch}
 			end
 		else
 			debugLog("Playing quiet weather track.")
 			if immediate then
-				sounds.playImmediate{module = moduleName, reference = ref, volume = volume, type = "quiet", pitch = pitch}
+				sounds.playImmediate{module = moduleName, volume = volume, type = "quiet", pitch = pitch}
 			else
-				sounds.play{module = moduleName, reference = ref, volume = volume, type = "quiet", pitch = pitch}
+				sounds.play{module = moduleName, volume = volume, type = "quiet", pitch = pitch}
 			end
 		end
 	elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
@@ -70,16 +65,16 @@ local function weatherParser(options)
 			if weatherNow == 3 or weatherNow == 4 then
 				debugLog("Found warm weather, using warm wind loops.")
 				if immediate then
-					sounds.playImmediate{module = moduleName, reference = ref, volume = volume, type = "warm", pitch = pitch}
+					sounds.playImmediate{module = moduleName, volume = volume, type = "warm", pitch = pitch}
 				else
-					sounds.play{module = "outdoor",reference = ref, volume = volume, type = "warm", pitch = pitch}
+					sounds.play{module = "outdoor", volume = volume, type = "warm", pitch = pitch}
 				end
 			elseif weatherNow == 8 or weatherNow == 5 then
 				debugLog("Found cold weather, using cold wind loops.")
 				if immediate then
-					sounds.playImmediate{module = moduleName, reference = ref, volume = volume, type = "cold", pitch = pitch}
+					sounds.playImmediate{module = moduleName, volume = volume, type = "cold", pitch = pitch}
 				else
-					sounds.play{module = "outdoor",reference = ref, volume = volume, type = "cold", pitch = pitch}
+					sounds.play{module = "outdoor", volume = volume, type = "cold", pitch = pitch}
 				end
 			end
 		else
@@ -130,7 +125,7 @@ local function cellCheck()
 	-- Gets messy otherwise
 	if tes3.mobilePlayer.waiting then
 		debugLog("Player waiting. Returning.")
-		timer.start({duration=3, callback=cellCheck, type=timer.real})
+		timer.delayOneFrame(function() cellCheck() end)
 		return
 	end
 
@@ -191,16 +186,16 @@ local function cellCheck()
 	and weatherNow==weatherLast
 	and (common.checkCellDiff(cell, cellLast)==false
 	or cell == cellLast) then
-		debugLog("Same conditions detected. Returning.")
+		debugLog("Same conditions. Returning.")
 		return
 	elseif timeNow~=timeLast and weatherNow==weatherLast then
 		if (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
-			debugLog("Same conditions detected. Returning.")
+			debugLog("Same conditions. Returning.")
 			return
 		end
 	end
 	
-	debugLog("Different conditions detected. Resetting sounds.")
+	debugLog("Different conditions. Resetting sounds.")
 	
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
@@ -263,7 +258,7 @@ local function positionCheck(e)
 	debugLog("Player underwater. Stopping AURA sounds.")
 	if (not cell.isInterior) or (cell.behavesAsExterior) then
 		sounds.removeImmediate{module = moduleName}
-		sounds.playImmediate{module = moduleName, last = true, volume = 0.4*OAvol, pitch=0.5, reference = cell}
+		sounds.playImmediate{module = moduleName, last = true, volume = 0.4*OAvol, pitch=0.5}
 	end
 	if playSplash and moduleAmbientOutdoor then
 		tes3.playSound{sound="splash_lrg", volume=0.5*splashVol, pitch=0.6}
@@ -272,7 +267,7 @@ local function positionCheck(e)
 		debugLog("Player above water level. Resetting AURA sounds.")
 		if (not cell.isInterior) or (cell.behavesAsExterior) then
 			sounds.removeImmediate{module = moduleName}
-			sounds.playImmediate{module = moduleName, last = true, volume = OAvol, reference = cell}
+			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		end
 		timer.start({duration=1, callback=cellCheck, type=timer.real})
 		if playSplash and moduleAmbientOutdoor then

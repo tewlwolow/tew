@@ -2,17 +2,10 @@ local trainingData = require("tew\\AURA\\UI\\trainingData")
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
+local common = require("tew.AURA.common")
 local UIvol=config.UIvol/200
 
---[[
-local config = require("tew\\AURA\\config")
-local debugLogOn=config.debugLogOn
-
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] Training: "..string)
-    end
-end--]]
+local debugLog = common.debugLog
 
 local function onTrainingMenu(e)
 
@@ -30,7 +23,8 @@ local function onTrainingMenu(e)
                     skillClick:register("mouseDown", function()
                         for skill, sound in pairs(trainingData) do
                             if string.find(skillClick.text, skill) then
-                                tes3.playSound{soundPath=sound, reference=tes3.player, volume=0.7*UIvol}
+                                debugLog(sound.id.." played.")
+                                tes3.playSound{sound=sound, reference=tes3.player, volume=0.7*UIvol}
                             end
                         end
                     end)

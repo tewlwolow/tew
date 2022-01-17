@@ -1,15 +1,11 @@
+local config = require("tew\\AURA\\config")
+local common = require("tew.AURA.common")
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
-local config = require("tew\\AURA\\config")
-local debugLogOn=config.debugLogOn
 local UIvol=config.UIvol/200
 --local moduleContainers=config.moduleContainers
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] UI: "..string)
-    end
- end
+local debugLog = common.debugLog
 
 local function playBarterSounds(e)
 

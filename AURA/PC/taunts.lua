@@ -5,16 +5,10 @@ local raceNames=serviceVoicesData.raceNames
 local tauntsData = require("tew\\AURA\\PC\\tauntsData")
 local tVol = config.tVol
 local tauntChance = config.tauntChance
-local debugLogOn = config.debugLogOn
-local modversion = require("tew\\AURA\\version")
-local version = modversion.version
+local common = require("tew.AURA.common")
 local playedTaunt = 0
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] PC: "..string.format("%s", string))
-    end
-end
+local debugLog = common.debugLog
 
 --[[local function getArrays()
 

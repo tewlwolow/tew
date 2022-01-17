@@ -1,12 +1,9 @@
-local modversion = require("tew\\AURA\\version")
 local config = require("tew\\AURA\\config")
 local common=require("tew\\AURA\\common")
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
 local IWAURAdir="tew\\AURA\\Interior Weather\\"
-local version = modversion.version
-local debugLogOn=config.debugLogOn
 local IWvol = config.IWvol/200
 
 local cellLast
@@ -16,11 +13,7 @@ local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTi
 
 local thunArray=common.thunArray
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] IW: "..string)
-    end
-end
+local debugLog = common.debugLog
 
 local function playThunder()
     local thunVol

@@ -2,13 +2,9 @@ local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local config = require("tew\\AURA\\config")
 local UIvol=config.UIvol/200
-local debugLogOn=config.debugLogOn
+local common = require("tew.AURA.common")
 
-local function debugLog(string)
-    if debugLogOn then
-       mwse.log("[AURA "..version.."] UI : "..string)
-    end
-end
+local debugLog = common.debugLog
 
 local silts={
     "Silt_1",
