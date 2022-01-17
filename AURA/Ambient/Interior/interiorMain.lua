@@ -50,6 +50,7 @@ local musicArrays = {
 }
 
 local function playMusic()
+    if not interiorMusic then return end
     lastMusicPath = musicPath
     --debugLog("Playing music track: "..musicPath)
     tes3.streamMusic{
