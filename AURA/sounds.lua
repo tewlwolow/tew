@@ -369,6 +369,7 @@ local function crossFade(ref, volume, trackOld, trackNew, module)
 end
 
 function this.removeImmediate(options)
+	debugLog("Removing sounds for module: "..options.module)
 	local ref = options.reference or tes3.mobilePlayer.reference
 
 	if
@@ -376,14 +377,20 @@ function this.removeImmediate(options)
 		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
 	then
 		tes3.removeSound{sound = modules[options.module].old, reference = ref}
+		debugLog(modules[options.module].old.id.." removed.")
+	else
+		debugLog("Old track not playing.")
 	end
 	
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
-		and not modules[options.module].new == modules[options.module].old
+		and modules[options.module].new ~= modules[options.module].old
 	then
 		tes3.removeSound{sound = modules[options.module].new, reference = ref}
+		debugLog(modules[options.module].new.id.." removed.")
+	else
+		debugLog("New track not playing.")
 	end
 end
 
@@ -401,7 +408,7 @@ function this.remove(options)
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
-		and not modules[options.module].new == modules[options.module].old
+		and modules[options.module].new ~= modules[options.module].old
 	then
 		fadeOut(ref, volume, modules[options.module].new, options.module)
 	end
@@ -468,7 +475,7 @@ function this.playImmediate(options)
 	local volume = options.volume or MAX
 
 	if options.last and modules[options.module].new then
-		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
+		if tes3.getSoundPlaying{sound = track, reference = ref} then tes3.removeSound{sound = track, reference = ref} end
 		debugLog("Immediately restaring: "..modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
@@ -488,7 +495,7 @@ function this.playImmediate(options)
 			debugLog("Old track: "..modules[options.module].old.id)
 		end
 
-		debugLog("Immediately playing new track: "..newTrack.id)
+		debugLog("Immediately playing new track: "..newTrack.id.." for module: "..options.module)
 
 		tes3.playSound {
 			sound = newTrack,
@@ -503,7 +510,7 @@ end
 -- Supporting kwargs here
 function this.play(options)
 
-	local ref = tes3.mobilePlayer.reference
+	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
 
 	local newTrack = getTrack(options)
@@ -515,30 +522,22 @@ function this.play(options)
 		debugLog("Old track: "..modules[options.module].old.id)
 	end
 
-	debugLog("Playing new track: "..newTrack.id)
+	debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
 
-	timer.delayOneFrame
-	(
-		function()
-			timer.delayOneFrame
-			(
-				function()
-					tes3.playSound {
-						sound = newTrack,
-						loop = true,
-						reference = ref,
-						volume = MIN,
-						pitch = options.pitch or MAX
-					}
-					if not modules[options.module].old then
-						fadeIn(ref, volume, newTrack, options.module)
-					else
-						crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
-					end
-				end
-			)
-		end
-	)
+	tes3.playSound {
+		sound = newTrack,
+		loop = true,
+		reference = ref,
+		volume = MIN,
+		pitch = options.pitch or MAX
+	}
+
+	if not modules[options.module].old then
+		fadeIn(ref, volume, newTrack, options.module)
+	else
+		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
+	end
+				
 end
 
 function this.build()
