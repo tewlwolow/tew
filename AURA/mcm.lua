@@ -119,6 +119,59 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
 
+    template:createExclusionsPage{
+        label = "Taverns Blacklist",
+        description = "Select which taverns the music is disabled in.",
+        toggleText = "Toggle",
+        leftListLabel = "Disabled taverns",
+        rightListLabel = "Enabled taverns",
+        showAllBlocked = false,
+        variable = mwse.mcm.createTableVariable{
+            id = "disabledTaverns",
+            table = config,
+        },
+
+        filters = {
+
+            {
+                label = "Enabled taverns",
+                callback = (
+                    function()
+                        local enabledTaverns = {}
+                        for cell in tes3.iterate(tes3.dataHandler.nonDynamicData.cells) do
+                            if cell.isInterior then
+                                for npc in cell:iterateReferences(tes3.objectType.npc) do
+                                    if (npc.object.class.id == "Publican"
+                                    or npc.object.class.id == "T_Sky_Publican"
+                                    or npc.object.class.id == "T_Cyr_Publican") then
+                                        table.insert(enabledTaverns, cell.name)
+                                    end
+                                end
+                            end
+                        end
+                        
+                        -- Remove duplicated tavern names
+                        table.sort(enabledTaverns)
+                        local previous
+                        local duplicates = {}
+                        for k, v in pairs(enabledTaverns) do
+                            if v == previous then
+                                table.insert(duplicates, k, v)
+                            end
+                            previous = v
+                        end
+                        for k, v in pairs(duplicates) do
+                            table.remove(enabledTaverns, k-1)
+                        end
+
+                        return enabledTaverns
+                    end
+                )
+            },
+
+        }
+    }
+
     local pagePA = template:createPage{label="Populated Ambient"}
     pagePA:createCategory{
         label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"

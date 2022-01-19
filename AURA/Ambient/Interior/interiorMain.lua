@@ -8,12 +8,18 @@ local intVol = config.intVol/200
 local interiorMusic = config.interiorMusic
 
 local played = false
-
 local musicPath, lastMusicPath
-
 local moduleName = "interior"
-
 local debugLog = common.debugLog
+
+local disabledTaverns = config.disabledTaverns
+local function isEnabled(cellName)
+    if disabledTaverns[cellName] and disabledTaverns[cellName] == true then
+        return false
+    else
+        return true
+    end
+end
 
 local function getTypeCell(maxCount, cell)
     local count = 0
@@ -71,7 +77,56 @@ for folder in lfs.dir("Data Files\\Music\\tew\\AURA") do
     end
 end
 
+local function onMusicSelection()
+    local cell = tes3.getPlayerCell()
+
+    if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then return end
+
+    if not isEnabled(cell.name) then debugLog("Tavern blacklisted: "..cell.name..". Returning.") return end
+
+    if getPopulatedCell(3, cell) == false then return end
+
+    for race, _ in pairs(data.tavernNames) do
+        for _, pattern in ipairs(data.tavernNames[race]) do
+            if string.find(cell.name, pattern) then
+                while musicPath == lastMusicPath do
+                    musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
+                end
+                playMusic()
+                return
+            end
+        end
+    end
+
+    for npc in cell:iterateReferences(tes3.objectType.npc) do
+        if (npc.object.class.id == "Publican"
+        or npc.object.class.id == "T_Sky_Publican"
+        or npc.object.class.id == "T_Cyr_Publican")
+        and (npc.object.mobile and not npc.object.mobile.isDead) then
+
+            local race = npc.object.race.id
+            if race ~= "Imperial"
+            and race ~= "Nord"
+            and race ~= "Dark Elf" then
+                race = "Dark Elf"
+            end
+
+            while musicPath == lastMusicPath do
+                musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
+            end
+
+            playMusic()
+            return
+        end
+    end
+
+end
+
 local function cellCheck()
+
+    if interiorMusic then
+        onMusicSelection()
+    end
 
     -- Gets messy otherwise
 	if tes3.mobilePlayer.waiting then
@@ -153,48 +208,7 @@ local function cellCheck()
     debugLog("No appropriate cell detected.")
 end
 
-local function onMusicSelection()
-    local cell = tes3.getPlayerCell()
 
-    if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then return end
-
-    if getPopulatedCell(3, cell) == false then return end
-
-    for race, _ in pairs(data.tavernNames) do
-        for _, pattern in ipairs(data.tavernNames[race]) do
-            if string.find(cell.name, pattern) then
-                while musicPath == lastMusicPath do
-                    musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
-                end
-                playMusic()
-                return
-            end
-        end
-    end
-
-    for npc in cell:iterateReferences(tes3.objectType.npc) do
-        if (npc.object.class.id == "Publican"
-        or npc.object.class.id == "T_Sky_Publican"
-        or npc.object.class.id == "T_Cyr_Publican")
-        and (npc.object.mobile and not npc.object.mobile.isDead) then
-
-            local race = npc.object.race.id
-            if race ~= "Imperial"
-            and race ~= "Nord"
-            and race ~= "Dark Elf" then
-                race = "Dark Elf"
-            end
-
-            while musicPath == lastMusicPath do
-                musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
-            end
-
-            playMusic()
-            return
-        end
-    end
-
-end
 
 -- Make sure any law-breakers, murderes and maniacs are covered
 -- Meaning the death of a publican means we recheck conditions
