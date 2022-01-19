@@ -223,7 +223,7 @@ local template = mwse.mcm.createTemplate{
         variable=registerVariable("vsVol")
     }
     pagePC:createSlider{
-        label = "Changes % chance for a battle taunt to play. Default = 100%.\nRequires restart. Chance %",
+        label = "Changes % chance for a battle taunt to play. Default = 30%.\nRequires restart. Chance %",
         min = 0,
         max = 100,
         step = 1,
