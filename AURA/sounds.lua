@@ -2,7 +2,7 @@
 local this={}
 
 -- Imports
-local common=require("tew\\AURA\\common")
+local common=require("tew.AURA.common")
 
 -- Logger
 local debugLog = common.debugLog
@@ -14,6 +14,7 @@ local climDir = "\\C\\"
 local comDir = "\\S\\"
 local popDir = "\\P\\"
 local interiorDir = "\\I\\"
+local wDir = "\\W\\"
 local quietDir = "q"
 local warmDir = "w"
 local coldDir = "c"
@@ -63,6 +64,42 @@ local interior = {
     }
 }
 
+local interiorWeather = {
+
+    ["big"] = {
+        [4] = nil,
+        [5] = nil,
+        [6] = nil,
+        [7] = nil,
+        [9] = nil
+    },
+    ["sma"] = {
+        [4] = nil,
+        [5] = nil,
+        [6] = nil,
+        [7] = nil,
+        [9] = nil
+    },
+    ["ten"] = {
+        [4] = nil,
+        [5] = nil,
+        [6] = nil,
+        [7] = nil,
+        [9] = nil
+    }
+}
+local function getWeatherSounds()
+	local ashSound = tes3.getSound("ashstorm")
+	local blightSound = tes3.getSound("Blight")
+	local blizzardSound = tes3.getSound("BM Blizzard")
+
+	for type in pairs(interiorWeather) do
+		table.insert(interiorWeather[type], 6, ashSound)
+		table.insert(interiorWeather[type], 7, blightSound)
+		table.insert(interiorWeather[type], 9, blizzardSound)
+	end
+end
+
 local modules = {
 	["outdoor"] = {
 		old = nil,
@@ -76,7 +113,13 @@ local modules = {
 		old = nil,
 		new = nil
 	},
+	["interiorWeather"] = {
+		old = nil,
+		new = nil
+	}
 }
+
+
 
 -- Building tables --
 
@@ -205,6 +248,92 @@ local function buildTavernSounds()
 	end
 end
 
+local function buildWeatherSounds()
+    debugLog("|---------------------- Building interior weather sounds. ----------------------|\n")
+   
+    local sound, filename, objectId
+
+    filename = soundDir..wDir.."\\big\\r.wav"
+    objectId = "tew_b_rainheavy"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["big"][4] = sound
+
+    filename = soundDir..wDir.."\\big\\rh.wav"
+    objectId = "tew_b_rain"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["big"][5] = sound
+
+    filename = soundDir..wDir.."\\sma\\r.wav"
+    objectId = "tew_s_rainheavy"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["sma"][4] = sound
+
+    filename = soundDir..wDir.."\\sma\\rh.wav"
+    objectId = "tew_s_rain"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["sma"][5] = sound
+
+    filename = soundDir..wDir.."\\ten\\r.wav"
+    objectId = "tew_t_rainheavy"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["ten"][4] = sound
+
+    filename = soundDir..wDir.."\\ten\\rh.wav"
+    objectId = "tew_t_rain"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    sound = tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+    interiorWeather["ten"][5] = sound
+
+    filename = soundDir..wDir.."\\com\\wg.wav"
+    objectId = "tew_wind_gust"
+    debugLog("File id: "..objectId)
+    debugLog("Filename: "..filename.."\n---------------")
+    tes3.createObject{
+        id = objectId,
+        objectType = tes3.objectType.sound,
+        filename = filename,
+    }
+
+    sound, filename, objectId = nil, nil, nil
+
+    debugLog("|---------------------- Finished building interior weather sounds. ----------------------|\n")
+end
+
 
 local function buildMisc()
 	mwse.log("\n")
@@ -266,8 +395,6 @@ local function buildMisc()
 	}
 	debugLog("Adding misc file: tew_spear")
 end
-
--- TODO: Build container sounds
 
 ----------------------------------------------------------------------------------------------------------
 --//////////////////////////////////////////////////////////////////////////////////////////////////////--
@@ -369,7 +496,7 @@ local function crossFade(ref, volume, trackOld, trackNew, module)
 end
 
 function this.removeImmediate(options)
-	debugLog("Removing sounds for module: "..options.module)
+	debugLog("Immediately removing sounds for module: "..options.module)
 	local ref = options.reference or tes3.mobilePlayer.reference
 
 	if
@@ -458,6 +585,13 @@ local function getTrack(options)
 			debugLog("Got interior "..options.type.." type.")
 			table = interior[options.type]
 		end
+	elseif options.module == "interiorWeather" then
+		if options.type == "wind" then
+			return tes3.getSound("tew_wind_gust")
+		end
+		debugLog("Got interior weather module.")
+		debugLog("Got interior type: "..options.type)
+		return interiorWeather[options.type][options.weather]
 	end
 
 	local newTrack = table[math.random(1, #table)]
@@ -467,6 +601,8 @@ local function getTrack(options)
 		end
 	end
 
+	debugLog("Selected track: "..newTrack.id)
+
 	return newTrack
 end
 
@@ -475,7 +611,7 @@ function this.playImmediate(options)
 	local volume = options.volume or MAX
 
 	if options.last and modules[options.module].new then
-		if tes3.getSoundPlaying{sound = track, reference = ref} then tes3.removeSound{sound = track, reference = ref} end
+		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
 		debugLog("Immediately restaring: "..modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
@@ -548,7 +684,10 @@ function this.build()
 	buildPopulatedSounds()
 	buildInteriorSounds()
 	buildTavernSounds()
+	buildWeatherSounds()
 	buildMisc()
+	event.register("loaded", getWeatherSounds) -- Needed to do after initialisation, errors out otherwise
+
 	mwse.log("\n")
 	debugLog("|---------------------- Finished building sound objects. ----------------------|\n")
 end

@@ -1,19 +1,21 @@
-local config = require("tew\\AURA\\config")
-local common=require("tew\\AURA\\common")
-local tewLib = require("tew\\tewLib\\tewLib")
-local isOpenPlaza=tewLib.isOpenPlaza
+-- TODO:
+--     This file has some awfully complicated logic.
+--     Everything needs to be redesigned and streamlined at some point.
 
-local IWAURAdir="tew\\AURA\\Interior Weather\\"
+local config = require("tew.AURA.config")
+local common=require("tew.AURA.common")
+local tewLib = require("tew.tewLib.tewLib")
+local isOpenPlaza=tewLib.isOpenPlaza
+local sounds = require("tew.AURA.sounds")
+
 local IWvol = config.IWvol/200
 
-local cellLast
-local IWLoop, thunRef, windoors, interiorType, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall
-
---local WtC=tes3.getWorldController().weatherController
-
+local cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, interiorType, weather, weatherLast
 local thunArray=common.thunArray
 
 local debugLog = common.debugLog
+
+local moduleName = "interiorWeather"
 
 local function playThunder()
     local thunVol
@@ -49,38 +51,38 @@ local function playInteriorSmall(cell)
         debugLog("Found open plaza. Applying volume boost and removing thunder timer.")
     end
 
-    local IWPath=IWAURAdir..interiorType.."\\"..IWLoop..".wav"
-
-    if IWLoop=="rain heavy" then
-        tes3.playSound{soundPath=IWPath, volume=0.7*IWvol+volBoost, loop=true, reference=cell}
+    if weather == 5 then
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = interiorType}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
-    elseif IWLoop=="Rain" then
-        tes3.playSound{soundPath=IWPath, volume=0.6*IWvol+volBoost, loop=true, reference=cell}
-        debugLog("Playing small interior rain loops.")
-    elseif IWLoop=="Blight" or IWLoop=="ashstorm" or IWLoop=="BM Blizzard" then
-        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.7, loop=true, reference=cell}
-        tes3.playSound{soundPath=IWAURAdir.."Common\\wind gust.wav", volume=0.2, loop=true, reference=cell}
+    elseif weather == 4 then
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = interiorType}
+        debugLog("Playing small interior rain and wind loop.")
+    elseif weather == 6 or weather == 7 or weather == 9 then
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
     else
-        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.6, loop=true, reference=cell}
+        debugLog("Playing small interior weather loop.")
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
     end
 end
 
 local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
-    if IWLoop=="Rain" then
-        tes3.playSound{sound="Sound Test", volume=0.9*IWvol, pitch=0.8, loop=true, reference=windoor}
+
+    if weather == 4 then
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
         debugLog("Playing big interior rain loop.")
-    elseif IWLoop=="rain heavy" then
-        tes3.playSound{sound="Sound Test", volume=0.9*IWvol, pitch=1.4, loop=true, reference=windoor}
+    elseif weather == 5 then
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
         debugLog("Playing big interior storm loop.")
         thunderTimerBig:resume()
     else
-        debugLog("Playing big interior loop: "..IWLoop)
-        tes3.playSound{sound=IWLoop, volume=0.5*IWvol, pitch=0.6, loop=true, reference=windoor}
+        debugLog("Playing big interior loop.")
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
     end
 end
 
@@ -117,95 +119,105 @@ local function cellCheck()
         thunderTimerSmall:pause()
     end
 
-    local cell=tes3.getPlayerCell()
+    local cell = tes3.getPlayerCell()
     if not cell then debugLog("No cell detected. Returning.") return end
 
     if (not cell.isInterior or cell.behavesAsExterior)
     and (isOpenPlaza(cell)==false
     and common.checkCellDiff(cell, cellLast)==true) then
-        debugLog("Found exterior cell. Returning.")
+        debugLog("Found exterior cell. Removing sounds and returning.")
+        -- Only need to remove from small types here, the rest is handled automatically in the engine
+        sounds.removeImmediate{module = moduleName, type = "small"}
+        cellLast = cell
         return
     end
 
-    local IWweather = tes3.getRegion({useDoors=true}).weather.index
-    IWLoop=nil
-    if not (IWweather >=4 and IWweather <= 7) and not IWweather==9 then
-        debugLog("Uneligible weather detected. Returning.")
-        return
-    elseif IWweather==4 then
-        IWLoop="Rain"
-    elseif IWweather==5 then
-        IWLoop="rain heavy"
-    elseif IWweather==6 then
-        IWLoop="ashstorm"
-    elseif IWweather==7 then
-        IWLoop="Blight"
-    elseif IWweather==9 then
-        IWLoop="BM Blizzard"
+    weather = tes3.getRegion({useDoors=true}).weather.index
+    debugLog("Weather: "..weather)
+
+    if weather ~= weatherLast then
+        sounds.removeImmediate{module = moduleName, type = "small"}
     end
-    debugLog("Weather: "..IWweather)
+    if weather == weatherLast and cellLast == cell then
+        debugLog("Same weather detected. Returning.")
+        return
+    end
+
+    if weather < 4 or weather == 8 then
+        debugLog("Uneligible weather detected. Returning.")
+        sounds.removeImmediate{module = moduleName, type = "small"}
+        if windoors~={} and windoors~=nil then
+            for _, windoor in ipairs(windoors) do
+                sounds.removeImmediate{module = moduleName, reference=windoor, type = "big"}
+            end
+        end
+        return
+    end
 
     if (isOpenPlaza(cell) == true)
-    and (IWLoop == "Blight"
-    or IWLoop == "ashstorm") then
+    and (weather == 6
+    or weather == 7) then
         return
     end
 
-    tes3.removeSound{reference=cell}
+    -- if windoors~={} and windoors~=nil then
+    --     debugLog("Clearing windoors.")
+    --     for _, windoor in ipairs(windoors) do
+    --        sounds.removeImmediate{module = moduleName, reference=windoor, type = interiorType}
+    --     end
+    --     return
+    -- end
+ 
 
-    if IWLoop==nil then
-        if windoors~={} and windoors~=nil then
-            debugLog("Clearing windoors.")
-            for _, windoor in ipairs(windoors) do
-                tes3.removeSound{reference=windoor}
-            end
-            return
-        else
-            return
-        end
+    if common.getCellType(cell, common.cellTypesSmall)==true then
+        interiorType = "sma"
+    elseif common.getCellType(cell, common.cellTypesTent)==true then
+        interiorType = "ten"
+    else
+        interiorType = "big"
     end
 
     windoors={}
     windoors=common.getWindoors(cell)
 
     debugLog("Found interior cell.")
-    if common.getCellType(cell, common.cellTypesSmall)==true then
+    if interiorType == "sma" then
         debugLog("Playing small interior sounds.")
         if isOpenPlaza(cell) == true then
             tes3.getSound("Rain").volume = 0
             tes3.getSound("rain heavy").volume = 0
         else
-            if IWLoop=="rain heavy" then
+            if weather == 5 then
                 thunRef=cell
                 thunderTimerSmall:resume()
             end
         end
-        interiorType="Small"
-        playInteriorSmall(cell, interiorType)
-    elseif common.getCellType(cell, common.cellTypesTent)==true then
-        interiorType="Tent"
-        playInteriorSmall(cell, interiorType)
+        playInteriorSmall(cell)
+    elseif interiorType == "ten" then
         debugLog("Playing tent interior sounds.")
-        if IWLoop=="rain heavy" then
+        playInteriorSmall(cell)
+        if weather == 5 then
             thunRef=cell
             thunderTimerSmall:resume()
         end
     else
+        interiorType = "big"
         if windoors and windoors[1] ~= nil then
+            debugLog("Playing big interior sound.")
             for _, windoor in ipairs(windoors) do
-                tes3.removeSound{reference=windoor}
+                sounds.removeImmediate{module = moduleName, reference=windoor, type = interiorType}
                 playInteriorBig(windoor)
             end
             interiorTimer:resume()
-            debugLog("Playing big interior sound.")
-            if IWLoop=="rain heavy" then
+            if weather == 5 then
                 updateThunderBig()
                 thunderTimerBig:resume()
             end
         end
     end
 
-    cellLast=cell
+    weatherLast = weather
+    cellLast = cell
 end
 
 
