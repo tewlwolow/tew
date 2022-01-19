@@ -1,8 +1,10 @@
-local config = require("tew\\AURA\\config")
+-- TODO: check race and gender at the end of chargen
+
+local config = require("tew.AURA.config")
 local playerRace, playerSex
-local serviceVoicesData = require("tew\\AURA\\Service Voices\\serviceVoicesData")
+local serviceVoicesData = require("tew.AURA.Service Voices.serviceVoicesData")
 local raceNames=serviceVoicesData.raceNames
-local tauntsData = require("tew\\AURA\\PC\\tauntsData")
+local tauntsData = require("tew.AURA.PC.tauntsData")
 local tVol = config.tVol
 local tauntChance = config.tauntChance
 local common = require("tew.AURA.common")
@@ -66,6 +68,8 @@ local debugLog = common.debugLog
 end]]
 
 local function playerCheck()
+    if tes3.worldController.charGenState.value ~= -1 then return end
+
     playedTaunt = 0
     if tes3.player.object.female then
         playerSex = "f"
@@ -81,9 +85,11 @@ local function playerCheck()
 
     debugLog("Determined player race: "..playerRace)
     debugLog("Determined player sex: "..playerSex)
+    event.unregister("cellChanged", playerCheck)
 end
 
 local function combatCheck(e)
+    if tes3.worldController.charGenState.value ~= -1 then return end
 
     if playedTaunt == 1 then debugLog("Flag on. Returning.") return end
 
@@ -148,6 +154,7 @@ local function combatCheck(e)
 
 end
 
+event.register("cellChanged", playerCheck)
 event.register("loaded", playerCheck)
 event.register("combatStarted", combatCheck)
 
