@@ -1,6 +1,6 @@
-local modversion = require("tew\\AURA\\version")
+local modversion = require("tew.AURA.version")
 local version = modversion.version
-local config=require("tew\\AURA\\config")
+local config=require("tew.AURA.config")
 
 local function init()
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor

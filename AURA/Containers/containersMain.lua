@@ -1,10 +1,10 @@
-local config = require("tew\\AURA\\config")
+local config = require("tew.AURA.config")
 local common = require("tew.AURA.common")
-local tewLib = require("tew\\tewLib\\tewLib")
+local tewLib = require("tew.tewLib.tewLib")
 local findWholeWords = tewLib.findWholeWords
 
 local flag = 0
-local containersData = require("tew\\AURA\\Containers\\containersData")
+local containersData = require("tew.AURA.Containers.containersData")
 
 local debugLog = common.debugLog
 

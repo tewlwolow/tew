@@ -1,23 +1,19 @@
-local climates = require("tew\\AURA\\Ambient\\Outdoor\\outdoorClimates")
-local config = require("tew\\AURA\\config")
-local modversion = require("tew\\AURA\\version")
-local common=require("tew\\AURA\\common")
-local tewLib = require("tew\\tewLib\\tewLib")
-local sounds = require("tew\\AURA\\sounds")
+local climates = require("tew.AURA.Ambient.Outdoor.outdoorClimates")
+local config = require("tew.AURA.config")
+local common=require("tew.AURA.common")
+local tewLib = require("tew.tewLib.tewLib")
+local sounds = require("tew.AURA.sounds")
 
 local isOpenPlaza=tewLib.isOpenPlaza
---local getInteriorRegion = common.getInteriorRegion
 
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 local moduleInteriorWeather=config.moduleInteriorWeather
 local playSplash=config.playSplash
-local debugLogOn = config.debugLogOn
 local quietChance=config.quietChance/100
 local OAvol = config.OAvol/200
 local splashVol = config.splashVol/200
 local playWindy=config.playWindy
 local playInteriorAmbient=config.playInteriorAmbient
-local version = modversion.version
 
 local moduleName = "outdoor"
 
@@ -201,7 +197,7 @@ local function cellCheck()
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
 			-- Not using sounds lib because we actually want to clear ALL sounds on ref
-			tes3.removeSound{reference=windoor}
+			sounds.removeImmediate{module=moduleName, reference=windoor}
 		end
 		debugLog("Clearing windoors.")
 	end
@@ -219,8 +215,15 @@ local function cellCheck()
 	if not cell.isInterior
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
-		debugLog("Found exterior cell.")
-		weatherParser()
+		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
+		and weatherNow==weatherLast and climateNow==climateLast then
+		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
+			debugLog("Found same cell. Immediately playing last sound.")
+			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
+		else
+			debugLog("Found exterior cell.")
+			weatherParser()
+		end
 	elseif cell.isInterior then
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
 			debugLog("Found interior cell. Removing sounds.")

@@ -1,5 +1,5 @@
-local serviceVoicesData = require("tew\\AURA\\Service Voices\\serviceVoicesData")
-local config = require("tew\\AURA\\config")
+local serviceVoicesData = require("tew.AURA.Service Voices.serviceVoicesData")
+local config = require("tew.AURA.config")
 local common = require("tew.AURA.common")
 local UIvol=config.UIvol/200
 local SVvol=config.SVvol/200

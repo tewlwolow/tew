@@ -4,7 +4,7 @@ local healthTimer, fatigueTimer, magickaTimer, diseaseTimer, blightTimer
 local genderFatigue, genderDisease = "", ""
 local player
 
-local config = require("tew\\AURA\\config")
+local config = require("tew.AURA.config")
 local PChealth = config.PChealth
 local PCfatigue = config.PCfatigue
 local PCmagicka = config.PCmagicka

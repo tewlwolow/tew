@@ -1,7 +1,7 @@
 local data = require("tew.AURA.Ambient.Populated.populatedData")
 local config = require("tew.AURA.config")
 local sounds = require("tew.AURA.sounds")
-local common=require("tew\\AURA\\common")
+local common=require("tew.AURA.common")
 local popVol = config.popVol/200
 
 local time, timeLast, typeCellLast, weatherNow, weatherLast
