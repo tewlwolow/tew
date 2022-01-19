@@ -12,7 +12,7 @@ local function init()
     end
 
     if PCtaunts then
-        print("[AURA "..version.."] Loading file: vitalSigns.lua")
+        print("[AURA "..version.."] Loading file: taunts.lua")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\PC\\taunts.lua")
     end
 
