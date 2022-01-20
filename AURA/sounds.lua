@@ -19,6 +19,8 @@ local quietDir = "q"
 local warmDir = "w"
 local coldDir = "c"
 
+-- Load config
+local config = require("tew.AURA.config")
 
 -- Constants
 local STEP = 0.01
@@ -31,6 +33,8 @@ local clear = {}
 local quiet = {}
 local warm = {}
 local cold = {}
+
+local blocked = {}
 
 local populated = {
     ["ash"] = {},
@@ -88,6 +92,7 @@ local interiorWeather = {
         [9] = nil
     }
 }
+
 local function getWeatherSounds()
 	local ashSound = tes3.getSound("ashstorm")
 	local blightSound = tes3.getSound("Blight")
@@ -145,6 +150,7 @@ local function buildClearSounds()
 									id = objectId,
 									objectType = tes3.objectType.sound,
 									filename = filename,
+									getIfExists = config.safeFetchMode
 								}
 								table.insert(clear[climate][time], sound)
 							end
@@ -171,6 +177,7 @@ local function buildContextSounds(dir, array)
 				id = objectId,
 				objectType = tes3.objectType.sound,
 				filename = filename,
+				getIfExists = config.safeFetchMode
 			}
 			table.insert(array, sound)
 		end
@@ -194,6 +201,7 @@ local function buildPopulatedSounds()
 					id = objectId,
 					objectType = tes3.objectType.sound,
 					filename = filename,
+					getIfExists = config.safeFetchMode
 				}
 				table.insert(populated[populatedType], sound)
 				debugLog("Adding populated file: "..soundfile)
@@ -218,6 +226,7 @@ local function buildInteriorSounds()
 					id = objectId,
 					objectType = tes3.objectType.sound,
 					filename = filename,
+					getIfExists = config.safeFetchMode
 				}
 
 				table.insert(interior[interiorType], sound)
@@ -232,7 +241,7 @@ local function buildTavernSounds()
 	for folder in lfs.dir(AURAdir..interiorDir.."\\tav\\") do
 		for soundfile in lfs.dir(AURAdir..interiorDir.."\\tav\\"..folder) do
 			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
-				local objectId = string.sub("I_tav_"..soundfile, 1, -5)
+				local objectId = string.sub("I_tav_"..folder.."_"..soundfile, 1, -5)
 				local filename = soundDir..interiorDir.."tav\\"..folder.."\\"..soundfile
 				debugLog("Adding tavern file: "..soundfile)
 				debugLog("File id: "..objectId)
@@ -241,6 +250,7 @@ local function buildTavernSounds()
 					id = objectId,
 					objectType = tes3.objectType.sound,
 					filename = filename,
+					getIfExists = config.safeFetchMode
 				}
 				table.insert(interior["tav"][folder], sound)
 			end
@@ -261,6 +271,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["big"][4] = sound
 
@@ -272,6 +283,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["big"][5] = sound
 
@@ -283,6 +295,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["sma"][4] = sound
 
@@ -294,6 +307,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["sma"][5] = sound
 
@@ -305,6 +319,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["ten"][4] = sound
 
@@ -316,6 +331,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
     interiorWeather["ten"][5] = sound
 
@@ -327,6 +343,7 @@ local function buildWeatherSounds()
         id = objectId,
         objectType = tes3.objectType.sound,
         filename = filename,
+		getIfExists = config.safeFetchMode
     }
 
     sound, filename, objectId = nil, nil, nil
@@ -343,6 +360,7 @@ local function buildMisc()
 		id = "splash_lrg",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_lrg.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: splash_lrg")
 
@@ -350,6 +368,7 @@ local function buildMisc()
 		id = "splash_sml",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\splash_sml.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: splash_sml")
 
@@ -357,6 +376,7 @@ local function buildMisc()
 		id = "tew_clap",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\ent_react04a.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_clap")
 
@@ -364,6 +384,7 @@ local function buildMisc()
 		id = "tew_potnpour",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\item\\potnpour.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_potnpour")
 
@@ -371,6 +392,7 @@ local function buildMisc()
 		id = "tew_shield",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\item\\shield.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_shield")
 
@@ -378,6 +400,7 @@ local function buildMisc()
 		id = "tew_blunt",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\item\\bluntOut.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_blunt")
 
@@ -385,6 +408,7 @@ local function buildMisc()
 		id = "tew_longblad",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\item\\longblad.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_longblad")
 
@@ -392,6 +416,7 @@ local function buildMisc()
 		id = "tew_spear",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\item\\spear.wav",
+		getIfExists = config.safeFetchMode
 	}
 	debugLog("Adding misc file: tew_spear")
 end
@@ -400,11 +425,26 @@ end
 --//////////////////////////////////////////////////////////////////////////////////////////////////////--
 ----------------------------------------------------------------------------------------------------------
 
+local function removeBlocked(track)
+	for k, v in pairs(blocked) do
+		if v == track then
+			table.remove(blocked, k)
+		end
+	end
+end
+
+local function isBlocked(track)
+	for k, v in pairs(blocked) do 
+		if v == track then return true end
+	end
+end
+
 -- Play/Stop handling --
 local function fadeIn(ref, volume, track, module)
 	
-	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
+	if isBlocked(track) or not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 	debugLog("Running fade in for: "..track.id)
+	table.insert(blocked, track)
 
 	local TIME = math.ceil((volume/STEP)*TICK)
 	local ITERS = math.ceil(volume/STEP)
@@ -425,6 +465,7 @@ local function fadeIn(ref, volume, track, module)
 
 	local function queuer()
 		modules[module].old = track
+		removeBlocked(track)
 		debugLog("Fade in for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end
 
@@ -446,16 +487,16 @@ end
 
 local function fadeOut(ref, volume, track, module)
 
-	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
+	if isBlocked(track) or not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
 	debugLog("Running fade out for: "..track.id)
-
+	table.insert(blocked, track)
+	
 	local TIME = math.ceil((volume/STEP)*TICK)
 	local ITERS = math.ceil(volume/STEP)
 	local runs = ITERS
 
 	local function fader()
 		local incremented = STEP*runs
-
 		if not tes3.getSoundPlaying{sound = track, reference = ref} then
 			debugLog("Out not playing: "..track.id)
 			return
@@ -468,6 +509,7 @@ local function fadeOut(ref, volume, track, module)
 
 	local function queuer()
 		modules[module].old = track
+		removeBlocked(track)
 		if tes3.getSoundPlaying{sound = track, reference = ref} then tes3.removeSound{sound = track, reference = ref} end
 		debugLog("Fade out for "..track.id.." finished in: "..tostring(TIME).." s.")
 	end

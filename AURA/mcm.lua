@@ -69,6 +69,11 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("moduleMisc"),
         restartRequired=true
     }
+    page:createYesNoButton{
+        label = "Enable safe fetch mode? Turn off if you added your custom sounds. Otherwise keep it on.",
+        variable = registerVariable("safeFetchMode"),
+        restartRequired=true
+    }
 
     local pageOA = template:createPage{label="Outdoor Ambient"}
     pageOA:createCategory{
