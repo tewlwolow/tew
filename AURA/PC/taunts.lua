@@ -143,9 +143,10 @@ local function combatCheck(e)
         playedTaunt = 1
         debugLog("Played battle taunt: "..taunt)
 
-        timer.start{type=timer.real, duration=3, callback=function()
+        timer.start{type=timer.real, duration=5, callback=function()
             playedTaunt = 0
         end}
+
     else
         debugLog("Could not determine battle situation.")
         debugLog(e.target.object.id)
