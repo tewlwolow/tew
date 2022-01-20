@@ -181,7 +181,7 @@ local function cellCheck()
 	if timeNow==timeLast
 	and climateNow==climateLast
 	and weatherNow==weatherLast
-	and (common.checkCellDiff(cell, cellLast)==false
+	and (common.checkCellDiff(cell, cellLast) == false
 	or cell == cellLast) then
 		debugLog("Same conditions. Returning.")
 		return
@@ -196,7 +196,6 @@ local function cellCheck()
 	
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
-			-- Not using sounds lib because we actually want to clear ALL sounds on ref
 			sounds.removeImmediate{module=moduleName, reference=windoor}
 		end
 		debugLog("Clearing windoors.")
@@ -219,9 +218,11 @@ local function cellCheck()
 		and weatherNow==weatherLast and climateNow==climateLast then
 		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 			debugLog("Found same cell. Immediately playing last sound.")
+			sounds.removeImmediate{module = moduleName}
 			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		else
 			debugLog("Found exterior cell.")
+			sounds.remove{module = moduleName}
 			weatherParser()
 		end
 	elseif cell.isInterior then
@@ -231,10 +232,11 @@ local function cellCheck()
 		else
 			if common.getCellType(cell, common.cellTypesSmall)==true
 			or common.getCellType(cell, common.cellTypesTent)==true then
+				debugLog("Found small interior cell. Playing interior loops.")
 				sounds.removeImmediate{module = moduleName}
 				playInteriorSmall()
-				debugLog("Found small interior cell. Playing interior loops.")
 			else
+				debugLog("Found big interior cell. Playing interior loops.")
 				sounds.removeImmediate{module = moduleName}
 				windoors=nil
 				windoors=common.getWindoors(cell)
@@ -243,7 +245,6 @@ local function cellCheck()
 						playInteriorBig(windoor)
 					end
 					interiorTimer:resume()
-					debugLog("Found big interior cell. Playing interior loops.")
 				end
 			end
 		end
