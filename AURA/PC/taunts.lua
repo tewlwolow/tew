@@ -9,6 +9,7 @@ local tVol = config.tVol
 local tauntChance = config.tauntChance
 local common = require("tew.AURA.common")
 local playedTaunt = 0
+local werewolfSounds = {"were moan", "were roar", "were scream", "weregrowl", "werehowl"}
 
 local debugLog = common.debugLog
 
@@ -90,10 +91,24 @@ end
 
 local function combatCheck(e)
     if tes3.worldController.charGenState.value ~= -1 then return end
-
     if playedTaunt == 1 then debugLog("Flag on. Returning.") return end
 
-    local player = tes3.mobilePlayer
+    local player = tes3.mobilePlayer.reference
+    if tes3.mobilePlayer.werewolf then
+        local taunt = werewolfSounds[math.random(1, #werewolfSounds)]
+        tes3.play{
+            sound=taunt,
+            volume=0.9*tVol,
+            reference=player
+        }
+        playedTaunt = 1
+        debugLog("Played werewolf battle taunt: "..taunt)
+
+        timer.start{type=timer.real, duration=7, callback=function()
+            playedTaunt = 0
+        end}
+    end
+
     if e.target == player or e.actor == player
     and playerRace~=nil
     and playerSex ~= nil
