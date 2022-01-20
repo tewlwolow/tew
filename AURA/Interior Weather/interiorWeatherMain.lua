@@ -1,6 +1,6 @@
--- TODO:
---     This file has some awfully complicated logic.
---     Everything needs to be redesigned and streamlined at some point.
+-- TODOS:
+-- Use weatherTransition scalar to determine fade-in?
+-- do not fade in if cell changed, but weather did not
 
 local config = require("tew.AURA.config")
 local common=require("tew.AURA.common")
@@ -10,7 +10,7 @@ local sounds = require("tew.AURA.sounds")
 
 local IWvol = config.IWvol/200
 
-local cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, interiorType, weather, weatherLast
+local cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, thunderTime, interiorType, weather, weatherLast
 local thunArray=common.thunArray
 
 local debugLog = common.debugLog
@@ -18,27 +18,34 @@ local debugLog = common.debugLog
 local moduleName = "interiorWeather"
 
 local function playThunder()
-    local thunVol
+    local thunVol, thunPitch
     if thunRef==nil then return end
-    if thunRef.region then
-        thunVol=0.8
-    else
-        thunVol=0.2
-    end
+    
+    thunVol = (math.random(3,8))/10
+    thunPitch = (math.random(5,15))/10
+
     thunder=thunArray[math.random(1, #thunArray)]
     debugLog("Playing thunder: "..thunder)
-    tes3.playSound{sound=thunder, volume=thunVol, pitch=0.7, reference=thunRef}
-end
+    tes3.playSound{sound=thunder, volume=thunVol, pitch=thunPitch, reference=thunRef}
+    event.trigger("AURA:thunderPlayed", {reference=thunRef})
 
-local function updateThunderBig()
-    debugLog("Updating interior doors for thunders.")
-    local playerPos=tes3.player.position
-    for _, windoor in ipairs(windoors) do
-        if common.getDistance(playerPos, windoor.position) < 2048
-        and windoor~=nil then
-            thunRef=windoor
-            playThunder()
+    thunderTime = math.random(3,20)
+
+    if interiorType == "big" then
+        if thunderTimerBig then
+            thunderTimerBig:pause()
+            thunderTimerBig:cancel()
+            thunderTimerBig = nil
         end
+        thunRef = windoors[math.random(1, #windoors)]
+        thunderTimerBig = timer.start({duration=thunderTime, iterations=1, callback=playThunder, type=timer.real})
+    elseif interiorType == "sma" or interiorType == "ten" then
+        if thunderTimerSmall then
+            thunderTimerSmall:pause()
+            thunderTimerSmall:cancel()
+            thunderTimerSmall = nil
+        end
+        thunderTimerBig = timer.start({duration=thunderTime, iterations=1, callback=playThunder, type=timer.real})
     end
 end
 
@@ -47,26 +54,25 @@ local function playInteriorSmall(cell)
 
     if isOpenPlaza(cell)==true then
         volBoost=0.2
-        thunderTimerSmall:pause()
         debugLog("Found open plaza. Applying volume boost and removing thunder timer.")
     end
 
     if weather == 5 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = interiorType}
+        sounds.play{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = interiorType}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif weather == 4 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = interiorType}
+        sounds.play{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = interiorType}
         debugLog("Playing small interior rain and wind loop.")
     elseif weather == 6 or weather == 7 or weather == 9 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
+        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
+        sounds.play{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
     else
         debugLog("Playing small interior weather loop.")
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
+        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
     end
 end
 
@@ -74,15 +80,14 @@ local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
 
     if weather == 4 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
+        sounds.play{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif weather == 5 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
+        sounds.play{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
         debugLog("Playing big interior storm loop.")
-        thunderTimerBig:resume()
     else
         debugLog("Playing big interior loop.")
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
+        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
     end
 end
 
@@ -99,24 +104,13 @@ end
 local function cellCheck()
 
     IWvol = config.IWvol/200
+    thunderTime = math.random(1,15)
 
     if not interiorTimer then
         interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig, type=timer.real})
         interiorTimer:pause()
     else
         interiorTimer:pause()
-    end
-    if not thunderTimerBig then
-        thunderTimerBig = timer.start({duration=15, iterations=-1, callback=updateThunderBig, type=timer.real})
-        thunderTimerBig:pause()
-    else
-        thunderTimerBig:pause()
-    end
-    if not thunderTimerSmall then
-        thunderTimerSmall = timer.start({duration=15, iterations=-1, callback=playThunder, type=timer.real})
-        thunderTimerSmall:pause()
-    else
-        thunderTimerSmall:pause()
     end
 
     local cell = tes3.getPlayerCell()
@@ -129,6 +123,16 @@ local function cellCheck()
         -- Only need to remove from small types here, the rest is handled automatically in the engine
         sounds.removeImmediate{module = moduleName, type = "small"}
         cellLast = cell
+        if thunderTimerBig then
+            thunderTimerBig:pause()
+            thunderTimerBig:cancel()
+            thunderTimerBig = nil
+        end
+        if thunderTimerBig then
+            thunderTimerSmall:pause()
+            thunderTimerSmall:cancel()
+            thunderTimerSmall = nil
+        end
         return
     end
 
@@ -160,15 +164,6 @@ local function cellCheck()
         return
     end
 
-    -- if windoors~={} and windoors~=nil then
-    --     debugLog("Clearing windoors.")
-    --     for _, windoor in ipairs(windoors) do
-    --        sounds.removeImmediate{module = moduleName, reference=windoor, type = interiorType}
-    --     end
-    --     return
-    -- end
- 
-
     if common.getCellType(cell, common.cellTypesSmall)==true then
         interiorType = "sma"
     elseif common.getCellType(cell, common.cellTypesTent)==true then
@@ -189,7 +184,7 @@ local function cellCheck()
         else
             if weather == 5 then
                 thunRef=cell
-                thunderTimerSmall:resume()
+                thunderTimerSmall = timer.start({duration=thunderTime, iterations=1, callback=playThunder, type=timer.real})
             end
         end
         playInteriorSmall(cell)
@@ -198,7 +193,7 @@ local function cellCheck()
         playInteriorSmall(cell)
         if weather == 5 then
             thunRef=cell
-            thunderTimerSmall:resume()
+            thunderTimerSmall = timer.start({duration=thunderTime, iterations=1, callback=playThunder, type=timer.real})
         end
     else
         interiorType = "big"
@@ -209,9 +204,9 @@ local function cellCheck()
                 playInteriorBig(windoor)
             end
             interiorTimer:resume()
+            thunRef = windoors[math.random(1, #windoors)]
             if weather == 5 then
-                updateThunderBig()
-                thunderTimerBig:resume()
+                thunderTimerBig = timer.start({duration=thunderTime, iterations=1, callback=playThunder, type=timer.real})
             end
         end
     end
