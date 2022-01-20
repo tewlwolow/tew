@@ -1,3 +1,7 @@
+-- Flags to custom events
+-- Unify condition check in one script
+-- Diff between sound building/logic
+
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local sounds = require("tew\\AURA\\sounds")
