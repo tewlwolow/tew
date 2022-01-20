@@ -50,9 +50,9 @@ local function getPopulatedCell(maxCount, cell)
 end
 
 local musicArrays = {
-    ["Imperial"] = {},
-    ["Dark Elf"] = {},
-    ["Nord"] = {},
+    ["imp"] = {},
+    ["dar"] = {},
+    ["nor"] = {},
 }
 
 local function playMusic()
