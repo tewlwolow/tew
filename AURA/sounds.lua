@@ -434,7 +434,7 @@ local function removeBlocked(track)
 end
 
 local function isBlocked(track)
-	for k, v in pairs(blocked) do 
+	for _, v in pairs(blocked) do
 		if v == track then return true end
 	end
 end
@@ -442,7 +442,12 @@ end
 -- Play/Stop handling --
 local function fadeIn(ref, volume, track, module)
 	
-	if isBlocked(track) or not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
+	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
+
+	if isBlocked(track) then
+		timer.delayOneFrame(function() fadeIn(ref, volume, track, module) end)
+	end
+
 	debugLog("Running fade in for: "..track.id)
 	table.insert(blocked, track)
 
@@ -487,7 +492,16 @@ end
 
 local function fadeOut(ref, volume, track, module)
 
-	if isBlocked(track) or not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
+	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
+	
+	-- if isBlocked(track) then
+	-- 	timer.start{callback = function() fadeOut(ref, volume, track, module) end, type = timer.real, iterations = 1, duration = 2}
+	-- end
+
+	if isBlocked(track) then
+		timer.delayOneFrame(function() fadeIn(ref, volume, track, module) end)
+	end
+	
 	debugLog("Running fade out for: "..track.id)
 	table.insert(blocked, track)
 	
