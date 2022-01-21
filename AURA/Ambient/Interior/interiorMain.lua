@@ -205,7 +205,8 @@ local function cellCheck()
         end
     end
 
-    debugLog("No appropriate cell detected.")
+    debugLog("No appropriate cell detected. Removing sounds.")
+    sounds.removeImmediate{module = moduleName}
 end
 
 
