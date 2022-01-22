@@ -57,6 +57,12 @@ this.names = {
         "Tel Uvirith, Omavel's House",
         "Healer",
     },
+    ["cou"] = {
+        "Telvanni Council House",
+        "Redoran Council Hall",
+        "Manor",
+        "Grand Council"
+    },
     ["mag"] = {
         "Mages Guild",
         "Mage's Guild",
