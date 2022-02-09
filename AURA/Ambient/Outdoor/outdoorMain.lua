@@ -215,7 +215,8 @@ local function cellCheck()
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
 		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
-		and weatherNow==weatherLast and climateNow==climateLast then
+		and weatherNow==weatherLast and climateNow==climateLast
+		and not ((weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8)) then
 		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 			debugLog("Found same cell. Immediately playing last sound.")
 			sounds.removeImmediate{module = moduleName, volume = OAvol}
