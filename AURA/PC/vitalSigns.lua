@@ -28,10 +28,10 @@ end
 local function onLoaded()
 
     if tes3.player.object.female then
-        genderFatigue = "fatigue_f.wav"
+        genderFatigue = "fatigue_f.mp3"
         genderDisease = "disease_f.wav"
     else
-        genderFatigue = "fatigue_m.wav"
+        genderFatigue = "fatigue_m.mp3"
         genderDisease = "disease_m.wav"
     end
 
@@ -104,8 +104,11 @@ end
 local function playFatigue()
     if fatigueFlag == 1 then return end
     if not fatigueTimer then
-        fatigueTimer = timer.start{type=timer.real, duration=2.8, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\A\\PC\\"..genderFatigue, volume=0.6*vsVol, reference=player}
+        fatigueTimer = timer.start{type=timer.real, duration=4.3, iterations=-1, callback=function()
+            tes3.say{
+                volume=0.9*vsVol,
+                soundPath="Vo\\tew\\A\\PC\\"..genderFatigue, reference=player
+            }
         end}
     else
         fatigueTimer:resume()
