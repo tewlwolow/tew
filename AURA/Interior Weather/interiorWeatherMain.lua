@@ -58,21 +58,22 @@ local function playInteriorSmall(cell)
     end
 
     if weather == 5 then
-        sounds.play{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol+volBoost, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = "wind"}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif weather == 4 then
-        sounds.play{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = interiorType}
         debugLog("Playing small interior rain and wind loop.")
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol+volBoost, type = interiorType}
     elseif weather == 6 or weather == 7 or weather == 9 then
-        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
-        sounds.play{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol+volBoost, type = "wind"}
     else
         debugLog("Playing small interior weather loop.")
-        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
     end
 end
 
@@ -80,14 +81,14 @@ local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
 
     if weather == 4 then
-        sounds.play{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif weather == 5 then
-        sounds.play{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
         debugLog("Playing big interior storm loop.")
     else
         debugLog("Playing big interior loop.")
-        sounds.play{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
     end
 end
 
