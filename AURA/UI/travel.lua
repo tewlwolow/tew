@@ -24,11 +24,11 @@ local function travelFee(e)
             tes3.playSound{sound="wind trees2", reference=tes3.player}
         elseif class=="Shipmaster" then
             debugLog("Shipmaster travel fee sound played.")
-            tes3.playSound{soundPath="tew\\AURA\\Misc\\serviceboat.wav", volume=0.6*UIvol, reference=tes3.player}
+            tes3.playSound{sound="tew_boat", volume=0.6*UIvol, reference=tes3.player}
             tes3.playSound{sound="Flag", volume=0.7, reference=tes3.player}
         elseif class=="Gondolier" then
             debugLog("Gondolier travel fee sound played.")
-            tes3.playSound{soundPath="tew\\AURA\\Misc\\servicegondola.wav", volume=0.6*UIvol, reference=tes3.player}
+            tes3.playSound{sound="tew_gondola", volume=0.6*UIvol, reference=tes3.player}
         end
     end
 
