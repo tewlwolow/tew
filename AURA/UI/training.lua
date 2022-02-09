@@ -23,8 +23,8 @@ local function onTrainingMenu(e)
                     skillClick:register("mouseDown", function()
                         for skill, sound in pairs(trainingData) do
                             if string.find(skillClick.text, skill) then
-                                debugLog(sound.id.." played.")
                                 tes3.playSound{sound=sound, reference=tes3.player, volume=0.7*UIvol}
+                                debugLog(sound.." played.")
                             end
                         end
                     end)
