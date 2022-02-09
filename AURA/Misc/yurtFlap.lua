@@ -25,17 +25,17 @@ local bearSkins={
 local debugLog = common.debugLog
 
 local function yurtFlap(e)
-    if not e.target.object.objectType == tes3.objectType.door then return end
+    if not (e.target.object.objectType == tes3.objectType.door) then return end
     for _, door in pairs(yurtDoors) do
         if e.target.object.id==door then
-            tes3.playSound({soundPath="tew\\AURA\\Misc\\yurtflap.wav", volume=0.9*vol, pitch=0.8, reference=tes3.player})
+            tes3.playSound{sound="tew_yurt", volume=0.9*vol, pitch=0.8}
             debugLog("Playing yurt flap sound.")
             return
         end
     end
     for _, door in pairs(bearSkins) do
         if e.target.object.id==door then
-            tes3.playSound({soundPath="tew\\AURA\\Misc\\yurtflap.wav", volume=0.9*vol, pitch=0.5, reference=tes3.player})
+            tes3.playSound{sound="tew_yurt", volume=0.9*vol, pitch=0.5}
             debugLog("Playing bear skin sound.")
             return
         end
