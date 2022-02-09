@@ -23,8 +23,8 @@ local coldDir = "c"
 local config = require("tew.AURA.config")
 
 -- Constants
-local STEP = 0.01
-local TICK = 0.1
+local STEP = 0.025
+local TICK = 0.25
 local MAX = 1
 local MIN = 0
 
@@ -49,6 +49,7 @@ local populated = {
 local interior = {
     ["aba"] = {},
     ["alc"] = {},
+	["cou"] = {},
     ["cav"] = {},
     ["clo"] = {},
     ["dae"] = {},
@@ -373,6 +374,30 @@ local function buildMisc()
 	debugLog("Adding misc file: splash_sml")
 
 	tes3.createObject{
+		id = "tew_yurt",
+		objectType = tes3.objectType.sound,
+		filename = "tew\\A\\M\\yurtflap.wav",
+		getIfExists = config.safeFetchMode
+	}
+	debugLog("Adding misc file: tew_yurt")
+
+	tes3.createObject{
+		id = "tew_boat",
+		objectType = tes3.objectType.sound,
+		filename = "tew\\A\\M\\serviceboat.wav",
+		getIfExists = config.safeFetchMode
+	}
+	debugLog("Adding misc file: tew_boat")
+
+	tes3.createObject{
+		id = "tew_gondola",
+		objectType = tes3.objectType.sound,
+		filename = "tew\\A\\M\\servicegondola.wav",
+		getIfExists = config.safeFetchMode
+	}
+	debugLog("Adding misc file: tew_gondola")
+
+	tes3.createObject{
 		id = "tew_clap",
 		objectType = tes3.objectType.sound,
 		filename = "Fx\\envrn\\ent_react04a.wav",
@@ -435,7 +460,7 @@ end
 
 local function isBlocked(track)
 	for _, v in pairs(blocked) do
-		if v == track then return true end
+		if v == track then debugLog("Track blocked: "..track.id) return true end
 	end
 end
 
@@ -445,7 +470,7 @@ local function fadeIn(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
 	if isBlocked(track) then
-		timer.delayOneFrame(function() fadeIn(ref, volume, track, module) end)
+		return
 	end
 
 	debugLog("Running fade in for: "..track.id)
@@ -466,6 +491,7 @@ local function fadeIn(ref, volume, track, module)
 		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
 		debugLog("Adjusting volume in: "..track.id.." | "..tostring(incremented))
 		runs = runs + 1
+		debugLog("In runs: "..runs)
 	end
 
 	local function queuer()
@@ -499,7 +525,7 @@ local function fadeOut(ref, volume, track, module)
 	-- end
 
 	if isBlocked(track) then
-		timer.delayOneFrame(function() fadeIn(ref, volume, track, module) end)
+		return
 	end
 	
 	debugLog("Running fade out for: "..track.id)
@@ -519,6 +545,7 @@ local function fadeOut(ref, volume, track, module)
 		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
 		debugLog("Adjusting volume out: "..track.id.." | "..tostring(incremented))
 		runs = runs - 1
+		debugLog("Out runs: "..runs)
 	end
 
 	local function queuer()
@@ -651,7 +678,7 @@ local function getTrack(options)
 	end
 
 	local newTrack = table[math.random(1, #table)]
-	if modules[options.module].old then
+	if modules[options.module].old and #table > 1 then
 		while newTrack.id == modules[options.module].old.id do
 			newTrack = table[math.random(1, #table)]
 		end
