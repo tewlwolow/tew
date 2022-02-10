@@ -13,7 +13,7 @@ end
 
 local function isAvniDead()
     -- Snatched from Guar Whisperer
-    local ref = tes3.getReference("tew_Avni")
+    local ref = tes3.getReference("tew_avni")
     if not ref.mobile then return false end
     local animState = ref.mobile.actionData.animationAttackState
     local isDead = (
@@ -29,9 +29,9 @@ local function summonAvni()
     debugLog("Starting teleport function.")
     tes3.playSound{
         soundPath = "Vo\\tew\\avni\\tew_avnisummon.mp3",
-        reference = tes3.getReference("tew_Avni")
+        reference = tes3.getReference("tew_avni")
     }
-    local ref = tes3.getReference("tew_Avni")
+    local ref = tes3.getReference("tew_avni")
     local distance = 500
     local isForward = distance >= 0
     local target = tes3.player
@@ -192,7 +192,7 @@ local function showFeedMenu()
 
                 tes3.playSound{
                     soundPath = "Vo\\tew\\avni\\tew_avnieating.mp3",
-                    reference = tes3.getReference("tew_Avni")
+                    reference = tes3.getReference("tew_avni")
                 }
 
                 debugLog("Avni fed.")
@@ -251,7 +251,7 @@ local function showUI(e)
                     menuAvni:destroy()
                     tes3.playSound{
                         soundPath = "Vo\\tew\\avni\\tew_avnifollowing.mp3",
-                        reference = tes3.getReference("tew_Avni")
+                        reference = tes3.getReference("tew_avni")
                         }
                     UICreated = 0
                     end)
@@ -276,14 +276,14 @@ local function showUI(e)
                 stayButton:register( "mouseClick", function()
                     tes3.setAIWander{
                         reference = e.target,
-                        idles = {"default"},
+                        idles = {50, 50, 0, 0, 0, 0, 0, 0},
                         range = 0,
                     }
                     tes3ui.leaveMenuMode()
                     menuAvni:destroy()
                     tes3.playSound{
                     soundPath = "Vo\\tew\\avni\\tew_avnisitting.mp3",
-                    reference = tes3.getReference("tew_Avni")
+                    reference = tes3.getReference("tew_avni")
                     }
                     UICreated = 0
                 end)
@@ -308,14 +308,14 @@ local function showUI(e)
                 restButton:register( "mouseClick", function()
                     tes3.setAIWander{
                         reference = e.target,
-                        idles = {"default"},
+                        idles = {50, 50, 0, 0, 0, 0, 0, 0},
                         range = 300,
                     }
                     tes3ui.leaveMenuMode()
                     menuAvni:destroy()
                     tes3.playSound{
                         soundPath = "Vo\\tew\\avni\\tew_avniarea.mp3",
-                        reference = tes3.getReference("tew_Avni")
+                        reference = tes3.getReference("tew_avni")
                     }
                     UICreated = 0
                 end)
@@ -341,14 +341,14 @@ local function showUI(e)
                 wanderButton:register( "mouseClick", function()
                     tes3.setAIWander{
                         reference = e.target,
-                        idles = {"default"},
+                        idles = {50, 50, 0, 0, 0, 0, 0, 0},
                         range = 2000,
                     }
                     tes3ui.leaveMenuMode()
                     menuAvni:destroy()
                     tes3.playSound{
                         soundPath = "Vo\\tew\\avni\\tew_avniexplore.mp3",
-                        reference = tes3.getReference("tew_Avni")
+                        reference = tes3.getReference("tew_avni")
                     }
                     UICreated = 0
                 end)
