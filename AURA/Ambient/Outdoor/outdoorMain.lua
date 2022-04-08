@@ -85,14 +85,14 @@ local function weatherParser(options)
 	end
 end
 
-local function playInteriorBig(windoor)
+local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
-	if cellLast and not cellLast.isInterior then
+	if (cellLast and not cellLast.isInterior) or playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.35*OAvol, pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.45*OAvol, pitch=0.8}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = 0.35*OAvol, pitch = 0.8, immediate = true}
+		weatherParser{reference = windoor, volume = 0.45*OAvol, pitch = 0.8, immediate = true}
 	end
 end
 
@@ -102,7 +102,7 @@ local function updateInteriorBig()
 	for _, windoor in ipairs(windoors) do
 		if common.getDistance(playerPos, windoor.position) > 2048
 		and windoor~=nil then
-			playInteriorBig(windoor)
+			playInteriorBig(windoor, true)
 		end
 	end
 end
@@ -110,10 +110,10 @@ end
 local function playInteriorSmall()
 	if cellLast and not cellLast.isInterior then
 		debugLog("Playing interior ambient sounds for small interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, volume = 0.3*OAvol, pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, volume = 0.4*OAvol, pitch=0.8}
 	else
 		debugLog("Playing interior ambient sounds for small interiors using new track.")
-		weatherParser{volume = 0.3*OAvol, pitch = 0.8, immediate = true}
+		weatherParser{volume = 0.4*OAvol, pitch = 0.8, immediate = true}
 	end
 end
 
@@ -196,7 +196,7 @@ local function cellCheck()
 	
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
-			sounds.removeImmediate{module=moduleName, reference=windoor, volume = OAvol}
+			sounds.removeImmediate{module=moduleName, reference=windoor}
 		end
 		debugLog("Clearing windoors.")
 	end
@@ -219,26 +219,26 @@ local function cellCheck()
 		and not ((weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8)) then
 		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 			debugLog("Found same cell. Immediately playing last sound.")
-			sounds.removeImmediate{module = moduleName, volume = OAvol}
+			sounds.removeImmediate{module = moduleName}
 			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		else
 			debugLog("Found exterior cell.")
-			sounds.remove{module = moduleName, volume = OAvol}
+			sounds.remove{module = moduleName}
 			weatherParser{volume=OAvol}
 		end
 	elseif cell.isInterior then
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
 			debugLog("Found interior cell. Removing sounds.")
-			sounds.removeImmediate{module = moduleName, volume = OAvol}
+			sounds.removeImmediate{module = moduleName}
 		else
 			if common.getCellType(cell, common.cellTypesSmall)==true
 			or common.getCellType(cell, common.cellTypesTent)==true then
 				debugLog("Found small interior cell. Playing interior loops.")
-				sounds.removeImmediate{module = moduleName, volume = OAvol}
+				sounds.removeImmediate{module = moduleName}
 				playInteriorSmall()
 			else
 				debugLog("Found big interior cell. Playing interior loops.")
-				sounds.removeImmediate{module = moduleName, volume = OAvol}
+				sounds.removeImmediate{module = moduleName}
 				windoors=nil
 				windoors=common.getWindoors(cell)
 				if windoors ~= nil then
@@ -263,7 +263,7 @@ local function positionCheck(e)
 	local element=e.element
 	debugLog("Player underwater. Stopping AURA sounds.")
 	if (not cell.isInterior) or (cell.behavesAsExterior) then
-		sounds.removeImmediate{module = moduleName, volume = OAvol}
+		sounds.removeImmediate{module = moduleName}
 		sounds.playImmediate{module = moduleName, last = true, volume = 0.4*OAvol, pitch=0.5}
 	end
 	if playSplash and moduleAmbientOutdoor then
@@ -272,7 +272,7 @@ local function positionCheck(e)
 	element:register("destroy", function()
 		debugLog("Player above water level. Resetting AURA sounds.")
 		if (not cell.isInterior) or (cell.behavesAsExterior) then
-			sounds.removeImmediate{module = moduleName, volume = OAvol}
+			sounds.removeImmediate{module = moduleName}
 			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		end
 		timer.start({duration=1, callback=cellCheck, type=timer.real})
