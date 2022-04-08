@@ -61,7 +61,8 @@ this.names = {
         "Telvanni Council House",
         "Redoran Council Hall",
         "Manor",
-        "Grand Council"
+        "Grand Council",
+        "Plaza"
     },
     ["mag"] = {
         "Mages Guild",
