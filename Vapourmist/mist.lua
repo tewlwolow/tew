@@ -171,7 +171,7 @@ local function addMist(e)
     local gameHour = tes3.worldController.hour.value
     if ((gameHour >= WtC.sunriseHour + 2 and gameHour <= 24)
     or (gameHour >= 24 and gameHour < WtC.sunsetHour - 1))
-    and not (weatherNow == 2 or weatherNow == 3) then
+    and (weatherNow ~= 2 or weatherNow ~= 3) then
         debugLog("Uneligible time detected. Removing fog.")
         removeMist()
         return
