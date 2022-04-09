@@ -706,13 +706,8 @@ function this.playImmediate(options)
 		modules[options.module].old = modules[options.module].new
 	else
 		local newTrack = getTrack(options)
+		modules[options.module].old = modules[options.module].new
 		modules[options.module].new = newTrack
-
-		if not modules[options.module].old then
-			debugLog("Old track: none")
-		else
-			debugLog("Old track: "..modules[options.module].old.id)
-		end
 
 		debugLog("Immediately playing new track: "..newTrack.id.." for module: "..options.module)
 
@@ -734,13 +729,8 @@ function this.play(options)
 	local volume = options.volume or MAX
 
 	local newTrack = getTrack(options)
+	modules[options.module].old = modules[options.module].new
 	modules[options.module].new = newTrack
-
-	if not modules[options.module].old then
-		debugLog("Old track: none")
-	else
-		debugLog("Old track: "..modules[options.module].old.id)
-	end
 
 	debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
 
