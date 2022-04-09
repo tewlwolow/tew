@@ -476,7 +476,7 @@ local function fadeIn(ref, volume, track, module)
 	debugLog("Running fade in for: "..track.id)
 	table.insert(blocked, track)
 
-	local TIME = math.ceil((volume/STEP)*TICK)
+	local TIME = TICK*volume/STEP
 	local ITERS = math.ceil(volume/STEP)
 	local runs = 1
 
@@ -491,7 +491,7 @@ local function fadeIn(ref, volume, track, module)
 		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
 		debugLog("Adjusting volume in: "..track.id.." | "..tostring(incremented))
 		runs = runs + 1
-		debugLog("In runs: "..runs)
+		debugLog("In runs for track: "..track.id.." : "..runs)
 	end
 
 	local function queuer()
@@ -520,9 +520,9 @@ local function fadeOut(ref, volume, track, module)
 
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
 	
-	-- if isBlocked(track) then
-	-- 	timer.start{callback = function() fadeOut(ref, volume, track, module) end, type = timer.real, iterations = 1, duration = 2}
-	-- end
+	if isBlocked(track) then
+		timer.start{callback = function() fadeOut(ref, volume, track, module) end, type = timer.real, iterations = 2, duration = 3}
+	end
 
 	if isBlocked(track) then
 		return
@@ -531,7 +531,7 @@ local function fadeOut(ref, volume, track, module)
 	debugLog("Running fade out for: "..track.id)
 	table.insert(blocked, track)
 	
-	local TIME = math.ceil((volume/STEP)*TICK)
+	local TIME = TICK*volume/STEP
 	local ITERS = math.ceil(volume/STEP)
 	local runs = ITERS
 
@@ -545,7 +545,7 @@ local function fadeOut(ref, volume, track, module)
 		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
 		debugLog("Adjusting volume out: "..track.id.." | "..tostring(incremented))
 		runs = runs - 1
-		debugLog("Out runs: "..runs)
+		debugLog("Out runs for track: "..track.id.." : "..runs)
 	end
 
 	local function queuer()
@@ -728,6 +728,7 @@ end
 
 -- Supporting kwargs here
 function this.play(options)
+
 
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
