@@ -10,7 +10,14 @@ local moduleName = "populated"
 
 local debugLog = common.debugLog
 
+local blacklistedCells = {"Holamayan"}
+
 local function getPopulatedCell(maxCount, cell)
+    for _, v in ipairs(blacklistedCells) do
+        if string.find(cell.name, v) then
+            debugLog("Cell is blacklisted: "..v..". Returning.") return false
+        end
+    end
     local count = 0
     for npc in cell:iterateReferences(tes3.objectType.NPC) do
         if (npc.object.mobile) and (not npc.object.mobile.isDead) then
