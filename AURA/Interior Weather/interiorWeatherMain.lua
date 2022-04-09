@@ -58,8 +58,8 @@ local function playInteriorSmall(cell)
     end
 
     if weather == 5 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol+volBoost, type = interiorType}
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.7*IWvol+volBoost, type = "wind"}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = IWvol+volBoost, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
         if isOpenPlaza(cell)==true then
@@ -67,10 +67,10 @@ local function playInteriorSmall(cell)
         end
     elseif weather == 4 then
         debugLog("Playing small interior rain and wind loop.")
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol+volBoost, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.8*IWvol+volBoost, type = interiorType}
     elseif weather == 6 or weather == 7 or weather == 9 then
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol+volBoost, type = "wind"}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.4*IWvol+volBoost, type = "wind"}
     else
         debugLog("Playing small interior weather loop.")
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
