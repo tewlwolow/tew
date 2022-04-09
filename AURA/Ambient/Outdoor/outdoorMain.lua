@@ -223,7 +223,7 @@ local function cellCheck()
 			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		else
 			debugLog("Found exterior cell.")
-			sounds.remove{module = moduleName}
+			sounds.remove{module = moduleName, volume=OAvol}
 			weatherParser{volume=OAvol}
 		end
 	elseif cell.isInterior then
