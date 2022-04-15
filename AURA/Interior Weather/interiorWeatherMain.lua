@@ -58,7 +58,7 @@ local function playInteriorSmall(cell)
     end
 
     if weather == 5 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = IWvol+volBoost, type = interiorType}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.8*IWvol+volBoost, type = interiorType}
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
         thunRef=cell
         debugLog("Playing small interior storm and thunder loops.")
