@@ -16,7 +16,6 @@ local function travelFee(e)
     local npcId=tes3ui.getServiceActor(e)
     local class=npcId.reference.object.class.id
     local function playFee()
-        tes3.removeSound()
         tes3.playSound{sound="Item Gold Up", volume=0.9*UIvol, reference=tes3.player}
         if class=="Caravaner" then
             debugLog("Caravaner travel fee sound played.")
