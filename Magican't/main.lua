@@ -1,0 +1,30 @@
+local fillbarVisible = false
+
+local function setFillbar(bool)
+    local menuMulti = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    local magicIcon = menuMulti:findChild(tes3ui.registerID("MenuMulti_magic_fill"))
+
+    if magicIcon then
+        magicIcon.children[1].visible = bool
+        magicIcon:updateLayout()
+    end
+
+    fillbarVisible = bool
+end
+
+local function fillbarCheck()
+    local spellCost = tes3.mobilePlayer.currentSpell.magickaCost
+    local currentMagicka = tes3.mobilePlayer.magicka.current
+
+    local bool = spellCost < currentMagicka
+
+    if fillbarVisible ~= bool then
+        setFillbar(bool)
+    end
+end
+
+local function init()
+    event.register("simulate", fillbarCheck)
+end
+
+event.register("initialized", init)
