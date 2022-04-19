@@ -16,7 +16,9 @@ local function fillbarCheck()
     local spellCost = tes3.mobilePlayer.currentSpell.magickaCost
     local currentMagicka = tes3.mobilePlayer.magicka.current
 
-    local bool = spellCost < currentMagicka
+    if (not spellCost) or (not currentMagicka) then return end
+
+    local bool = spellCost <= currentMagicka
 
     if fillbarVisible ~= bool then
         setFillbar(bool)
@@ -24,7 +26,7 @@ local function fillbarCheck()
 end
 
 local function init()
-    event.register("simulate", fillbarCheck)
+    event.register("enterFrame", fillbarCheck)
 end
 
 event.register("initialized", init)
