@@ -61,14 +61,15 @@ local function playInteriorSmall(cell)
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.8*IWvol+volBoost, type = interiorType}
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
         thunRef=cell
-        debugLog("Playing small interior storm and thunder loops.")
+        debugLog("Playing small interior storm, wind and thunder loops.")
         if isOpenPlaza(cell)==true then
             thunRef=nil
         end
     elseif weather == 4 then
-        debugLog("Playing small interior rain and wind loop.")
+        debugLog("Playing small interior rain loop.")
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.8*IWvol+volBoost, type = interiorType}
     elseif weather == 6 or weather == 7 or weather == 9 then
+        debugLog("Playing small interior ash, blight or blizzard loop.")
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.7, type = interiorType}
         sounds.playImmediate{weather = weather, module = moduleName, volume = 0.4*IWvol+volBoost, type = "wind"}
     else
