@@ -37,7 +37,6 @@ local function reColour(weatherNow, time)
                     local materialProperty = node:getProperty(0x2)
                     if materialProperty then
                         local fogColour
-                        --materialProperty.alpha = 0.0
                         if time == "dawn" then
                             fogColour = {weather.fogSunriseColor.r, weather.fogSunriseColor.g, weather.fogSunriseColor.b}
                         elseif time == "day" then
@@ -192,7 +191,7 @@ local function addCloud(e)
 
                 debugLog("First level cloud added.")
 
-                if config.CLOUD_DENSITY/200 > math.random() then
+                if config.CLOUD_DENSITY/120 > math.random() then
 
                     debugLog("Second check passed.")
 
@@ -205,7 +204,7 @@ local function addCloud(e)
                         object = cloud,
                         position = mistPosition,
                         cell = cell,
-                        scale = math.random(4,6)/10
+                        scale = math.random(5,8)/10
                     }
 
                     debugLog("Second level cloud added.")
@@ -263,7 +262,7 @@ local function init()
         objectType = tes3.objectType.static,
         id = "tew_cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
-        getIfExists = true
+        getIfExists = false
     }
 
 end

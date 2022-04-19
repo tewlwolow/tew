@@ -65,7 +65,7 @@ local function reColour(weatherNow, time)
                     if materialProperty then
                         local fogColour
                         debugLog("Time: "..time)
-                        --materialProperty.alpha = 0.0
+
                         if time == "dawn" then
                             fogColour = {weather.fogSunriseColor.r, weather.fogSunriseColor.g, weather.fogSunriseColor.b}
                         elseif time == "day" then
@@ -201,7 +201,6 @@ local function addMist(e)
     end
 
     -- Do not readd mist if it's already there but do recolour it
-
     for stat in cell:iterateReferences(tes3.objectType.static) do
         if stat.id == "tew_vapour"
         and not stat.deleted then
@@ -254,9 +253,9 @@ local function addMist(e)
                     statPosition.z = statPosition.z + math.random(100,500)
                     mistPosition = statPosition
 
-                    statOrientation.x = statOrientation.x + math.random(-5, 10)
-                    statOrientation.y = statOrientation.y + math.random(-5, 10)
-                    statOrientation.z = statOrientation.z + math.random(-5, 10)
+                    statOrientation.x = statOrientation.x + math.random(-50, -20)
+                    statOrientation.y = statOrientation.y + math.random(-15, -20)
+                    statOrientation.z = statOrientation.z + math.random(-15, -20)
                     mistOrientation = statOrientation
 
                     tes3.createReference{
@@ -296,7 +295,6 @@ local function moveMist()
                 stat.sceneNode.translation.z = stat.sceneNode.translation.z + math.random(10,40)/MOVE_SPEED
 
                 stat.sceneNode:update()
-
             end
         end
     end
@@ -325,7 +323,7 @@ local function init()
         objectType = tes3.objectType.static,
         id = "tew_vapour",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        getIfExists = true
+        getIfExists = false
     }
 
 
