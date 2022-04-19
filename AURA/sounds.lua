@@ -188,7 +188,7 @@ end
 -- Populated --
 local function buildPopulatedSounds()
 	mwse.log("\n")
-	debugLog("|---------------------- Building populated weather table. ----------------------|\n")
+	debugLog("|---------------------- Building populated sounds table. ----------------------|\n")
 	for populatedType, _ in pairs(populated) do
 		for soundfile in lfs.dir(AURAdir..popDir..populatedType) do
 			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
@@ -289,7 +289,7 @@ local function buildWeatherSounds()
     interiorWeather["big"][5] = sound
 
     filename = soundDir..wDir.."\\sma\\r.wav"
-    objectId = "tew_s_rainheavy"
+    objectId = "tew_s_rain"
     debugLog("File id: "..objectId)
     debugLog("Filename: "..filename.."\n---------------")
     sound = tes3.createObject{
@@ -301,7 +301,7 @@ local function buildWeatherSounds()
     interiorWeather["sma"][4] = sound
 
     filename = soundDir..wDir.."\\sma\\rh.wav"
-    objectId = "tew_s_rain"
+    objectId = "tew_s_rainheavy"
     debugLog("File id: "..objectId)
     debugLog("Filename: "..filename.."\n---------------")
     sound = tes3.createObject{
@@ -313,7 +313,7 @@ local function buildWeatherSounds()
     interiorWeather["sma"][5] = sound
 
     filename = soundDir..wDir.."\\ten\\r.wav"
-    objectId = "tew_t_rainheavy"
+    objectId = "tew_t_rain"
     debugLog("File id: "..objectId)
     debugLog("Filename: "..filename.."\n---------------")
     sound = tes3.createObject{
@@ -325,7 +325,7 @@ local function buildWeatherSounds()
     interiorWeather["ten"][4] = sound
 
     filename = soundDir..wDir.."\\ten\\rh.wav"
-    objectId = "tew_t_rain"
+    objectId = "tew_t_rainheavy"
     debugLog("File id: "..objectId)
     debugLog("Filename: "..filename.."\n---------------")
     sound = tes3.createObject{
@@ -595,7 +595,6 @@ function this.removeImmediate(options)
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
-		and modules[options.module].new ~= modules[options.module].old
 	then
 		tes3.removeSound{sound = modules[options.module].new, reference = ref}
 		debugLog(modules[options.module].new.id.." removed.")
@@ -618,7 +617,6 @@ function this.remove(options)
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
-		and modules[options.module].new ~= modules[options.module].old
 	then
 		fadeOut(ref, volume, modules[options.module].new, options.module)
 	end
