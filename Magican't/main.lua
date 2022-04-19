@@ -13,6 +13,9 @@ local function setFillbar(bool)
 end
 
 local function fillbarCheck()
+
+    if (not tes3.mobilePlayer) then return end
+
     local spellCost = tes3.mobilePlayer.currentSpell.magickaCost
     local currentMagicka = tes3.mobilePlayer.magicka.current
 
