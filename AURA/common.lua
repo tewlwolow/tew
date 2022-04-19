@@ -28,6 +28,7 @@ this.cellTypesSmall={
 	"s12_v_plaza",
 	"rp_v_arena",
 	"in_nord_house_04",
+	"in_nord_house_02",
 	"t_rea_set_i_house_"
 }
 
