@@ -150,11 +150,13 @@ local function cellCheck()
         return
     end
 
+    sounds.removeImmediate{module = moduleName}
+
     -- First check if the cell type can be determined by architecture
     local typeCell = getTypeCell(5, cell)
     if typeCell ~= nil then
         debugLog("Found appropriate cell. Playing interior ambient sound.")
-        sounds.play{module = moduleName, type = typeCell, volume = intVol}
+        sounds.playImmediate{module = moduleName, type = typeCell, volume = intVol}
         return
     end
 
@@ -164,7 +166,7 @@ local function cellCheck()
         for _, pattern in ipairs(taverns) do
             if string.find(cell.name, pattern) then
                 debugLog("Found appropriate tavern. Playing interior ambient sound for race type: "..race)
-                sounds.play{module = moduleName, race = race, volume = intVol}
+                sounds.playImmediate{module = moduleName, race = race, volume = intVol}
                 return
             end
         end
@@ -178,7 +180,7 @@ local function cellCheck()
         for _, pattern in pairs(nameTable) do
             if findWholeWords(cell.name, pattern) then
                 debugLog("Found appropriate cell. Playing interior ambient sound for interior type: "..cellType)
-                sounds.play{module = moduleName, type = cellType, volume = intVol}
+                sounds.playImmediate{module = moduleName, type = cellType, volume = intVol}
                 return
             end
         end
@@ -200,7 +202,7 @@ local function cellCheck()
             race = string.sub(race, 1, 3):lower()
             debugLog("Found appropriate tavern. Playing interior ambient sound for race type: "..race)
 
-            sounds.play{module = moduleName, race = race, volume = intVol}
+            sounds.playImmediate{module = moduleName, race = race, volume = intVol}
             return
         end
     end
