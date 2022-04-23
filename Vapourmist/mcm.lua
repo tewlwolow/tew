@@ -36,7 +36,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createSlider{
-        label = "Changes max cloud amount in a cell. Default = 20.\nRequires changing cell or weather. Cloud amount",
+        label = "Changes max cloud amount in a cell. Default = "..tostring(config.CLOUD_LIMIT)..".\nRequires changing cell or weather. Cloud amount",
         min = 0,
         max = 100,
         step = 1,
@@ -45,7 +45,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createSlider{
-        label = "Changes % cloud density. Default = 10%.\nRequires changing cell or weather. Cloud density %",
+        label = "Changes % cloud density. Default = "..tostring(config.CLOUD_DENSITY).."%.\nRequires changing cell or weather. Cloud density %",
         min = 0,
         max = 100,
         step = 1,
@@ -54,12 +54,30 @@ local template = mwse.mcm.createTemplate{
     }
 
     page:createSlider{
-        label = "Changes cloud speed. Default = 20.\nCloud speed",
+        label = "Changes cloud speed. Default = "..tostring(config.MOVE_SPEED)..".\nCloud speed",
         min = 0,
         max = 100,
         step = 1,
         jump = 10,
         variable=registerVariable("MOVE_SPEED")
+    }
+
+    page:createSlider{
+        label = "Changes max mist amount in a cell. Default = "..tostring(config.MIST_LIMIT)..".\nRequires changing cell or weather. Cloud amount",
+        min = 0,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("MIST_LIMIT")
+    }
+
+    page:createSlider{
+        label = "Changes % mist density. Default = "..tostring(config.MIST_DENSITY).."%.\nRequires changing cell or weather. Cloud density %",
+        min = 0,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("MIST_DENSITY")
     }
 
 
