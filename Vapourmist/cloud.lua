@@ -161,7 +161,7 @@ local function weatherCheck(e)
     for _, i in ipairs(BLOCKED_WEATHERS) do
         if to == i then
             debugLog(module, "Weather: "..to..". Yeeting clouds.")
-            common.moveYeet(module)
+            -- common.moveYeet(module)
         end
     end
 
