@@ -10,6 +10,7 @@ local data = require("tew\\Vapourmist\\data")
 -- Check what weather we're transitioning to
 local function weatherChangedCheck(e, weather, immediate)
 
+    -- Resolve weather
     local to
     if e then
         to = e.to.index
@@ -17,9 +18,11 @@ local function weatherChangedCheck(e, weather, immediate)
         to = weather
     end
 
+    -- Get game hour and time
     local gameHour = tes3.worldController.hour.value
     local time = fogService.getTime(gameHour)
 
+    -- Iterate through fog types
     for _, fogType in pairs(data.fogTypes) do
         debugLog("Checking weather: "..to.." for "..fogType.name.." fog.")
 
@@ -61,20 +64,10 @@ local function weatherChangedCheck(e, weather, immediate)
                 return
             end
         end
-
         fogService.addFog(options)
 
     end
 
-end
-
-local function isWeatherBlocked(weather, blockedWeathers)
-    for _, i in ipairs(blockedWeathers) do
-        if weather == i then
-            return true
-        end
-    end
-    return false
 end
 
 -- Controls conditions and fog spawning/removing
@@ -95,6 +88,7 @@ local function conditionCheck(e)
     -- Check weather
     local weatherNow = tes3.getRegion({useDoors=true}).weather.index
 
+    -- Iterate through fog types
     for _, fogType in pairs(data.fogTypes) do
 
         -- Log fog type
@@ -152,7 +146,7 @@ local function conditionCheck(e)
 
         -- Bust out if we're not in the right weather
         debugLog("Weather: "..weatherNow..". Running weather check.")
-        if isWeatherBlocked(weatherNow, fogType.blockedWeathers) then
+        if fogService.isWeatherBlocked(weatherNow, fogType.blockedWeathers) then
             weatherChangedCheck(nil, weatherNow, false)
         else -- I wish there was a continue statement in lua
             -- At this point we're good to go

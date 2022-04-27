@@ -48,6 +48,15 @@ function this.isCellFogged(activeCell, type)
 	return false
 end
 
+function this.isWeatherBlocked(weather, blockedWeathers)
+    for _, i in ipairs(blockedWeathers) do
+        if weather == i then
+            return true
+        end
+    end
+    return false
+end
+
 -- Determine fog position
 function this.getFogPosition(activeCell, height)
 	local average = 0
