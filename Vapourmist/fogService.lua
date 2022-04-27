@@ -7,7 +7,6 @@ local VERSION = version.version
 local WtC = tes3.worldController.weatherController
 
 -- TODO: lerp colours
--- TODO: calculate fog height for static position, clamp if > height
 
 -- Print debug messages
 function this.debugLog( string)
