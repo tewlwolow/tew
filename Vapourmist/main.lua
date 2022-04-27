@@ -1,33 +1,28 @@
 -- Vapourmist by tewlwolow
 -- Automatic mist/fog/vapour based on time, location, and weather
 
---[[ TODO:
-* diff between spawning hours - movement
-]]
-
 -->>>---------------------------------------------------------------------------------------------<<<--
 
 local version = require("tew\\Vapourmist\\version")
 local VERSION = version.version
+local data = require("tew\\Vapourmist\\data")
 
-local config = require("tew\\Vapourmist\\config")
+local function loadData()
+    local player = tes3.player
+    if player then
+        player.data.vapourmist = {}
+        player.data.vapourmist.cells = {}
+
+        for _, fogType in pairs(data.fogTypes) do
+            player.data.vapourmist.cells[fogType.name] = {}
+        end
+    end
+end
 
 local function init()
-
-    mwse.log("[Vapourmist] Version "..VERSION.." initialised.")
-    local mistOn = config.mistOn
-    local cloudsOn = config.cloudsOn
-
-    if mistOn then
-        mwse.log("[Vapourmist "..VERSION.."] Loading file: mist.lua.")
-        dofile("Data Files\\MWSE\\mods\\tew\\Vapourmist\\mist.lua")
-    end
-
-    if cloudsOn then
-        mwse.log("[Vapourmist "..VERSION.."] Loading file: clouds.lua.")
-        dofile("Data Files\\MWSE\\mods\\tew\\Vapourmist\\cloud.lua")
-    end
-
+    mwse.log("[Vapourmist] Version "..VERSION.." initialised.") 
+    dofile("Data Files\\MWSE\\mods\\tew\\Vapourmist\\conditionController.lua")
+    event.register("loaded", loadData)
 end
 
 -- Registers MCM menu --

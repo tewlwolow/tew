@@ -24,61 +24,6 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("debugLogOn"),
         restartRequired=true
     }
-    page:createYesNoButton{
-        label = "Enable low-hanging mist at dawn, dusk, night and in overcast/foggy weather?",
-        variable = registerVariable("mistOn"),
-        restartRequired=true
-    }
-    page:createYesNoButton{
-        label = "Enable high altitude clouds?",
-        variable = registerVariable("cloudsOn"),
-        restartRequired=true
-    }
-
-    page:createSlider{
-        label = "Changes max cloud amount in a cell. Default = "..tostring(config.CLOUD_LIMIT)..".\nRequires changing cell or weather. Cloud amount",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable=registerVariable("CLOUD_LIMIT")
-    }
-
-    page:createSlider{
-        label = "Changes % cloud density. Default = "..tostring(config.CLOUD_DENSITY).."%.\nRequires changing cell or weather. Cloud density %",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable=registerVariable("CLOUD_DENSITY")
-    }
-
-    page:createSlider{
-        label = "Changes cloud speed. Default = "..tostring(config.MOVE_SPEED)..".\nCloud speed",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable=registerVariable("MOVE_SPEED")
-    }
-
-    page:createSlider{
-        label = "Changes max mist amount in a cell. Default = "..tostring(config.MIST_LIMIT)..".\nRequires changing cell or weather. Cloud amount",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable=registerVariable("MIST_LIMIT")
-    }
-
-    page:createSlider{
-        label = "Changes % mist density. Default = "..tostring(config.MIST_DENSITY).."%.\nRequires changing cell or weather. Cloud density %",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable=registerVariable("MIST_DENSITY")
-    }
 
 
 template:saveOnClose(configPath, config)
