@@ -1,5 +1,3 @@
--- TODO: check race and gender at the end of chargen
-
 local config = require("tew.AURA.config")
 local playerRace, playerSex
 local serviceVoicesData = require("tew.AURA.Service Voices.serviceVoicesData")
