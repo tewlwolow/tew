@@ -111,6 +111,8 @@ local function onMusicSelection()
                 race = "Dark Elf"
             end
 
+            race = string.sub(race, 1, 3):lower()
+
             while musicPath == lastMusicPath do
                 musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
             end
