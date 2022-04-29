@@ -127,8 +127,8 @@ local function cellCheck()
 	end
 
 	local region
-	
-	OAvol = config.OAvol/200
+
+	OAvol = config.OAvol/200	
 	
 	debugLog("Cell changed or time check triggered. Running cell check.")
 	
@@ -141,7 +141,7 @@ local function cellCheck()
 	end
 	
 	local cell = tes3.getPlayerCell()
-	if cell == nil then debugLog("No cell detected. Returning.") return end
+	if (not cell) then debugLog("No cell detected. Returning.") return end
 	
 	if cell.isInterior then
 		region = tes3.getRegion({useDoors=true}).name
@@ -178,20 +178,25 @@ local function cellCheck()
 	debugLog("Weather: "..weatherNow)
 	
 	-- Transition filter chunk --
-	if timeNow==timeLast
-	and climateNow==climateLast
-	and weatherNow==weatherLast
-	and (common.checkCellDiff(cell, cellLast) == false
-	or cell == cellLast) then
+	if
+		timeNow==timeLast
+		and climateNow==climateLast
+		and weatherNow==weatherLast
+		and (common.checkCellDiff(cell, cellLast) == false
+			or cell == cellLast) then
+
 		debugLog("Same conditions. Returning.")
 		return
-	elseif timeNow~=timeLast and weatherNow==weatherLast then
-		if (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
-			debugLog("Same conditions. Returning.")
+	elseif
+		timeNow~=timeLast
+		and weatherNow==weatherLast
+		and (common.checkCellDiff(cell, cellLast) == false) 
+		and (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
+
+			debugLog("Time changed but weather didn't. Returning.")
 			return
-		end
 	end
-	
+		
 	debugLog("Different conditions. Resetting sounds.")
 	
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
@@ -201,16 +206,6 @@ local function cellCheck()
 		debugLog("Clearing windoors.")
 	end
 	
-	-- TODO: move the check to sounds.lua maybe?
-	-- Seems too complicated for new implementation. Consider dropping.
-	-- Playing appropriate track per conditions detected --
-	-- if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
-	-- and weatherNow==weatherLast and climateNow==climateLast then
-	-- 	-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
-	-- 	debugLog("Found same cell. Immediately playing last sound.")
-	-- 	sounds.playImmediate{last = true, volume = OAvol}
-	-- end
-
 	if not cell.isInterior
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
@@ -251,6 +246,7 @@ local function cellCheck()
 		end
 	end
 		
+	-- Setting last values --
 	timeLast=timeNow
 	climateLast=climateNow
 	weatherLast=weatherNow
