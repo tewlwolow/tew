@@ -6,7 +6,7 @@ this.fogTypes = {
     cloud = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
-        height = 3200,
+        height = 3800,
         isAvailable = function(_, _)
             return true
         end,
@@ -37,7 +37,7 @@ this.fogTypes = {
     mist = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 30,
+        height = -100,
         isAvailable = function(gameHour, weather)
             if ((gameHour >= WtC.sunriseHour + 2 and gameHour <= 24)
             or (gameHour >= 24 and gameHour < WtC.sunsetHour - 1))
