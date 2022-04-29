@@ -129,7 +129,13 @@ local function lerpFogColours(e)
 			local type = string.sub(vfx.name, 5)
 
 			local particleSystem = vfx:getObjectByName("MistEffect")
-			local colorModifier = particleSystem.controller.particleModifiers
+			local controller = particleSystem.controller
+			local colorModifier = controller.particleModifiers
+		
+			if vfx.name == "tew_cloud" then
+				controller.speed =  math.lerp(lerp.speed.from, lerp.speed.from, lerp.time)
+			end
+
 			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
 			local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
 			local deltaB = math.lerp(lerp[type].colours.from.b, lerp[type].colours.to.b, lerp.time)
@@ -146,7 +152,7 @@ local function lerpFogColours(e)
 			materialProperty.diffuse = {deltaR, deltaG, deltaB}
 			materialProperty.ambient = {deltaR, deltaG, deltaB}
 
-			lerp.time = lerp.time + (e.delta * 0.0012)
+			lerp.time = lerp.time + (e.delta * 0.002)
 			particleSystem:updateNodeEffects()
 		
 		end
@@ -195,7 +201,8 @@ end
 
 function this.reColourImmediate(vfx, fogColour)
 	local particleSystem = vfx:getObjectByName("MistEffect")
-	local colorModifier = particleSystem.controller.particleModifiers
+	local controller = particleSystem.controller
+	local colorModifier = controller.particleModifiers
 
 	for _, key in ipairs(colorModifier.colorData.keys) do
 		key.color.r, key.color.g, key.color.b = table.unpack(fogColour)
@@ -207,57 +214,89 @@ function this.reColourImmediate(vfx, fogColour)
 	materialProperty.diffuse = fogColour
 	materialProperty.ambient = fogColour
 
+	if vfx.name == "tew_cloud" then
+		local speed
+		if WtC.nextWeather then
+			speed = WtC.nextWeather.cloudsSpeed or 10
+		else
+			speed = WtC.currentWeather.cloudsSpeed or 10
+		end
+		controller.speed = speed
+	end
+
 	particleSystem:updateNodeEffects()
 end
 
 -- Recolours fog nodes with slightly modified current fog colour by modifying colour keys in NiColorData and material property values
 function this.reColour(options)
+	if simulateRegistered then this.debugLog("Removing lerp.") lerp.time = 1 return end
 
-	if simulateRegistered then this.debugLog("Lerping in progress. Fuck off.") return end
+	timer.delayOneFrame(function()
 
-	local fromTime = options.fromTime
-	local toTime = options.toTime
-	local colours = options.colours
-	local type = options.type
-	local fromWeather = options.fromWeather
-	local toWeather = options.toWeather
+		local fromTime = options.fromTime
+		local toTime = options.toTime
+		local colours = options.colours
+		local type = options.type
+		local fromWeather = options.fromWeather
+		local toWeather = options.toWeather
 
-    this.debugLog("Running colour change for "..type)
+		this.debugLog("Running colour change for "..type)
 
-	if (fromTime == toTime) and (fromWeather == toWeather) then
-		this.debugLog("Same conditions. Recolouring immediately.")
-		local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-		for _, vfx in pairs(vfxRoot.children) do
-			if not vfx then break end
-	
-			if vfx.name == "tew_"..type then
-				local fogColour = this.getOutputColours(toTime, toWeather, colours)
-				this.reColourImmediate(vfx, fogColour)
+		if (fromTime == toTime) and (fromWeather == toWeather) then
+			this.debugLog("Same conditions. Recolouring immediately.")
+			local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+			for _, vfx in pairs(vfxRoot.children) do
+				if not vfx then break end
+		
+				if vfx.name == "tew_"..type then
+					local fogColour = this.getOutputColours(toTime, toWeather, colours)
+					this.reColourImmediate(vfx, fogColour)
+				end
+			end
+		else
+			this.debugLog("Different conditions. Recolouring "..type.." over time.")
+
+			-- TODO: nuke
+			this.debugLog("From time: "..fromTime)
+			this.debugLog("To time: "..toTime)
+			this.debugLog("From weather: "..fromWeather.index)
+			this.debugLog("To weather: "..toWeather.index)
+
+			local fromColour = this.getOutputColours(fromTime, fromWeather, colours)
+			local toColour = this.getOutputColours(toTime, toWeather, colours)
+
+			if lerp then return end
+			
+			lerp = {}
+			lerp.time = WtC.transitionScalar or 0
+
+			local fromSpeed, toSpeed
+			if WtC.nextWeather then
+				fromSpeed = WtC.nextWeather.cloudsSpeed or 10
+			else
+				fromSpeed = WtC.currentWeather.cloudsSpeed or 10
+				toSpeed = fromSpeed
+			end	
+			lerp.speed = {
+				from = fromSpeed,
+				to = toSpeed
+			}
+
+			for _, fogType in pairs(data.fogTypes) do
+				lerp[fogType.name] = {}
+				lerp[fogType.name].colours = {from = fromColour, to = toColour}
+				lerp[fogType.name].name = fogType.name
+				this.debugLog("Prepared lerp for type "..fogType.name)
+			end
+
+			if not simulateRegistered then
+				simulateRegistered = true
+				event.register("simulate", lerpFogColours)
+				this.debugLog("Lerp registered for "..type)
 			end
 		end
-	else
-		this.debugLog("Different conditions. Recolouring "..type.." over time.")
-		local fromColour = this.getOutputColours(fromTime, fromWeather, colours)
-		local toColour = this.getOutputColours(toTime, toWeather, colours)
 
-		if lerp then return end
-		
-		lerp = {}
-		lerp.time = WtC.transitionScalar or 0
-		for _, fogType in pairs(data.fogTypes) do
-			lerp[fogType.name] = {}
-			lerp[fogType.name].colours = {from = fromColour, to = toColour}
-			lerp[fogType.name].name = fogType.name
-			this.debugLog("Prepared lerp for type "..fogType.name)
-		end
-
-		if not simulateRegistered then
-			simulateRegistered = true
-			event.register("simulate", lerpFogColours)
-			this.debugLog("Lerp registered for "..type)
-		end
-	end
-
+	end)
 end
 
 -- Adds fog to the cell
@@ -291,6 +330,15 @@ function this.addFog(options)
 
 			vfxRoot:attachChild(fogMesh, true)
 
+			if type == "cloud" then
+				for _, vfx in pairs(vfxRoot.children) do
+					if not vfx then break end
+					local particleSystem = vfx:getObjectByName("MistEffect")
+					local controller = particleSystem.controller
+					controller.speed = (WtC.currentWeather.cloudsSpeed*10) or 10
+				end
+			end
+
 			fogMesh:update()
 			fogMesh:updateProperties()
 			fogMesh:updateNodeEffects()
@@ -302,6 +350,7 @@ function this.addFog(options)
 		end
 	end
 
+
 	this.reColour{
 		fromTime = fromTime,
 		toTime = toTime,
@@ -310,6 +359,7 @@ function this.addFog(options)
 		colours = colours,
 		type = type,
 	}
+
 
 end
 
@@ -341,21 +391,25 @@ end
 function this.removeFogImmediate(options)
     this.debugLog("Immediately removing fog of type: "..options.type)
 
+	if lerp then lerp.time = 1 end
+
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+
+	for _, vfx in pairs(vfxRoot.children) do
+		if not vfx then break end
+		if vfx.name == "tew_"..options.type then
+			local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
+			this.reColourImmediate(vfx, fogColour)
+		end
+	end
+
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..options.type then
 			vfxRoot:detachChild(node)
 		end
 	end
 
-	for _, vfx in pairs(vfxRoot.children) do
-		if not vfx then break end
 
-		if vfx.name == "tew_"..options.type then
-			local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
-			this.reColourImmediate(vfx, fogColour)
-		end
-	end
 end
 
 return this
