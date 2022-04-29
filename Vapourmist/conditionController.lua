@@ -6,40 +6,38 @@ local fogService = require("tew\\Vapourmist\\fogService")
 local debugLog = fogService.debugLog
 local data = require("tew\\Vapourmist\\data")
 
+local fromTime, toTime, fromWeather, toWeather
 
 -- Check what weather we're transitioning to
-local function weatherChangedCheck(e, weather, immediate)
+local function weatherChangedCheck(e, immediate)
 
-    -- Resolve weather
-    local to
-    if e then
-        to = e.to.index
-    else
-        to = weather
-    end
+   fromWeather = WtC.currentWeather
+   toWeather = WtC.nextWeather or fromWeather
 
     -- Get game hour and time
     local gameHour = tes3.worldController.hour.value
-    local time = fogService.getTime(gameHour)
+    toTime = fogService.getTime(gameHour)
 
     -- Iterate through fog types
     for _, fogType in pairs(data.fogTypes) do
-        debugLog("Checking weather: "..to.." for "..fogType.name.." fog.")
+        debugLog("Checking weather: "..toWeather.index.." for "..fogType.name.." fog.")
 
         local options = {
             mesh = fogType.mesh,
             type = fogType.name,
             height = fogType.height,
             colours = fogType.colours,
-            weather = to,
-            time = time,
+            fromWeather = fromWeather,
+            toWeather = toWeather,
+            fromTime = fromTime,
+            toTime = toTime,
         }
 
         -- Check if we're transitioning to a weather that warrants post-rain mist
         if fogType.wetWeathers then
             for _, i in ipairs(fogType.wetWeathers) do
-                if to == i then
-                    debugLog("Weather: "..to..". Adding post-rain mist.")
+                if toWeather.index == i then
+                    debugLog("Weather: "..toWeather.index..". Adding post-rain mist.")
                     fogService.addFog(options)
                     break
                 end
@@ -48,17 +46,27 @@ local function weatherChangedCheck(e, weather, immediate)
 
         -- Check if we're transitioning to a weather that should be inactive
         for _, i in ipairs(fogType.blockedWeathers) do
-            if to == i then
+            if toWeather.index == i then
                 if immediate then
-                    debugLog("Weather: "..to..". Removing fogs immediately.")
-                    fogService.removeFogImmediate(fogType)
-                else
-                    debugLog("Weather: "..to..". Removing fogs with fade out")
-                    fogService.removeFog{
-                        type = fogType.name,
-                        weather = to,
-                        time = time,
+                    debugLog("Weather: "..toWeather.index..". Removing fogs immediately.")
+
+                    fogService.removeFogImmediate{
+                        fromTime = fromTime,
+                        toTime = toTime,
+                        fromWeather = fromWeather,
+                        toWeather = toWeather,
                         colours = fogType.colours,
+                        type = type,
+                    }
+                else
+                    debugLog("Weather: "..toWeather.index..". Removing fogs with fade out")
+                    fogService.removeFog{
+                        fromTime = fromTime,
+                        toTime = toTime,
+                        fromWeather = fromWeather,
+                        toWeather = toWeather,
+                        colours = fogType.colours,
+                        type = fogType.name,
                     }
                 end
                 return
@@ -84,9 +92,12 @@ local function conditionCheck(e)
 
     -- Get game hour and time type
     local gameHour = tes3.worldController.hour.value
-    local time = fogService.getTime(gameHour)
+    toTime = fogService.getTime(gameHour)
+    if not fromTime then fromTime = toTime end
+
     -- Check weather
-    local weatherNow = tes3.getRegion({useDoors=true}).weather.index
+    fromWeather =  WtC.currentWeather
+    toWeather = WtC.nextWeather or fromWeather
 
     -- Iterate through fog types
     for _, fogType in pairs(data.fogTypes) do
@@ -101,8 +112,10 @@ local function conditionCheck(e)
                 debugLog("INT/EXT transition. Removing fog.")
                 fogService.removeFog{
                     type = fogType.name,
-                    weather = weatherNow,
-                    time = time,
+                    fromWeather = fromWeather,
+                    toWeather = toWeather,
+                    fromTime = fromTime,
+                    toTime = toTime,
                     colours = fogType.colours,
                 }
                 return
@@ -113,10 +126,12 @@ local function conditionCheck(e)
         if (fogService.isCellFogged(cell, fogType.name)) then
             debugLog("Cell is fogged. Recolouring.")
             fogService.reColour{
+                fromTime = fromTime,
+                toTime = toTime,
+                fromWeather = fromWeather,
+                toWeather = toWeather,
                 colours = fogType.colours,
-                weather = weatherNow,
-                time = time,
-                type = fogType.name
+                type = fogType.name,
             }
         else
             debugLog("Cell is not fogged. Removing all.")
@@ -124,13 +139,15 @@ local function conditionCheck(e)
         end
 
         -- Check whether we can add the fog at this time
-        if not (fogType.isAvailable(gameHour, weatherNow)) then
+        if not (fogType.isAvailable(gameHour, fromWeather)) then
             debugLog("Fog: "..fogType.name.." not available.")
             fogService.removeFog{
-                type = fogType.name,
-                weather = weatherNow,
-                time = time,
+                fromTime = fromTime,
+                toTime = toTime,
+                fromWeather = fromWeather,
+                toWeather = toWeather,
                 colours = fogType.colours,
+                type = fogType.name,
             }
             return
         end
@@ -140,14 +157,16 @@ local function conditionCheck(e)
             type = fogType.name,
             height = fogType.height,
             colours = fogType.colours,
-            weather = weatherNow,
-            time = time,
+            fromWeather = fromWeather,
+            toWeather = toWeather,
+            fromTime = fromTime,
+            toTime = toTime,
         }
 
         -- Bust out if we're not in the right weather
-        debugLog("Weather: "..weatherNow..". Running weather check.")
-        if fogService.isWeatherBlocked(weatherNow, fogType.blockedWeathers) then
-            weatherChangedCheck(nil, weatherNow, false)
+        debugLog("Weather: "..fromWeather.index..". Running weather check.")
+        if fogService.isWeatherBlocked(fromWeather, fogType.blockedWeathers) then
+            weatherChangedCheck(nil, false)
         else -- I wish there was a continue statement in lua
             -- At this point we're good to go
             -- Prepare options
@@ -158,6 +177,8 @@ local function conditionCheck(e)
         end
     end
 
+    fromWeather = toWeather
+    fromTime = toTime
 end
 
 -- A timer needed to check for time changes
@@ -172,9 +193,9 @@ local function init()
     WtC = tes3.worldController.weatherController
     event.register("loaded", function() debugLog("--Loaded--") onLoaded() end)
     event.register("cellChanged", function() debugLog("--cellChanged--") conditionCheck() end)
-    event.register("weatherChangedImmediate", function(e) debugLog("--weatherChangedImmediate--") weatherChangedCheck(e, nil, true) end)
-    event.register("weatherTransitionImmediate", function(e) debugLog("--weatherTransitionImmediate--") weatherChangedCheck(e, nil, true) end)
-    event.register("weatherTransitionStarted", function(e) debugLog("--weatherTransitionStarted--") weatherChangedCheck(e, nil, false) end)
+    event.register("weatherChangedImmediate", function(e) debugLog("--weatherChangedImmediate--") weatherChangedCheck(e, true) end)
+    event.register("weatherTransitionImmediate", function(e) debugLog("--weatherTransitionImmediate--") weatherChangedCheck(e, true) end)
+    event.register("weatherTransitionStarted", function(e) debugLog("--weatherTransitionStarted--") weatherChangedCheck(e, false) end)
 end
 
 -- Cuz SOLID, encapsulation blah blah blah

@@ -4,15 +4,21 @@ local config = require("tew\\Vapourmist\\config")
 local version = require("tew\\Vapourmist\\version")
 local VERSION = version.version
 
-local WtC = tes3.worldController.weatherController
+local data = require("tew\\Vapourmist\\data")
 
--- TODO: lerp colours
+local WtC = tes3.worldController.weatherController
+local lerp
+local simulateRegistered = false
 
 -- Print debug messages
-function this.debugLog( string)
+function this.debugLog(string)
     if config.debugLogOn then
-        string = tostring(string)
-        mwse.log("[Vapourmist "..VERSION.."] "..string.format("%s", string))
+		string = tostring(string)
+		local info = debug.getinfo(2, "Sl")
+        local module = info.short_src:match("^.+\\(.+).lua$")
+        local prepend = ("[Vapourmist.%s.%s:%s]:"):format(VERSION, module, info.currentline)
+        local aligned = ("%-36s"):format(prepend)
+        mwse.log(aligned.." -- "..string.format("%s", string))
     end
 end
 
@@ -50,7 +56,7 @@ end
 
 function this.isWeatherBlocked(weather, blockedWeathers)
     for _, i in ipairs(blockedWeathers) do
-        if weather == i then
+        if weather.index == i then
             return true
         end
     end
@@ -77,7 +83,6 @@ function this.getFogPosition(activeCell, height)
 	end
 
 	return (average/denom) + height
-
 end
 
 -- Determine time of day
@@ -100,62 +105,158 @@ function this.switchFog(bool, type)
 		if node and node.name == "tew_"..type then
 			for _, fog in pairs(node.children) do
 				if fog.name == "Mist Emitter" then
-					fog.appCulled = bool
-                    fog:update()
-					this.debugLog("Fog switched to "..tostring(bool))
+					if fog.appCulled ~= bool then
+						fog.appCulled = bool
+						fog:update()
+						this.debugLog("Appculling switched to "..tostring(bool).." for "..type.." fog.")
+					end
 				end
 			end
 		end
 	end
 end
 
-function this.getMGEFogColour(time, weather)
-	if time == "dawn" then
-		return weather.fogSunriseColor
-	elseif time == "day" then
-		return weather.fogDayColor
-	elseif time == "dusk" then
-		return weather.fogSunsetColor
-	elseif time == "night" then
-		return weather.fogNightColor
+-- Apply colour changes in simulate
+local function lerpFogColours(e)
+	this.debugLog("Lerping fog colours.")
+
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+	for _, vfx in pairs(vfxRoot.children) do
+		if not vfx then break end
+
+		if string.find(vfx.name, "tew_") then
+
+			local type = string.sub(vfx.name, 5)
+
+			local particleSystem = vfx:getObjectByName("MistEffect")
+			local colorModifier = particleSystem.controller.particleModifiers
+			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
+			local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
+			local deltaB = math.lerp(lerp[type].colours.from.b, lerp[type].colours.to.b, lerp.time)
+
+			for _, key in ipairs(colorModifier.colorData.keys) do
+				key.color.r = deltaR
+				key.color.g = deltaG
+				key.color.b = deltaB
+			end
+
+			local materialProperty = particleSystem.materialProperty
+			materialProperty.emissive = {deltaR, deltaG, deltaB}
+			materialProperty.specular = {deltaR, deltaG, deltaB}
+			materialProperty.diffuse = {deltaR, deltaG, deltaB}
+			materialProperty.ambient = {deltaR, deltaG, deltaB}
+
+			lerp.time = lerp.time + (e.delta * 0.0012)
+			particleSystem:updateNodeEffects()
+		
+		end
 	end
+
+	if (lerp.time >= 1) then
+		if simulateRegistered then
+			event.unregister("simulate", lerpFogColours)
+			simulateRegistered = false
+			this.debugLog("Lerp finished")
+			for _, vfx in pairs(vfxRoot.children) do
+				if not vfx then break end
+				if string.find(vfx.name, "tew_") then
+					local type = string.sub(vfx.name, 5)
+					this.reColourImmediate(vfx, lerp[type].colours.to)
+				end
+			end
+			lerp = nil
+		end
+	end
+
+end
+
+-- Calculate output colours per time and weather
+function this.getOutputColours(time, weather, colours)
+
+	local weatherColour
+
+	if time == "dawn" then
+		weatherColour = weather.fogSunriseColor
+	elseif time == "day" then
+		weatherColour = weather.fogDayColor
+	elseif time == "dusk" then
+		weatherColour = weather.fogSunsetColor
+	elseif time == "night" then
+		weatherColour = weather.fogNightColor
+	end
+
+	return {
+		r = weatherColour.r + colours[time].r,
+		g = weatherColour.g + colours[time].g,
+		b = weatherColour.b + colours[time].b
+	}
+
+end
+
+function this.reColourImmediate(vfx, fogColour)
+	local particleSystem = vfx:getObjectByName("MistEffect")
+	local colorModifier = particleSystem.controller.particleModifiers
+
+	for _, key in ipairs(colorModifier.colorData.keys) do
+		key.color.r, key.color.g, key.color.b = table.unpack(fogColour)
+	end
+
+	local materialProperty = particleSystem.materialProperty
+	materialProperty.emissive = fogColour
+	materialProperty.specular = fogColour
+	materialProperty.diffuse = fogColour
+	materialProperty.ambient = fogColour
+
+	particleSystem:updateNodeEffects()
 end
 
 -- Recolours fog nodes with slightly modified current fog colour by modifying colour keys in NiColorData and material property values
 function this.reColour(options)
 
-	local time = options.time
+	if simulateRegistered then this.debugLog("Lerping in progress. Fuck off.") return end
+
+	local fromTime = options.fromTime
+	local toTime = options.toTime
 	local colours = options.colours
 	local type = options.type
-	local weather = WtC.weathers[options.weather+1]
+	local fromWeather = options.fromWeather
+	local toWeather = options.toWeather
 
-    this.debugLog("Running colour change.")
+    this.debugLog("Running colour change for "..type)
 
-    local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-
-	for _, vfx in pairs(vfxRoot.children) do
-        if not vfx then break end
-
-		if vfx.name == "tew_"..type then
-            local particleSystem = vfx:getObjectByName("MistEffect")
-            local colorModifier = particleSystem.controller.particleModifiers
-
-			local fogColour = this.getMGEFogColour(time, weather)
-			fogColour = {fogColour.r + colours[time].r, fogColour.g + colours[time].g, fogColour.b + colours[time].b}
-
-			for _, key in ipairs(colorModifier.colorData.keys) do
-				key.color.r, key.color.g, key.color.b = table.unpack(fogColour)
+	if (fromTime == toTime) and (fromWeather == toWeather) then
+		this.debugLog("Same conditions. Recolouring immediately.")
+		local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+		for _, vfx in pairs(vfxRoot.children) do
+			if not vfx then break end
+	
+			if vfx.name == "tew_"..type then
+				local fogColour = this.getOutputColours(toTime, toWeather, colours)
+				this.reColourImmediate(vfx, fogColour)
 			end
+		end
+	else
+		this.debugLog("Different conditions. Recolouring "..type.." over time.")
+		local fromColour = this.getOutputColours(fromTime, fromWeather, colours)
+		local toColour = this.getOutputColours(toTime, toWeather, colours)
 
-            local materialProperty = particleSystem.materialProperty
-            materialProperty.emissive = fogColour
-            materialProperty.specular = fogColour
-            materialProperty.diffuse = fogColour
-            materialProperty.ambient = fogColour
+		if lerp then return end
+		
+		lerp = {}
+		lerp.time = WtC.transitionScalar or 0
+		for _, fogType in pairs(data.fogTypes) do
+			lerp[fogType.name] = {}
+			lerp[fogType.name].colours = {from = fromColour, to = toColour}
+			lerp[fogType.name].name = fogType.name
+			this.debugLog("Prepared lerp for type "..fogType.name)
+		end
 
-            particleSystem:updateNodeEffects()
-	    end
-    end
+		if not simulateRegistered then
+			simulateRegistered = true
+			event.register("simulate", lerpFogColours)
+			this.debugLog("Lerp registered for "..type)
+		end
+	end
 
 end
 
@@ -164,8 +265,10 @@ function this.addFog(options)
 
     local mesh = options.mesh
 	local type = options.type
-	local weather = options.weather
-	local time = options.time
+	local fromTime = options.fromTime
+	local toTime = options.toTime
+	local fromWeather = options.fromWeather
+	local toWeather = options.toWeather
 	local height = options.height
 	local colours = options.colours
 
@@ -200,10 +303,12 @@ function this.addFog(options)
 	end
 
 	this.reColour{
-		time = time,
+		fromTime = fromTime,
+		toTime = toTime,
+		fromWeather = fromWeather,
+		toWeather = toWeather,
 		colours = colours,
-		weather = weather,
-		type = type
+		type = type,
 	}
 
 end
@@ -212,16 +317,20 @@ end
 function this.removeFog(options)
     this.debugLog("Removing fog of type: "..options.type)
 
-	local time = options.time
-	local colours = options.colours
-	local weather = options.weather
 	local type = options.type
+	local fromTime = options.fromTime
+	local toTime = options.toTime
+	local fromWeather = options.fromWeather
+	local toWeather = options.toWeather
+	local colours = options.colours
 
 	this.reColour{
-		time = time,
+		fromTime = fromTime,
+		toTime = toTime,
+		fromWeather = fromWeather,
+		toWeather = toWeather,
 		colours = colours,
-		weather = weather,
-		type = type
+		type = type,
 	}
 
 	this.switchFog(true, type)
@@ -229,17 +338,24 @@ function this.removeFog(options)
 end
 
 -- Removes fog from view by detaching - without fade out
-function this.removeFogImmediate(type)
-    this.debugLog("Immediately removing fog of type: "..type)
+function this.removeFogImmediate(options)
+    this.debugLog("Immediately removing fog of type: "..options.type)
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
-		if node and node.name == "tew_"..type then
+		if node and node.name == "tew_"..options.type then
 			vfxRoot:detachChild(node)
 		end
 	end
 
-	this.purgeFoggedCells(type)
+	for _, vfx in pairs(vfxRoot.children) do
+		if not vfx then break end
+
+		if vfx.name == "tew_"..options.type then
+			local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
+			this.reColourImmediate(vfx, fogColour)
+		end
+	end
 end
 
 return this
