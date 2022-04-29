@@ -56,7 +56,7 @@ local function weatherChangedCheck(e, immediate)
                         fromWeather = fromWeather,
                         toWeather = toWeather,
                         colours = fogType.colours,
-                        type = type,
+                        type = fogType.name,
                     }
                 else
                     debugLog("Weather: "..toWeather.index..". Removing fogs with fade out")
