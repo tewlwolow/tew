@@ -135,7 +135,14 @@ local function conditionCheck(e)
             }
         else
             debugLog("Cell is not fogged. Removing all.")
-            fogService.removeFogImmediate(fogType.name)
+            fogService.removeFogImmediate{
+                fromTime = fromTime,
+                toTime = toTime,
+                fromWeather = fromWeather,
+                toWeather = toWeather,
+                colours = fogType.colours,
+                type = fogType.name,
+            }
         end
 
         -- Check whether we can add the fog at this time
