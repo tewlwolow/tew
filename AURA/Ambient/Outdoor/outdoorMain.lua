@@ -120,9 +120,9 @@ end
 local function cellCheck()
 
 	-- Gets messy otherwise
-	if tes3.mobilePlayer.waiting then
-		debugLog("Player waiting. Returning.")
-		timer.delayOneFrame(function() cellCheck() end)
+	local mp = tes3.mobilePlayer
+	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+		debugLog("Player waiting or travelling. Returning.")
 		return
 	end
 
@@ -184,15 +184,13 @@ local function cellCheck()
 		and weatherNow==weatherLast
 		and (common.checkCellDiff(cell, cellLast) == false
 			or cell == cellLast) then
-
 		debugLog("Same conditions. Returning.")
 		return
 	elseif
 		timeNow~=timeLast
 		and weatherNow==weatherLast
-		and (common.checkCellDiff(cell, cellLast) == false) 
-		and (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
-
+		and (common.checkCellDiff(cell, cellLast) == false)
+		and ((weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8)) then
 			debugLog("Time changed but weather didn't. Returning.")
 			return
 	end
@@ -293,5 +291,6 @@ event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
 event.register("weatherTransitionFinished", cellCheck, {priority=-160})
+event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
 event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
