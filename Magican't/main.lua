@@ -12,15 +12,19 @@ local function setFillbar(bool)
     fillbarVisible = bool
 end
 
+-- Necrolesian, you're my hero.
 local function fillbarCheck()
 
-    if (not tes3.mobilePlayer) then return end
+    local mp = tes3.mobilePlayer
+    if not mp then return end
 
-    local spellCost = tes3.mobilePlayer.currentSpell.magickaCost
-    local currentMagicka = tes3.mobilePlayer.magicka.current
+    local spell = mp.currentSpell
+    if not spell then return end
 
-    if (not spellCost) or (not currentMagicka) then return end
+    local spellCost = spell.magickaCost
+    if not spellCost then return end
 
+    local currentMagicka = mp.magicka.current
     local bool = spellCost <= currentMagicka
 
     if fillbarVisible ~= bool then
