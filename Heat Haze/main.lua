@@ -123,7 +123,7 @@ local function startHaze()
         return
     end
 
-    local WtC=tes3.getWorldController().weatherController
+    local WtC=tes3.worldController.weatherController
     local currentWeather = WtC.currentWeather
     local weatherNow
 
