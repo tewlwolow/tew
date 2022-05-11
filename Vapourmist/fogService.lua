@@ -79,10 +79,10 @@ function this.isWeatherBlocked(weather, blockedWeathers)
 end
 
 -- Determine fog position
-function this.getFogPosition(activeCell, height)
+local function getFogPosition(activeCell, height)
 	local average = 0
 	local denom = 0
-	for  stat in activeCell:iterateReferences() do
+	for stat in activeCell:iterateReferences() do
 		average = average + stat.position.z
 		denom = denom + 1
 	end
@@ -100,16 +100,30 @@ function this.getFogPosition(activeCell, height)
 	return (average/denom) + height
 end
 
+-- Determine fog position
+local function getInteriorCellPosition(cell)
+	local pos = {x = 0, y = 0, z = 0}
+	local denom = 0
+
+	for stat in cell:iterateReferences() do
+		pos.x = pos.x + stat.position.x
+		pos.y = pos.y + stat.position.y
+		pos.z = pos.z + stat.position.z
+		denom = denom + 1
+	end
+
+	return {x = pos.x/denom, y = pos.y/denom, z = pos.z/denom}
+end
+
 -- Determine time of day
 function this.getTime(gameHour)
-	-- this.debugLog("======================="..WtC.sunriseHour.." "..WtC.sunsetHour.." "..gameHour)
-	if (gameHour >= WtC.sunriseHour - 0.2) and (gameHour < WtC.sunriseHour + 1.8) then
+	if (gameHour >= WtC.sunriseHour - 0.3) and (gameHour < WtC.sunriseHour + 1.8) then
 		return "dawn"
 	elseif (gameHour >= WtC.sunriseHour + 1.8) and (gameHour < WtC.sunsetHour - 1.2) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 1.2) and (gameHour < WtC.sunsetHour + 1.5) then
+	elseif (gameHour >= WtC.sunsetHour - 1.2) and (gameHour < WtC.sunsetHour + 1.2) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 1.5) or (gameHour < WtC.sunriseHour - 0.2) then
+	elseif (gameHour >= WtC.sunsetHour + 1.2) or (gameHour < WtC.sunriseHour - 0.3) then
 		return "night"
 	end
 end
@@ -135,7 +149,7 @@ end
 -- Apply colour changes in simulate
 local function lerpFogColours(e)
 
-	this.debugLog("Lerping fog colours. Time: "..lerp.time)
+	-- this.debugLog("Lerping fog colours. Time: "..lerp.time)
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	
@@ -150,8 +164,12 @@ local function lerpFogColours(e)
 			local controller = particleSystem.controller
 			local colorModifier = controller.particleModifiers
 		
-			if vfx.name == "tew_cloud" then
+			if lerp.speed then
 				controller.speed = math.lerp(lerp.speed.from, lerp.speed.to, lerp.time)
+			end
+
+			if lerp.angle then
+				controller.planarAngle = math.lerp(lerp.angle.from, lerp.angle.to, lerp.time)
 			end
 
 			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
@@ -198,6 +216,8 @@ end
 -- Calculate output colours per time and weather
 function this.getOutputColours(time, weather, colours)
 
+	this.debugLog("Getting output colours. Time: "..time.." Weather: "..weather.index)
+
 	local weatherColour
 
 	if time == "dawn" then
@@ -211,15 +231,15 @@ function this.getOutputColours(time, weather, colours)
 	end
 
 	return {
-		r = math.clamp(weatherColour.r + colours[time].r, 0.0, 1.0),
-		g = math.clamp(weatherColour.g + colours[time].g, 0.0, 1.0),
-		b = math.clamp(weatherColour.b + colours[time].b, 0.0, 1.0)
+		r = math.clamp(weatherColour.r + colours[time].r, 0.0, 0.9),
+		g = math.clamp(weatherColour.g + colours[time].g, 0.0, 0.9),
+		b = math.clamp(weatherColour.b + colours[time].b, 0.0, 0.9)
 	}
 
 end
 
 function this.reColourImmediate(vfx, fogColour)
-	this.debugLog("Recolouring immediate. Fog colour: "..fogColour.r.." "..fogColour.g.." "..fogColour.b)
+	this.debugLog("Recolouring immediately. Fog colour: "..fogColour.r.." "..fogColour.g.." "..fogColour.b)
 
 	local particleSystem = vfx:getObjectByName("MistEffect")
 	local controller = particleSystem.controller
@@ -242,10 +262,13 @@ function this.reColourImmediate(vfx, fogColour)
 		else
 			speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
 		end
+		local windVector = WtC.windVelocityCurrWeather:normalized()
+		controller.planarAngle = windVector.y * math.pi * 2
 		controller.speed = speed
 	end
 
 	particleSystem:updateNodeEffects()
+	this.debugLog("Fog recoloured.")
 end
 
 -- Recolours fog nodes with slightly adjusted current fog colour by modifying colour keys in NiColorData and material property values
@@ -278,7 +301,7 @@ function this.reColour(options)
 	else
 		this.debugLog("Different conditions. Recolouring "..type.." over time.")
 
-		-- TODO: nuke
+		-- TODO: nuke?
 		this.debugLog("From time: "..fromTime)
 		this.debugLog("To time: "..toTime)
 		this.debugLog("From weather: "..fromWeather.index)
@@ -292,19 +315,35 @@ function this.reColour(options)
 			lerp.time = WtC.transitionScalar
 		else
 			lerp.time = 0
-		end	
-
-		local toSpeed
-		local fromSpeed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
-		if WtC.nextWeather then
-			toSpeed =  math.max(WtC.nextWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
-		else
-			toSpeed = fromSpeed
 		end
-		lerp.speed = {
-			from = fromSpeed,
-			to = toSpeed
-		}
+
+		if type == "tew_cloud" then
+			local toSpeed
+			local fromSpeed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+
+			local windVector = WtC.windVelocityCurrWeather:normalized()
+			local toAngle
+			local fromAngle = windVector.y * math.pi * 2
+
+			if WtC.nextWeather then
+				local windVectorNext = WtC.windVelocityNextWeather:normalized()
+				toAngle = windVectorNext.y * math.pi * 2
+				toSpeed =  math.max(WtC.nextWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+			else
+				toSpeed = fromSpeed
+				toAngle = fromAngle
+			end
+
+			lerp.speed = {
+				from = fromSpeed,
+				to = toSpeed
+			}
+			
+			lerp.angle = {
+				from = fromAngle,
+				to = toAngle
+			}
+		end
 
 		for _, fogType in pairs(data.fogTypes) do
 			lerp[fogType.name] = {}
@@ -339,7 +378,7 @@ function this.addFog(options)
 	this.debugLog("Checking if we can add fog: "..type)
 
 	for _, activeCell in ipairs(tes3.getActiveCells()) do
-		if not this.isCellFogged(activeCell, type) then
+		if not this.isCellFogged(activeCell, type) and not activeCell.isInterior then
 			this.debugLog("Cell is not fogged. Adding "..type..".")
 
 			local fogMesh = tes3.loadMesh(mesh):clone()
@@ -348,7 +387,7 @@ function this.addFog(options)
 			fogMesh.translation = tes3vector3.new(
 				8192 * activeCell.gridX + 4096,
 				8192 * activeCell.gridY + 4096,
-				this.getFogPosition(activeCell, height)
+				getFogPosition(activeCell, height)
 			)
 
 			vfxRoot:attachChild(fogMesh, true)
@@ -359,11 +398,20 @@ function this.addFog(options)
 				if vfx.name == "tew_"..options.type then
 					local particleSystem = vfx:getObjectByName("MistEffect")
 					local controller = particleSystem.controller
-					controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
 					controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
-					local fogColour = this.getOutputColours(toTime, toWeather, colours)
-					this.reColourImmediate(vfx, fogColour)
+
+					if vfx.name == "tew_cloud" then
+
+						controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+						
+						local windVector = WtC.windVelocityCurrWeather:normalized()
+						controller.planarAngle = windVector.y * math.pi * 2
+
+					end
+					
 				end
+				local fogColour = this.getOutputColours(toTime, toWeather, colours)
+				this.reColourImmediate(vfx, fogColour)
 			end
 
 
@@ -430,6 +478,68 @@ function this.removeFogImmediate(options)
 	end
 
 	this.purgeFoggedCells(options.type)
+end
+
+local function getInteriorColour(cell, colours)
+
+	return {
+		r = math.clamp(cell.ambientColor.r + colours.r, 0.2, 0.5),
+		g = math.clamp(cell.ambientColor.g + colours.g, 0.26, 0.5),
+		b = math.clamp(cell.ambientColor.b + colours.b, 0.3, 0.5)
+	}
+
+end
+
+function this.addInteriorFog(options)
+
+	this.debugLog("Adding interior fog.")
+
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+
+	local mesh = options.mesh
+	local type = options.type
+	local height = options.height
+	local colours = options.colours
+	local cell = options.cell
+
+	if not (this.isCellFogged(cell, type)) then
+		this.debugLog("Interior cell is not fogged. Adding "..type..".")
+
+		local fogMesh = tes3.loadMesh(mesh):clone()
+
+		local pos = getInteriorCellPosition(cell)
+
+		fogMesh:clearTransforms()
+		fogMesh.translation = tes3vector3.new(
+			pos.x,
+			pos.y,
+			pos.z + height
+		)
+
+		vfxRoot:attachChild(fogMesh, true)
+
+		for _, vfx in pairs(vfxRoot.children) do
+			if not vfx then break end
+			if vfx.name == "tew_"..type then
+				local particleSystem = vfx:getObjectByName("MistEffect")
+				local controller = particleSystem.controller
+				controller.initialSize = table.choice(data.interiorFog.initialSize)
+			end
+			local fogColour = getInteriorColour(cell, colours)
+			this.reColourImmediate(vfx, fogColour)
+		end
+
+		fogMesh:update()
+		fogMesh:updateProperties()
+		fogMesh:updateNodeEffects()
+
+		this.updateData(cell, type)
+	else
+		this.debugLog("Cell is already fogged. Showing fog.")
+		this.switchFog(false, type)
+	end
+
+
 end
 
 return this

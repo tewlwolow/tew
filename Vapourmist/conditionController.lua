@@ -8,6 +8,26 @@ local data = require("tew\\Vapourmist\\data")
 
 local fromTime, toTime, fromWeather, toWeather, fromRegion, toRegion
 
+-- Check for interior cells
+local function interiorCheck(cell)
+
+	debugLog("Starting interior check.")
+
+	if data.interiorFog.isAvailable(cell) and not fogService.isCellFogged(cell, data.interiorFog.name) then
+
+		local options = {
+			mesh = data.interiorFog.mesh,
+			type = data.interiorFog.name,
+			height = data.interiorFog.height,
+			colours = data.interiorFog.colours,
+			cell = cell,
+		}
+
+		fogService.addInteriorFog(options)
+
+	end
+
+end
 
 -- Controls conditions and fog spawning/removing
 local function conditionCheck(e)
@@ -18,6 +38,10 @@ local function conditionCheck(e)
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
 		debugLog("Player waiting or travelling. Returning.")
+		timer.start{
+			duration = 1,
+			callback = conditionCheck,
+		}
 		return
 	end
 
@@ -26,8 +50,7 @@ local function conditionCheck(e)
 	-- Sanity check
 	if not cell then debugLog("No cell. Returning.") return end
 
-	-- TODO: remove this once we have a proper interior cell solution
-	if (cell.isInterior) and not (cell.behavesAsExterior) then debugLog("Interior cell. Returning.") return end
+	if (cell.isInterior) and not (cell.behavesAsExterior) then interiorCheck(cell) return end
 
 	-- Get game hour and time type
 	local gameHour = tes3.worldController.hour.value
@@ -35,11 +58,8 @@ local function conditionCheck(e)
 	if not fromTime then fromTime = toTime end
 
 	-- Check weather
-	fromWeather =  WtC.currentWeather
-	toWeather = WtC.nextWeather or fromWeather
-
-	local windVector = WtC.windVelocityCurrWeather:normalized()
-	debug.log("Wind vector: " .. windVector.x .. ", " .. windVector.y .. ", " .. windVector.z)
+	toWeather = WtC.nextWeather or WtC.currentWeather
+	if not fromWeather then fromWeather = toWeather end
 
 	-- Check region
 	toRegion = cell.region
@@ -50,21 +70,12 @@ local function conditionCheck(e)
 	debugLog("Game hour: "..gameHour)
 	debugLog("Region: "..fromRegion.id.." -> "..toRegion.id)
 
-
 	-- Iterate through fog types
 	for _, fogType in pairs(data.fogTypes) do
 
 		-- Log fog type
 		debugLog("Fog type: "..fogType.name)
-
-		if fromWeather.index == toWeather.index
-		and fromTime == toTime
-		and fromRegion.id == toRegion.id
-		and (fogService.isCellFogged(cell, fogType.name)) then
-			debugLog("Conditions are the same. Returning.")
-			break
-		end
-
+		
 		local options = {
 			mesh = fogType.mesh,
 			type = fogType.name,
@@ -76,16 +87,24 @@ local function conditionCheck(e)
 			toTime = toTime,
 		}
 
-		if (fogService.isCellFogged(cell, fogType.name)) and not (fogService.isFogAppculled(fogType.name)) then
-			debugLog("Cell already fogged and not appculled. Recolouring.")
-			fogService.reColour(options)
-		end
-
 		-- Check whether we can add the fog at this time
 		if not (fogType.isAvailable(gameHour, toWeather)) then
 			debugLog("Fog: "..fogType.name.." not available.")
 			fogService.removeFog(options)
+			goto continue
+		end
+
+		if fromWeather.index == toWeather.index
+		and fromTime == toTime
+		and fromRegion.id == toRegion.id
+		and (fogService.isCellFogged(cell, fogType.name)) then
+			debugLog("Conditions are the same. Returning.")
 			break
+		end
+
+		if (fogService.isCellFogged(cell, fogType.name)) and not (fogService.isFogAppculled(fogType.name)) then
+			debugLog("Cell already fogged and not appculled. Recolouring.")
+			fogService.reColour(options)
 		end
 
 		debugLog("Checks passed. Adding fog.")
@@ -100,6 +119,8 @@ local function conditionCheck(e)
 		else
 			fogService.addFog(options)
 		end
+
+		::continue::
 	end
 
 	fromWeather = toWeather
@@ -109,14 +130,19 @@ local function conditionCheck(e)
 end
 
 -- On travelling, waiting etc.
-local function onImmediateChange()
+local function onImmediateChange(e)
 
-	fromWeather = WtC.currentWeather
-	toWeather = WtC.nextWeather or fromWeather
+	if e then
+		fromWeather = e.from or WtC.currentWeather
+		toWeather = e.to or WtC.nextWeather or fromWeather
+	else
+		fromWeather = WtC.currentWeather
+		toWeather = WtC.nextWeather or fromWeather
+	end
 
 	 -- Get game hour and time
-	 local gameHour = tes3.worldController.hour.value
-	 toTime = fogService.getTime(gameHour)
+	local gameHour = tes3.worldController.hour.value
+	toTime = fogService.getTime(gameHour)
 
 	 -- Iterate through fog types
 	for _, fogType in pairs(data.fogTypes) do
@@ -171,7 +197,7 @@ end
 local function init()
 	WtC = tes3.worldController.weatherController
 	event.register("loaded", function() debugLog("================== loaded ==================") onLoaded() end)
-	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end)
+	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority=-250})
 	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") onImmediateChange() end)
 	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") onImmediateChange() end)
 	event.register("weatherTransitionStarted", function() debugLog("================== weatherTransitionStarted ==================") conditionCheck() end, {priority = 100})

@@ -16,6 +16,8 @@ local function loadData()
         for _, fogType in pairs(data.fogTypes) do
             player.data.vapourmist.cells[fogType.name] = {}
         end
+
+        player.data.vapourmist.cells[data.interiorFog.name] = {}
     end
 end
 
