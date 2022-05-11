@@ -41,7 +41,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 3800,
-        initialSize = {150, 200, 250, 300, 350, 420, 450, 500, 510, 550, 600, 800, 1200},
+        initialSize = {420, 450, 500, 510, 550, 600, 800, 1200},
         isAvailable = function(_, weather)
             if this.fogTypes["cloud"].blockedWeathers[weather.index] then
                 return false
@@ -76,7 +76,7 @@ this.fogTypes = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
         height = 350,
-        initialSize = {200, 350, 460, 550, 600, 675, 700, 850},
+        initialSize = {350, 460, 550, 600, 675, 700, 850},
         isAvailable = function(gameHour, weather)
 
             if (this.fogTypes["mist"].mistyWeathers[weather.index]) then
@@ -130,7 +130,7 @@ this.interiorFog = {
     name = "interior",
     mesh = "tew\\Vapourmist\\vapourint.nif",
     height = -1000,
-    initialSize = {100, 200, 300, 400, 500, 600, 700, 800},
+    initialSize = {300, 400, 500, 600, 700, 800},
     isAvailable = function(cell)
         for _, namePattern in ipairs(interiorNames) do
             if string.find(cell.name:lower(), namePattern) then
