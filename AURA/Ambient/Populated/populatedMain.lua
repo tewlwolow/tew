@@ -46,10 +46,15 @@ local function getTypeCell(maxCount, cell)
 end
 
 local function cellCheck()
+
 	-- Gets messy otherwise
-	if tes3.mobilePlayer.waiting then
-		debugLog("Player waiting. Returning.")
-		timer.delayOneFrame(function() cellCheck() end)
+	local mp = tes3.mobilePlayer
+	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+		debugLog("Player waiting or travelling. Returning.")
+		timer.start{
+			duration = 1,
+			callback = cellCheck,
+		}
 		return
 	end
 

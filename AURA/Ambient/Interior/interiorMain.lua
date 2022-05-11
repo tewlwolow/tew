@@ -130,16 +130,20 @@ local function cellCheck()
         onMusicSelection()
     end
 
-    -- Gets messy otherwise
-	if tes3.mobilePlayer.waiting then
-		debugLog("Player waiting. Returning.")
-		timer.delayOneFrame(function() cellCheck() end)
+	-- Gets messy otherwise
+	local mp = tes3.mobilePlayer
+	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+		debugLog("Player waiting or travelling. Returning.")
+		timer.start{
+			duration = 1,
+			callback = cellCheck,
+		}
 		return
 	end
 
     local cell = tes3.getPlayerCell()
 
-    if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then
+    if (not (cell)) or (not (cell.isInterior)) or (not (cell.name)) or (cell.behavesAsExterior) then
         debugLog("Exterior cell. Removing sound.")
         sounds.removeImmediate{module = moduleName}
         if interiorMusic and played == true then

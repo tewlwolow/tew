@@ -123,6 +123,10 @@ local function cellCheck()
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
 		debugLog("Player waiting or travelling. Returning.")
+		timer.start{
+			duration = 1,
+			callback = cellCheck,
+		}
 		return
 	end
 
