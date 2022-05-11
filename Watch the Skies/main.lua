@@ -54,8 +54,6 @@ local particleAmount = {
         2000,
     },
     ["snow"] = {
-        60,
-        100,
         300,
         460,
         600,
