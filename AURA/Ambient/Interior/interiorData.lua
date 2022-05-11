@@ -60,9 +60,13 @@ this.names = {
     ["cou"] = {
         "Telvanni Council House",
         "Redoran Council Hall",
-        "Manor",
+        "Manor District",
+        "Guildhall",
+        "Morag Tong",
+        "Arena Hidden Area",
         "Grand Council",
-        "Plaza"
+        "Plaza",
+        "Waistworks"
     },
     ["mag"] = {
         "Mages Guild",
