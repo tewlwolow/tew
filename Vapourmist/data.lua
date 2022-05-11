@@ -41,7 +41,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 3800,
-        initialSize = {420, 450, 500, 510, 550, 600, 800, 1200},
+        initialSize = {420, 450, 500, 510, 550, 600, 710},
         isAvailable = function(_, weather)
             if this.fogTypes["cloud"].blockedWeathers[weather.index] then
                 return false
