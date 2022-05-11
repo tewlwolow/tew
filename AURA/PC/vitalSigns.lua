@@ -104,7 +104,7 @@ end
 local function playFatigue()
     if fatigueFlag == 1 then return end
     if not fatigueTimer then
-        fatigueTimer = timer.start{type=timer.real, duration=4.3, iterations=-1, callback=function()
+        fatigueTimer = timer.start{type=timer.real, duration=10, iterations=-1, callback=function()
             tes3.say{
                 volume=0.9*vsVol,
                 soundPath="Vo\\tew\\A\\PC\\"..genderFatigue, reference=player
@@ -119,7 +119,7 @@ end
 local function playMagicka()
     if magickaFlag == 1 then return end
     if not magickaTimer then
-        magickaTimer = timer.start{type=timer.real, duration=6, iterations=-1, callback=function()
+        magickaTimer = timer.start{type=timer.real, duration=12, iterations=-1, callback=function()
             tes3.playSound{soundPath="tew\\A\\PC\\magicka.wav", volume=0.6*vsVol, pitch=0.8, reference=player}
         end}
     else
