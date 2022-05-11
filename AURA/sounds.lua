@@ -23,7 +23,7 @@ local coldDir = "c"
 local config = require("tew.AURA.config")
 
 -- Constants
-local STEP = 0.025
+local STEP = 0.04
 local TICK = 0.25
 local MAX = 1
 local MIN = 0
@@ -631,7 +631,7 @@ local function getTrack(options)
 
 	if options.module == "outdoor" then
 		debugLog("Got outdoor module.")
-		if not options.climate or not options.time then
+		if not (options.climate) or not (options.time) then
 			if options.type == "quiet" then
 				debugLog("Got quiet type.")
 				table = quiet
@@ -674,6 +674,8 @@ local function getTrack(options)
 		debugLog("Got interior type: "..options.type)
 		return interiorWeather[options.type][options.weather]
 	end
+
+	if not table then debugLog("No table found. Returning.") return end
 
 	local newTrack = table[math.random(1, #table)]
 	if modules[options.module].old and #table > 1 then
