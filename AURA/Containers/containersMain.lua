@@ -72,7 +72,7 @@ local function playOpenSound(e)
 end
 
 local function playCloseSound(e)
-    if not e.reference.object.objectType == tes3.objectType.container then return end
+    if not (e.reference.object.objectType == tes3.objectType.container) or (e.reference.object.objectType == tes3.objectType.npc)  then return end
     local Cvol=config.Cvol/200
     if flag == 1 then return end
    
