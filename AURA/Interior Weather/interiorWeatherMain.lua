@@ -82,14 +82,14 @@ local function playInteriorBig(windoor)
     if windoor==nil then debugLog("Dodging an empty ref.") return end
 
     if weather == 4 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 0.8, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor}
         debugLog("Playing big interior rain loop.")
     elseif weather == 5 then
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.4, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor}
         debugLog("Playing big interior storm loop.")
     else
         debugLog("Playing big interior loop.")
-        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType, reference=windoor}
+        sounds.playImmediate{weather = weather, module = moduleName, volume = 0.4*IWvol, pitch = 0.7, type = interiorType, reference=windoor}
     end
 end
 
