@@ -675,7 +675,11 @@ local function getTrack(options)
 		return interiorWeather[options.type][options.weather]
 	end
 
-	if not table then debugLog("No table found. Returning.") return end
+	if not table then
+		debugLog("No table found. Triggering condition change.")
+		event.trigger("AURA:conditionChanged")
+		return
+	end
 
 	local newTrack = table[math.random(1, #table)]
 	if modules[options.module].old and #table > 1 then
@@ -709,15 +713,17 @@ function this.playImmediate(options)
 		modules[options.module].old = modules[options.module].new
 		modules[options.module].new = newTrack
 
-		debugLog("Immediately playing new track: "..newTrack.id.." for module: "..options.module)
+		if newTrack then
+			debugLog("Immediately playing new track: "..newTrack.id.." for module: "..options.module)
 
-		tes3.playSound {
-			sound = newTrack,
-			loop = true,
-			reference = ref,
-			volume = volume,
-			pitch = options.pitch or MAX
-		}
+			tes3.playSound {
+				sound = newTrack,
+				loop = true,
+				reference = ref,
+				volume = volume,
+				pitch = options.pitch or MAX
+			}
+		end
 	end
 end
 

@@ -89,10 +89,10 @@ local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 	if (cellLast and not cellLast.isInterior) or playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.45*OAvol, pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.35*OAvol, pitch=0.9}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = 0.45*OAvol, pitch = 0.8, immediate = true}
+		weatherParser{reference = windoor, volume = 0.35*OAvol, pitch = 0.9, immediate = true}
 	end
 end
 
@@ -110,10 +110,10 @@ end
 local function playInteriorSmall()
 	if cellLast and not cellLast.isInterior then
 		debugLog("Playing interior ambient sounds for small interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, volume = 0.4*OAvol, pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, volume = 0.3*OAvol, pitch=0.9}
 	else
 		debugLog("Playing interior ambient sounds for small interiors using new track.")
-		weatherParser{volume = 0.4*OAvol, pitch = 0.8, immediate = true}
+		weatherParser{volume = 0.3*OAvol, pitch = 0.9, immediate = true}
 	end
 end
 
@@ -290,6 +290,11 @@ local function runHourTimer()
 	timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
 end
 
+local function hackyCheck()
+	runResetter()
+	cellCheck()
+end
+
 debugLog("Outdoor Ambient Sounds module initialised.")
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
@@ -298,3 +303,4 @@ event.register("weatherTransitionFinished", cellCheck, {priority=-160})
 event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
 event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
+event.register("AURA:conditionChanged", hackyCheck)
