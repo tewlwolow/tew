@@ -87,7 +87,7 @@ end
 
 local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
-	if (cellLast and not cellLast.isInterior) or playOld then
+	if playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
 		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.35*OAvol, pitch=0.9}
 	else
@@ -228,6 +228,7 @@ local function cellCheck()
 			debugLog("Found interior cell. Removing sounds.")
 			sounds.removeImmediate{module = moduleName}
 		else
+			if weatherNow > 3 and not weatherNow == 8 then return end
 			if common.getCellType(cell, common.cellTypesSmall)==true
 			or common.getCellType(cell, common.cellTypesTent)==true then
 				debugLog("Found small interior cell. Playing interior loops.")
