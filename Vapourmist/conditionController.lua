@@ -191,6 +191,7 @@ end
 local function onLoaded()
 	timer.start({duration = data.baseTimerDuration, callback = function() debugLog("================== timer ==================") conditionCheck() end, iterations = -1, type = timer.game})
 	debugLog("Timer started. Duration: "..data.baseTimerDuration)
+	fogService.removeAll()
 end
 
 -- Register events
