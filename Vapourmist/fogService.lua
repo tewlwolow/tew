@@ -119,11 +119,11 @@ end
 function this.getTime(gameHour)
 	if (gameHour >= WtC.sunriseHour - 0.3) and (gameHour < WtC.sunriseHour + 1.8) then
 		return "dawn"
-	elseif (gameHour >= WtC.sunriseHour + 1.8) and (gameHour < WtC.sunsetHour - 1.2) then
+	elseif (gameHour >= WtC.sunriseHour + 1.8) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 1.2) and (gameHour < WtC.sunsetHour + 1.2) then
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 1.5) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 1.2) or (gameHour < WtC.sunriseHour - 0.3) then
+	elseif (gameHour >= WtC.sunsetHour + 1.5) or (gameHour < WtC.sunriseHour - 0.3) then
 		return "night"
 	end
 end
@@ -156,7 +156,7 @@ local function lerpFogColours(e)
 	for _, vfx in pairs(vfxRoot.children) do
 		if not vfx then break end
 
-		if string.find(vfx.name, "tew_") then
+		if string.startswith(vfx.name, "tew_") then
 
 			local type = string.sub(vfx.name, 5)
 
@@ -171,6 +171,9 @@ local function lerpFogColours(e)
 			if lerp.angle then
 				controller.planarAngle = math.lerp(lerp.angle.from, lerp.angle.to, lerp.time)
 			end
+
+			-- Fuck me if I know why it's needed
+			if (not lerp[type]) or not (lerp[type].colours) or not (lerp[type].colours.from) or not (lerp[type].colours.to) or not (lerp.time) then lerp.time = 1 end
 
 			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
 			local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
@@ -202,7 +205,7 @@ local function lerpFogColours(e)
 			this.debugLog("Lerp finished.")
 			for _, vfx in pairs(vfxRoot.children) do
 				if not vfx then break end
-				if string.find(vfx.name, "tew_") then
+				if string.startswith(vfx.name, "tew_") then
 					local type = string.sub(vfx.name, 5)
 					this.reColourImmediate(vfx, lerp[type].colours.to)
 				end
@@ -216,7 +219,7 @@ end
 -- Calculate output colours per time and weather
 function this.getOutputColours(time, weather, colours)
 
-	this.debugLog("Getting output colours. Time: "..time.." Weather: "..weather.index)
+	this.debugLog("Getting output colours. Time: "..time.."; Weather: "..weather.index)
 
 	local weatherColour
 
@@ -239,7 +242,7 @@ function this.getOutputColours(time, weather, colours)
 end
 
 function this.reColourImmediate(vfx, fogColour)
-	this.debugLog("Recolouring immediately. Fog colour: "..fogColour.r.." "..fogColour.g.." "..fogColour.b)
+	this.debugLog("Recolouring "..vfx.name.." immediately. Fog colour: "..fogColour.r.." "..fogColour.g.." "..fogColour.b)
 
 	local particleSystem = vfx:getObjectByName("MistEffect")
 	local controller = particleSystem.controller
@@ -268,7 +271,7 @@ function this.reColourImmediate(vfx, fogColour)
 	end
 
 	particleSystem:updateNodeEffects()
-	this.debugLog("Fog recoloured.")
+	this.debugLog(vfx.name.." recoloured.")
 end
 
 -- Recolours fog nodes with slightly adjusted current fog colour by modifying colour keys in NiColorData and material property values
@@ -295,7 +298,6 @@ function this.reColour(options)
 			if vfx.name == "tew_"..type then
 				local fogColour = this.getOutputColours(toTime, toWeather, colours)
 				this.reColourImmediate(vfx, fogColour)
-
 			end
 		end
 	else
@@ -311,11 +313,7 @@ function this.reColour(options)
 		local toColour = this.getOutputColours(toTime, toWeather, colours)
 		
 		lerp = {}
-		if WtC.nextWeather then
-			lerp.time = WtC.transitionScalar
-		else
-			lerp.time = 0
-		end
+		lerp.time = 0
 
 		if type == "tew_cloud" then
 			local toSpeed
@@ -378,7 +376,7 @@ function this.addFog(options)
 	this.debugLog("Checking if we can add fog: "..type)
 
 	for _, activeCell in ipairs(tes3.getActiveCells()) do
-		if not this.isCellFogged(activeCell, type) and not activeCell.isInterior then
+		if (not (this.isCellFogged(activeCell, type)) and not (activeCell.isInterior)) then
 			this.debugLog("Cell is not fogged. Adding "..type..".")
 
 			local fogMesh = tes3.loadMesh(mesh):clone()
@@ -391,7 +389,6 @@ function this.addFog(options)
 			)
 
 			vfxRoot:attachChild(fogMesh, true)
-
 
 			for _, vfx in pairs(vfxRoot.children) do
 				if not vfx then break end
@@ -408,12 +405,10 @@ function this.addFog(options)
 						controller.planarAngle = windVector.y * math.pi * 2
 
 					end
-					
+					local fogColour = this.getOutputColours(toTime, toWeather, colours)
+					this.reColourImmediate(vfx, fogColour)				
 				end
-				local fogColour = this.getOutputColours(toTime, toWeather, colours)
-				this.reColourImmediate(vfx, fogColour)
 			end
-
 
 			fogMesh:update()
 			fogMesh:updateProperties()
@@ -439,14 +434,15 @@ function this.removeFog(options)
 	local toWeather = options.toWeather
 	local colours = options.colours
 
-	this.reColour{
-		fromTime = fromTime,
-		toTime = toTime,
-		fromWeather = fromWeather,
-		toWeather = toWeather,
-		colours = colours,
-		type = type,
-	}
+	-- TODO: Control params
+	-- this.reColour{
+	-- 	fromTime = fromTime,
+	-- 	toTime = toTime,
+	-- 	fromWeather = fromWeather,
+	-- 	toWeather = toWeather,
+	-- 	colours = colours,
+	-- 	type = type,
+	-- }
 
 	this.switchFog(true, type)
 	this.purgeFoggedCells(type)
@@ -524,9 +520,9 @@ function this.addInteriorFog(options)
 				local particleSystem = vfx:getObjectByName("MistEffect")
 				local controller = particleSystem.controller
 				controller.initialSize = table.choice(data.interiorFog.initialSize)
+				local fogColour = getInteriorColour(cell, colours)
+				this.reColourImmediate(vfx, fogColour)
 			end
-			local fogColour = getInteriorColour(cell, colours)
-			this.reColourImmediate(vfx, fogColour)
 		end
 
 		fogMesh:update()
@@ -539,6 +535,23 @@ function this.addInteriorFog(options)
 		this.switchFog(false, type)
 	end
 
+end
+
+function this.removeAll()
+
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+
+	for _, node in pairs(vfxRoot.children) do
+		if not node then break end
+
+		if string.startswith(node.name, "tew_") then
+
+			local type = string.sub(node.name, 5)
+			vfxRoot:detachChild(node)
+			this.purgeFoggedCells(type)
+
+		end
+	end
 
 end
 
