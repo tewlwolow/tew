@@ -87,7 +87,7 @@ local function cellCheck()
     end
 
     local gameHour = tes3.worldController.hour.value
-    if gameHour < 6 or gameHour > 21 then time = "night" else time = "day" end
+    if (gameHour < WtC.sunriseHour + 1) or (gameHour > WtC.sunsetHour + 1) then time = "night" else time = "day" end
 
     local typeCell = getTypeCell(5, cell)
 
