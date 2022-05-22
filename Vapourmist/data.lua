@@ -1,7 +1,7 @@
 local this = {}
 
 this.baseTimerDuration = 0.3
-this.lerpTime = 0.03
+this.lerpTime = 0.04
 this.speedCoefficient = 25
 this.minimumSpeed = 20
 this.minStaticCount = 5
@@ -75,8 +75,8 @@ this.fogTypes = {
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 350,
-        initialSize = {350, 460, 550, 600, 675, 700, 850},
+        height = 550,
+        initialSize = {200, 250, 300, 350, 400},
         isAvailable = function(gameHour, weather)
 
             if (this.fogTypes["mist"].mistyWeathers[weather.index]) then
@@ -130,7 +130,7 @@ this.interiorFog = {
     name = "interior",
     mesh = "tew\\Vapourmist\\vapourint.nif",
     height = -1000,
-    initialSize = {300, 400, 500, 600, 700, 800},
+    initialSize = {100, 150, 200, 300, 360},
     isAvailable = function(cell)
         for _, namePattern in ipairs(interiorNames) do
             if string.find(cell.name:lower(), namePattern) then
