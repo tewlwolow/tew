@@ -7,6 +7,9 @@ local common=require("tew.AURA.common")
 -- Logger
 local debugLog = common.debugLog
 
+-- Timer
+local blockTimer
+
 -- Paths
 local AURAdir = "Data Files\\Sound\\tew\\A"
 local soundDir = "tew\\A"
@@ -521,7 +524,17 @@ local function fadeOut(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
 	
 	if isBlocked(track) then
-		timer.start{callback = function() fadeOut(ref, volume, track, module) end, type = timer.real, iterations = 2, duration = 3}
+		if not (blockTimer) or (blockTimer.state == timer.expired) then
+			blockTimer = timer.start
+			{
+				callback = function()
+					fadeOut(ref, volume, track, module)
+				end,
+				type = timer.real,
+				iterations = 2,
+				duration = 3
+			}
+		end
 	end
 
 	if isBlocked(track) then
