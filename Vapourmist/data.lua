@@ -1,7 +1,7 @@
 local this = {}
 
-this.baseTimerDuration = 0.3
-this.lerpTime = 0.04
+this.baseTimerDuration = 0.4
+this.lerpTime = 0.05
 this.speedCoefficient = 25
 this.minimumSpeed = 20
 this.minStaticCount = 5
@@ -41,7 +41,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 3800,
-        initialSize = {420, 450, 500, 510, 550, 600, 710},
+        initialSize = {350, 420, 450, 500, 510, 550, 600},
         isAvailable = function(_, weather)
             if this.fogTypes["cloud"].blockedWeathers[weather.index] then
                 return false
@@ -87,7 +87,7 @@ this.fogTypes = {
                 (
                 (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 2)
                 or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
-                and not (this.fogTypes["mist"].wetWeathers[weather.index] or weather.index == 8 or weather.index == 9)
+                and not (this.fogTypes["mist"].wetWeathers[weather.index] or weather.index == 8 or weather.index == 9 or weather.index == 6 or weather.index == 7)
                 ) then
                 return true
             end
@@ -129,7 +129,7 @@ this.fogTypes = {
 this.interiorFog = {
     name = "interior",
     mesh = "tew\\Vapourmist\\vapourint.nif",
-    height = -1000,
+    height = -1300,
     initialSize = {100, 150, 200, 300, 360},
     isAvailable = function(cell)
         for _, namePattern in ipairs(interiorNames) do
