@@ -6,7 +6,7 @@ local fogService = require("tew\\Vapourmist\\fogService")
 local debugLog = fogService.debugLog
 local data = require("tew\\Vapourmist\\data")
 
-local fromTime, toTime, fromWeather, toWeather, fromRegion, toRegion
+local toTime, toWeather, toRegion, fromTime, fromWeather, fromRegion
 
 -- Check for interior cells
 local function interiorCheck(cell)
@@ -55,15 +55,15 @@ local function conditionCheck(e)
 	-- Get game hour and time type
 	local gameHour = tes3.worldController.hour.value
 	toTime = fogService.getTime(gameHour)
-	if not fromTime then fromTime = toTime end
+	fromTime = fromTime or toTime
 
 	-- Check weather
 	toWeather = WtC.nextWeather or WtC.currentWeather
-	if not fromWeather then fromWeather = toWeather end
+	fromWeather = fromWeather or WtC.currentWeather
 
 	-- Check region
 	toRegion = cell.region
-	if not fromRegion then fromRegion = toRegion end
+	fromRegion = fromRegion or toRegion
 
 	debugLog("Weather: "..fromWeather.index.." -> "..toWeather.index)
 	debugLog("Time: "..fromTime.." -> "..toTime)
@@ -90,7 +90,7 @@ local function conditionCheck(e)
 		-- Check whether we can add the fog at this time
 		if not (fogType.isAvailable(gameHour, toWeather)) then
 			debugLog("Fog: "..fogType.name.." not available.")
-			fogService.removeFog(options)
+			fogService.removeFog(options.type)
 			goto continue
 		end
 

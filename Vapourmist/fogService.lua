@@ -12,6 +12,7 @@ local lerp, simulateRegistered
 -- Print debug messages
 function this.debugLog(string)
     if config.debugLogOn then
+		if not string then string = "n/a" end
 		string = tostring(string)
 		local info = debug.getinfo(2, "Sl")
         local module = info.short_src:match("^.+\\(.+).lua$")
@@ -117,9 +118,9 @@ end
 
 -- Determine time of day
 function this.getTime(gameHour)
-	if (gameHour >= WtC.sunriseHour - 0.3) and (gameHour < WtC.sunriseHour + 1.8) then
+	if (gameHour >= WtC.sunriseHour - 0.3) and (gameHour < WtC.sunriseHour + 1.9) then
 		return "dawn"
-	elseif (gameHour >= WtC.sunriseHour + 1.8) and (gameHour < WtC.sunsetHour - 0.5) then
+	elseif (gameHour >= WtC.sunriseHour + 1.9) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
 	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 1.5) then
 		return "dusk"
@@ -187,9 +188,12 @@ local function lerpFogColours(e)
 
 			local materialProperty = particleSystem.materialProperty
 			materialProperty.emissive = {deltaR, deltaG, deltaB}
+			-- TODO: Check what gives us the white fog
 			materialProperty.specular = {deltaR, deltaG, deltaB}
 			materialProperty.diffuse = {deltaR, deltaG, deltaB}
 			materialProperty.ambient = {deltaR, deltaG, deltaB}
+
+			--this.debugLog("Current colours: "..materialProperty.emissive.r..", "..materialProperty.emissive.g..", "..materialProperty.emissive.b)
 
 			particleSystem:updateNodeEffects()
 		
@@ -311,6 +315,14 @@ function this.reColour(options)
 
 		local fromColour = this.getOutputColours(fromTime, fromWeather, colours)
 		local toColour = this.getOutputColours(toTime, toWeather, colours)
+
+		if WtC.nextWeather and WtC.transitionScalar then
+			fromColour = {
+				r = math.lerp(fromColour.r, toColour.r, WtC.transitionScalar),
+				g = math.lerp(fromColour.g, toColour.g, WtC.transitionScalar),
+				b = math.lerp(fromColour.b, toColour.b, WtC.transitionScalar)
+			}
+		end
 		
 		lerp = {}
 		lerp.time = 0
@@ -397,16 +409,25 @@ function this.addFog(options)
 					local controller = particleSystem.controller
 					controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
 
-					if vfx.name == "tew_cloud" then
-
-						controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
-						
-						local windVector = WtC.windVelocityCurrWeather:normalized()
-						controller.planarAngle = windVector.y * math.pi * 2
-
+					if WtC.nextWeather then
+						if vfx.name == "tew_cloud" then
+							controller.speed = math.max(WtC.nextWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+							local windVectorNext = WtC.windVelocityNextWeather:normalized()
+							controller.planarAngle = windVectorNext.y * math.pi * 2
+						end
+						this.reColour(options)
+					else
+						if vfx.name == "tew_cloud" then
+							controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+							local windVector = WtC.windVelocityCurrWeather:normalized()
+							controller.planarAngle = windVector.y * math.pi * 2
+						end
+						local fogColour = this.getOutputColours(toTime, toWeather, colours)
+						this.reColourImmediate(vfx, fogColour)
 					end
-					local fogColour = this.getOutputColours(toTime, toWeather, colours)
-					this.reColourImmediate(vfx, fogColour)				
+					
+
+	
 				end
 			end
 
@@ -424,26 +445,8 @@ function this.addFog(options)
 end
 
 -- Removes fog from view by appculling - with fade out
-function this.removeFog(options)
-    this.debugLog("Removing fog of type: "..options.type)
-
-	local type = options.type
-	local fromTime = options.fromTime
-	local toTime = options.toTime
-	local fromWeather = options.fromWeather
-	local toWeather = options.toWeather
-	local colours = options.colours
-
-	-- TODO: Control params
-	-- this.reColour{
-	-- 	fromTime = fromTime,
-	-- 	toTime = toTime,
-	-- 	fromWeather = fromWeather,
-	-- 	toWeather = toWeather,
-	-- 	colours = colours,
-	-- 	type = type,
-	-- }
-
+function this.removeFog(type)
+    this.debugLog("Removing fog of type: "..type)
 	this.switchFog(true, type)
 	this.purgeFoggedCells(type)
 end
