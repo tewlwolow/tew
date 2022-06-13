@@ -157,7 +157,7 @@ local function lerpFogColours(e)
 	for _, vfx in pairs(vfxRoot.children) do
 		if not vfx then break end
 
-		if string.startswith(vfx.name, "tew_") then
+		if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
 
 			local type = string.sub(vfx.name, 5)
 
@@ -172,9 +172,6 @@ local function lerpFogColours(e)
 			if lerp.angle then
 				controller.planarAngle = math.lerp(lerp.angle.from, lerp.angle.to, lerp.time)
 			end
-
-			-- Fuck me if I know why it's needed
-			if (not lerp[type]) or not (lerp[type].colours) or not (lerp[type].colours.from) or not (lerp[type].colours.to) or not (lerp.time) then lerp.time = 1 end
 
 			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
 			local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
@@ -208,8 +205,7 @@ local function lerpFogColours(e)
 			simulateRegistered = false
 			this.debugLog("Lerp finished.")
 			for _, vfx in pairs(vfxRoot.children) do
-				if not vfx then break end
-				if string.startswith(vfx.name, "tew_") then
+				if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
 					local type = string.sub(vfx.name, 5)
 					this.reColourImmediate(vfx, lerp[type].colours.to)
 				end
