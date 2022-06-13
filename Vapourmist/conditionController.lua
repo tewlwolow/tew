@@ -198,7 +198,7 @@ end
 local function init()
 	WtC = tes3.worldController.weatherController
 	event.register("loaded", function() debugLog("================== loaded ==================") onLoaded() end)
-	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority=-250})
+	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority=255})
 	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") onImmediateChange() end)
 	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") onImmediateChange() end)
 	event.register("weatherTransitionStarted", function() debugLog("================== weatherTransitionStarted ==================") conditionCheck() end, {priority = 100})
