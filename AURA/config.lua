@@ -45,8 +45,8 @@ return mwse.loadConfig("AURA", {
     PCmagicka=true,
     PCDisease=true,
     PCBlight=true,
-    PCtaunts=true,
+    PCtaunts=false,
     interiorMusic=false,
-    safeFetchMode=true,
+    safeFetchMode=false,
     disabledTaverns={}
 })
