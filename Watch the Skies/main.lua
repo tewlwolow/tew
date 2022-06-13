@@ -484,7 +484,7 @@ local function init()
 
     -- Populate data tables --
     if config.alterClouds then
-        WtC=tes3.getWorldController().weatherController
+        WtC=tes3.worldController.weatherController
         print("Watch the Skies version "..version.." initialised.")
         for weather, index in pairs(tes3.weather) do
             debugLog("Weather: "..weather)
