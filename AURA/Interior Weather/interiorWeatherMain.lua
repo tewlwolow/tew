@@ -26,8 +26,18 @@ local function playThunder()
 
     thunder=thunArray[math.random(1, #thunArray)]
     debugLog("Playing thunder: "..thunder)
-    tes3.playSound{sound=thunder, volume=thunVol, pitch=thunPitch, reference=thunRef}
-    event.trigger("AURA:thunderPlayed", {reference=thunRef})
+
+    local result = event.trigger("AURA:thunderPlayed", {sound=thunder, reference=thunRef, delay = 1.0})
+    local delay = table.get(result, "delay", 1.0)
+    tes3.messageBox(delay)
+
+    timer.start{
+        duration = delay,
+        type = timer.real,
+        callback = function()
+            tes3.playSound{sound=thunder, volume=thunVol, pitch=thunPitch, reference=thunRef}
+        end
+    }
 
     thunderTime = math.random(3,20)
 
