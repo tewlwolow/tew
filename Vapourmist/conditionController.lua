@@ -4,6 +4,7 @@
 
 local fogService = require("tew\\Vapourmist\\fogService")
 local debugLog = fogService.debugLog
+local config = require("tew\\Vapourmist\\config")
 local data = require("tew\\Vapourmist\\data")
 
 local toTime, toWeather, toRegion, fromTime, fromWeather, fromRegion
@@ -50,7 +51,12 @@ local function conditionCheck(e)
 	-- Sanity check
 	if not cell then debugLog("No cell. Returning.") return end
 
-	if (cell.isInterior) and not (cell.behavesAsExterior) then interiorCheck(cell) return end
+	if (cell.isInterior) and not (cell.behavesAsExterior) then
+		if config.interiorFog then
+			interiorCheck(cell)
+		end
+		return
+	end
 
 	-- Get game hour and time type
 	local gameHour = tes3.worldController.hour.value

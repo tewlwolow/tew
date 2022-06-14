@@ -17,12 +17,18 @@ local template = mwse.mcm.createTemplate{
 
     local page = template:createPage{label="Main Settings", noScroll=true}
     page:createCategory{
-        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nWarning! Some of the higher settings can bottleneck your performance or freeze your game. Use with caution. Stick to defaults if you're not running a high-end PC.\nSettings:\n",
+        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nSettings:\n",
     }
+    
     page:createYesNoButton{
         label = "Enable debug mode?",
         variable = registerVariable("debugLogOn"),
         restartRequired=true
+    }
+
+    page:createYesNoButton{
+        label = "Enable interior fog?",
+        variable = registerVariable("interiorFog"),
     }
 
 
