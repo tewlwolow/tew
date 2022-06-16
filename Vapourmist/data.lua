@@ -42,8 +42,8 @@ this.fogTypes = {
     ["cloud"] = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
-        height = 3800,
-        initialSize = {350, 420, 450, 500, 510, 550, 600},
+        height = 4500,
+        initialSize = {300, 350, 420, 450, 500, 510, 550},
         isAvailable = function(_, weather)
 
             if math.random(1, 100) <= config.randomCloudChance then
@@ -62,32 +62,32 @@ this.fogTypes = {
         end,
         colours = {
             ["dawn"] = {
+                r = -0.025,
+                g = -0.035,
+                b = -0.035
+            },
+            ["day"] = {
+                r = -0.04,
+                g = -0.04,
+                b = -0.04
+            },
+            ["dusk"] = {
                 r = -0.035,
                 g = -0.045,
                 b = -0.045
             },
-            ["day"] = {
-                r = -0.05,
-                g = -0.05,
-                b = -0.05
-            },
-            ["dusk"] = {
-                r = -0.045,
-                g = -0.055,
-                b = -0.055
-            },
             ["night"] = {
-                r = 0.035,
-                g = 0.035,
-                b = 0.038
+                r = 0.045,
+                g = 0.045,
+                b = 0.050
             },
         }
     },
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 700,
-        initialSize = {200, 250, 300, 350, 400, 500, 600},
+        height = 600,
+        initialSize = {200, 250, 300, 350, 400, 500},
         isAvailable = function(gameHour, weather)
 
             local WtC = tes3.worldController.weatherController
