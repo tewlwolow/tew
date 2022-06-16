@@ -32,21 +32,21 @@ local template = mwse.mcm.createTemplate{
     }
 
     mainPage:createSlider{
-        label = "Percent chance for mist to spawn when otherwise blocked",
-        min = 0,
-        max = 100,
-        step = 1,
-        jump = 10,
-        variable = registerVariable("randomMistChance")
-    }
-    
-    mainPage:createSlider{
-        label = "Percent chance for cloud to spawn when otherwise blocked",
+        label = "Spawn randomisation percentage for clouds",
         min = 0,
         max = 100,
         step = 1,
         jump = 10,
         variable = registerVariable("randomCloudChance")
+    }
+
+    mainPage:createSlider{
+        label = "Spawn randomisation percentage for mist",
+        min = 0,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable = registerVariable("randomMistChance")
     }
 
     local weathersPage = template:createPage{label="Weather Settings", noScroll=true}
