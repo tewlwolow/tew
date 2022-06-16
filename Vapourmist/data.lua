@@ -1,5 +1,7 @@
 local this = {}
 
+local config = require("tew.Vapourmist.config")
+
 this.baseTimerDuration = 0.4
 this.lerpTime = 0.05
 this.speedCoefficient = 25
@@ -43,12 +45,24 @@ this.fogTypes = {
         height = 3800,
         initialSize = {350, 420, 450, 500, 510, 550, 600},
         isAvailable = function(_, weather)
-            if this.fogTypes["cloud"].blockedWeathers[weather.index] then
-                return false
+
+            if math.random(1, 100) <= config.randomCloudChance then
+                return true
             end
-            return true
+
+            local weatherNow
+            for name, w in pairs(tes3.weather) do
+                if weather.index == w then
+                    weatherNow=name:sub(1,1):upper()..name:sub(2)
+                end
+            end
+
+            if config.cloudyWeathers[weatherNow] and config.cloudyWeathers[weatherNow] ~= nil then
+                return true
+            end
+
+            return false
         end,
-        blockedWeathers = {[0] = true, [6] = true, [7] = true, [9] = true},
         colours = {
             ["dawn"] = {
                 r = 0.045,
@@ -79,7 +93,18 @@ this.fogTypes = {
         initialSize = {200, 250, 300, 350, 400},
         isAvailable = function(gameHour, weather)
 
-            if (this.fogTypes["mist"].mistyWeathers[weather.index]) then
+            if math.random(1, 100) <= config.randomMistChance then
+                return true
+            end
+
+            local weatherNow
+            for name, w in pairs(tes3.weather) do
+                if weather.index == w then
+                    weatherNow=name:sub(1,1):upper()..name:sub(2)
+                end
+            end
+
+            if config.mistyWeathers[weatherNow] and config.mistyWeathers[weatherNow] ~= nil  then
                 return true
             end
 
@@ -92,15 +117,9 @@ this.fogTypes = {
                 return true
             end
 
-            if not (this.fogTypes["mist"].blockedWeathers[weather.index]) then
-                return true
-            end
-
             return false
         end,
-        blockedWeathers = {[0] = true, [1] = true, [4] = true, [5] = true, [6] = true, [7] = true, [8] = true, [9] = true},
         wetWeathers = {[4] = true, [5] = true},
-        mistyWeathers = {[2] = true, [3] = true},
         colours = {
             ["dawn"] = {
                 r = 0.06,
@@ -132,6 +151,7 @@ this.interiorFog = {
     height = -1300,
     initialSize = {100, 150, 200, 300, 360},
     isAvailable = function(cell)
+
         for _, namePattern in ipairs(interiorNames) do
             if string.find(cell.name:lower(), namePattern) then
                 return true
