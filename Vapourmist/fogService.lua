@@ -155,45 +155,46 @@ local function lerpFogColours(e)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	
 	for _, vfx in pairs(vfxRoot.children) do
-		if not vfx then break end
+		if vfx then
 
-		if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
+			if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
 
-			local type = string.sub(vfx.name, 5)
+				local type = string.sub(vfx.name, 5)
 
-			local particleSystem = vfx:getObjectByName("MistEffect")
-			local controller = particleSystem.controller
-			local colorModifier = controller.particleModifiers
-		
-			if lerp.speed then
-				controller.speed = math.lerp(lerp.speed.from, lerp.speed.to, lerp.time)
+				local particleSystem = vfx:getObjectByName("MistEffect")
+				local controller = particleSystem.controller
+				local colorModifier = controller.particleModifiers
+			
+				if lerp.speed then
+					controller.speed = math.lerp(lerp.speed.from, lerp.speed.to, lerp.time)
+				end
+
+				if lerp.angle then
+					controller.planarAngle = math.lerp(lerp.angle.from, lerp.angle.to, lerp.time)
+				end
+
+				local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
+				local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
+				local deltaB = math.lerp(lerp[type].colours.from.b, lerp[type].colours.to.b, lerp.time)
+
+				for _, key in ipairs(colorModifier.colorData.keys) do
+					key.color.r = deltaR
+					key.color.g = deltaG
+					key.color.b = deltaB
+				end
+
+				local materialProperty = particleSystem.materialProperty
+				materialProperty.emissive = {deltaR, deltaG, deltaB}
+				-- TODO: Check what gives us the white fog
+				materialProperty.specular = {deltaR, deltaG, deltaB}
+				materialProperty.diffuse = {deltaR, deltaG, deltaB}
+				materialProperty.ambient = {deltaR, deltaG, deltaB}
+
+				--this.debugLog("Current colours: "..materialProperty.emissive.r..", "..materialProperty.emissive.g..", "..materialProperty.emissive.b)
+
+				particleSystem:updateNodeEffects()
+
 			end
-
-			if lerp.angle then
-				controller.planarAngle = math.lerp(lerp.angle.from, lerp.angle.to, lerp.time)
-			end
-
-			local deltaR = math.lerp(lerp[type].colours.from.r, lerp[type].colours.to.r, lerp.time)
-			local deltaG = math.lerp(lerp[type].colours.from.g, lerp[type].colours.to.g, lerp.time)
-			local deltaB = math.lerp(lerp[type].colours.from.b, lerp[type].colours.to.b, lerp.time)
-
-			for _, key in ipairs(colorModifier.colorData.keys) do
-				key.color.r = deltaR
-				key.color.g = deltaG
-				key.color.b = deltaB
-			end
-
-			local materialProperty = particleSystem.materialProperty
-			materialProperty.emissive = {deltaR, deltaG, deltaB}
-			-- TODO: Check what gives us the white fog
-			materialProperty.specular = {deltaR, deltaG, deltaB}
-			materialProperty.diffuse = {deltaR, deltaG, deltaB}
-			materialProperty.ambient = {deltaR, deltaG, deltaB}
-
-			--this.debugLog("Current colours: "..materialProperty.emissive.r..", "..materialProperty.emissive.g..", "..materialProperty.emissive.b)
-
-			particleSystem:updateNodeEffects()
-		
 		end
 	end
 
@@ -205,9 +206,11 @@ local function lerpFogColours(e)
 			simulateRegistered = false
 			this.debugLog("Lerp finished.")
 			for _, vfx in pairs(vfxRoot.children) do
-				if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
-					local type = string.sub(vfx.name, 5)
-					this.reColourImmediate(vfx, lerp[type].colours.to)
+				if vfx then
+					if string.startswith(vfx.name, "tew_") and not (vfx.name == "tew_interior") then
+						local type = string.sub(vfx.name, 5)
+						this.reColourImmediate(vfx, lerp[type].colours.to)
+					end
 				end
 			end
 			lerp = nil
@@ -291,13 +294,15 @@ function this.reColour(options)
 		this.debugLog("Same conditions. Recolouring immediately.")
 		local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 		for _, vfx in pairs(vfxRoot.children) do
-			if not vfx then break end
+			if vfx then
 
-			this.debugLog("Recolouring immediately: from weather: "..fromWeather.index..", to weather: "..toWeather.index)
-	
-			if vfx.name == "tew_"..type then
-				local fogColour = this.getOutputColours(toTime, toWeather, colours)
-				this.reColourImmediate(vfx, fogColour)
+				this.debugLog("Recolouring immediately: from weather: "..fromWeather.index..", to weather: "..toWeather.index)
+		
+				if vfx.name == "tew_"..type then
+					local fogColour = this.getOutputColours(toTime, toWeather, colours)
+					this.reColourImmediate(vfx, fogColour)
+				end
+
 			end
 		end
 	else
@@ -399,31 +404,29 @@ function this.addFog(options)
 			vfxRoot:attachChild(fogMesh, true)
 
 			for _, vfx in pairs(vfxRoot.children) do
-				if not vfx then break end
-				if vfx.name == "tew_"..options.type then
-					local particleSystem = vfx:getObjectByName("MistEffect")
-					local controller = particleSystem.controller
-					controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
+				if vfx then
+					if vfx.name == "tew_"..options.type then
+						local particleSystem = vfx:getObjectByName("MistEffect")
+						local controller = particleSystem.controller
+						controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
 
-					if WtC.nextWeather then
-						if vfx.name == "tew_cloud" then
-							controller.speed = math.max(WtC.nextWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
-							local windVectorNext = WtC.windVelocityNextWeather:normalized()
-							controller.planarAngle = windVectorNext.y * math.pi * 2
+						if WtC.nextWeather then
+							if vfx.name == "tew_cloud" then
+								controller.speed = math.max(WtC.nextWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+								local windVectorNext = WtC.windVelocityNextWeather:normalized()
+								controller.planarAngle = windVectorNext.y * math.pi * 2
+							end
+							this.reColour(options)
+						else
+							if vfx.name == "tew_cloud" then
+								controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
+								local windVector = WtC.windVelocityCurrWeather:normalized()
+								controller.planarAngle = windVector.y * math.pi * 2
+							end
+							local fogColour = this.getOutputColours(toTime, toWeather, colours)
+							this.reColourImmediate(vfx, fogColour)
 						end
-						this.reColour(options)
-					else
-						if vfx.name == "tew_cloud" then
-							controller.speed = math.max(WtC.currentWeather.windSpeed * data.speedCoefficient, data.minimumSpeed)
-							local windVector = WtC.windVelocityCurrWeather:normalized()
-							controller.planarAngle = windVector.y * math.pi * 2
-						end
-						local fogColour = this.getOutputColours(toTime, toWeather, colours)
-						this.reColourImmediate(vfx, fogColour)
-					end
-					
-
-	
+					end	
 				end
 			end
 
@@ -459,10 +462,11 @@ function this.removeFogImmediate(options)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
 	for _, vfx in pairs(vfxRoot.children) do
-		if not vfx then break end
-		if vfx.name == "tew_"..options.type then
-			local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
-			this.reColourImmediate(vfx, fogColour)
+		if vfx then
+			if vfx.name == "tew_"..options.type then
+				local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
+				this.reColourImmediate(vfx, fogColour)
+			end
 		end
 	end
 
@@ -514,13 +518,14 @@ function this.addInteriorFog(options)
 		vfxRoot:attachChild(fogMesh, true)
 
 		for _, vfx in pairs(vfxRoot.children) do
-			if not vfx then break end
-			if vfx.name == "tew_"..type then
-				local particleSystem = vfx:getObjectByName("MistEffect")
-				local controller = particleSystem.controller
-				controller.initialSize = table.choice(data.interiorFog.initialSize)
-				local fogColour = getInteriorColour(cell, colours)
-				this.reColourImmediate(vfx, fogColour)
+			if vfx then
+				if vfx.name == "tew_"..type then
+					local particleSystem = vfx:getObjectByName("MistEffect")
+					local controller = particleSystem.controller
+					controller.initialSize = table.choice(data.interiorFog.initialSize)
+					local fogColour = getInteriorColour(cell, colours)
+					this.reColourImmediate(vfx, fogColour)
+				end
 			end
 		end
 
