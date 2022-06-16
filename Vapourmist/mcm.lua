@@ -17,7 +17,7 @@ local template = mwse.mcm.createTemplate{
 
     local mainPage = template:createPage{label="Main Settings", noScroll=true}
     mainPage:createCategory{
-        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nSettings:\n",
+        label = "Vapourmist "..VERSION.." by tewlwolow.\nLua-based 3D mist and clouds.\nYou need to wait or change cells for these settings to be applied.\nSettings:\n",
     }
     
     mainPage:createYesNoButton{
