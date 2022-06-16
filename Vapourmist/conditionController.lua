@@ -73,7 +73,7 @@ local function conditionCheck(e)
 	toRegion = cell.region
 	fromRegion = fromRegion or toRegion
 
-	debugLog("Weather: "..fromWeather.index.." -> "..toWeather.index)
+	debugLog("Weather: "..fromWeather.name.." -> "..toWeather.name)
 	debugLog("Time: "..fromTime.." -> "..toTime)
 	debugLog("Game hour: "..gameHour)
 	debugLog("Region: "..fromRegion.id.." -> "..toRegion.id)
@@ -84,7 +84,7 @@ local function conditionCheck(e)
 		-- Log fog type
 		debugLog("Fog type: "..fogType.name)
 
-		if fromWeather.index == toWeather.index
+		if fromWeather.name == toWeather.name
 		and fromTime == toTime
 		and fromRegion.id == toRegion.id
 		and (fogService.isCellFogged(cell, fogType.name)) then
@@ -172,7 +172,7 @@ end
 
 
 local function onWeatherChanged(e)
-	if data.fogTypes["mist"].wetWeathers[e.from.index] then
+	if data.fogTypes["mist"].wetWeathers[e.from.name] then
 
 		debugLog("Adding post-rain mist.")
 
