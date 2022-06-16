@@ -93,7 +93,7 @@ this.fogTypes = {
             local WtC = tes3.worldController.weatherController
             if (
                 (
-                (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 2)
+                (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 1.5)
                 or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
                 and not (this.fogTypes["mist"].wetWeathers[weather.name] or weather.name == "Ash" or weather.name == "Blight" or weather.name == "Snow" or weather.name == "Blizzard")
                 ) then
