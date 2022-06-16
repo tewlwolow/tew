@@ -57,6 +57,10 @@ this.fogTypes = {
                 end
             end
 
+            if math.random(1, 100) <= config.randomCloudChance then
+                return false
+            end
+
             if config.cloudyWeathers[weatherNow] and config.cloudyWeathers[weatherNow] ~= nil then
                 return true
             end
@@ -93,6 +97,15 @@ this.fogTypes = {
         initialSize = {200, 250, 300, 350, 400},
         isAvailable = function(gameHour, weather)
 
+            if (
+                (
+                (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 2)
+                or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
+                and not (this.fogTypes["mist"].wetWeathers[weather.index] or weather.index == 8 or weather.index == 9 or weather.index == 6 or weather.index == 7)
+                ) then
+                return true
+            end
+
             if math.random(1, 100) <= config.randomMistChance then
                 return true
             end
@@ -104,16 +117,11 @@ this.fogTypes = {
                 end
             end
 
-            if config.mistyWeathers[weatherNow] and config.mistyWeathers[weatherNow] ~= nil  then
-                return true
+            if math.random(1, 100) <= config.randomCloudChance then
+                return false
             end
 
-            if (
-                (
-                (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 2)
-                or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
-                and not (this.fogTypes["mist"].wetWeathers[weather.index] or weather.index == 8 or weather.index == 9 or weather.index == 6 or weather.index == 7)
-                ) then
+            if config.mistyWeathers[weatherNow] and config.mistyWeathers[weatherNow] ~= nil  then
                 return true
             end
 
