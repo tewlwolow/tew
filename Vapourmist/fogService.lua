@@ -229,9 +229,9 @@ function this.getOutputColours(time, weather, colours)
 	end
 
 	return {
-		r = math.clamp(weatherColour.r + colours[time].r, 0.0, 0.9),
-		g = math.clamp(weatherColour.g + colours[time].g, 0.0, 0.9),
-		b = math.clamp(weatherColour.b + colours[time].b, 0.0, 0.9)
+		r = math.clamp(weatherColour.r + colours[time].r, 0.1, 0.9),
+		g = math.clamp(weatherColour.g + colours[time].g, 0.1, 0.9),
+		b = math.clamp(weatherColour.b + colours[time].b, 0.1, 0.9)
 	}
 
 end
