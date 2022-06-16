@@ -122,9 +122,9 @@ function this.getTime(gameHour)
 		return "dawn"
 	elseif (gameHour >= WtC.sunriseHour + 1.9) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 1.5) then
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 1.8) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 1.5) or (gameHour < WtC.sunriseHour - 0.3) then
+	elseif (gameHour >= WtC.sunsetHour + 1.8) or (gameHour < WtC.sunriseHour - 0.3) then
 		return "night"
 	end
 end
