@@ -6,6 +6,8 @@ local popVol = config.popVol/200
 
 local time, timeLast, typeCellLast, weatherNow, weatherLast
 
+local WtC
+
 local moduleName = "populated"
 
 local debugLog = common.debugLog
@@ -131,6 +133,8 @@ local function populatedTimer()
     timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
 end
 
+WtC = tes3.worldController.weatherController
 event.register("cellChanged", cellCheck, { priority = -190 })
 event.register("loaded", populatedTimer)
+debugLog("Populated Sounds module initialised.")
 

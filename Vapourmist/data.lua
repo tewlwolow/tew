@@ -7,6 +7,7 @@ this.lerpTime = 0.05
 this.speedCoefficient = 25
 this.minimumSpeed = 20
 this.minStaticCount = 5
+local WtC = tes3.worldController.weatherController
 
 local interiorStatics = {
     "in_moldcave",

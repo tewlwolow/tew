@@ -9,6 +9,8 @@ local data = require("tew\\Vapourmist\\data")
 
 local toTime, toWeather, toRegion, fromTime, fromWeather, fromRegion
 
+local WtC
+
 -- Check for interior cells
 local function interiorCheck(cell)
 

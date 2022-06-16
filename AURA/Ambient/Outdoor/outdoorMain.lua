@@ -19,7 +19,7 @@ local moduleName = "outdoor"
 
 local climateLast, weatherLast, timeLast, cellLast
 local climateNow, weatherNow, timeNow
-
+local WtC
 local windoors, interiorTimer
 
 local debugLog = common.debugLog
@@ -296,7 +296,7 @@ local function hackyCheck()
 	cellCheck()
 end
 
-debugLog("Outdoor Ambient Sounds module initialised.")
+WtC = tes3.worldController.weatherController
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
@@ -305,3 +305,4 @@ event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
 event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
 event.register("AURA:conditionChanged", hackyCheck)
+debugLog("Outdoor Ambient Sounds module initialised.")
