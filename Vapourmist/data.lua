@@ -86,7 +86,7 @@ this.fogTypes = {
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 550,
+        height = 700,
         initialSize = {200, 250, 300, 350, 400, 500, 600},
         isAvailable = function(gameHour, weather)
 
