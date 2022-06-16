@@ -546,14 +546,14 @@ function this.removeAll()
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
 	for _, node in pairs(vfxRoot.children) do
-		if not node then break end
+		if node then
+			if string.startswith(node.name, "tew_") then
 
-		if string.startswith(node.name, "tew_") then
+				local type = string.sub(node.name, 5)
+				vfxRoot:detachChild(node)
+				this.purgeFoggedCells(type)
 
-			local type = string.sub(node.name, 5)
-			vfxRoot:detachChild(node)
-			this.purgeFoggedCells(type)
-
+			end
 		end
 	end
 
