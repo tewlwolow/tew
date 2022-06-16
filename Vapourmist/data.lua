@@ -87,7 +87,7 @@ this.fogTypes = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
         height = 550,
-        initialSize = {200, 250, 300, 350, 400},
+        initialSize = {200, 250, 300, 350, 400, 500, 600},
         isAvailable = function(gameHour, weather)
 
             local WtC = tes3.worldController.weatherController
