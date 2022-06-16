@@ -13,7 +13,7 @@ return mwse.loadConfig(
         mistyWeathers={
             ["Foggy"]=true,
         },
-        randomMistChance = 15,
-        randomCloudChance = 25
+        randomCloudChance = 15,
+        randomMistChance = 10
     }
 )
