@@ -54,6 +54,7 @@ function this.isCellFogged(activeCell, type)
 	return false
 end
 
+-- Check whether fog is appculled
 function this.isFogAppculled(type)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
@@ -68,15 +69,6 @@ function this.isFogAppculled(type)
 			end
 		end
 	end
-end
-
-function this.isWeatherBlocked(weather, blockedWeathers)
-    for _, i in ipairs(blockedWeathers) do
-        if weather.index == i then
-            return true
-        end
-    end
-    return false
 end
 
 -- Determine fog position
@@ -222,7 +214,7 @@ end
 -- Calculate output colours per time and weather
 function this.getOutputColours(time, weather, colours)
 
-	this.debugLog("Getting output colours. Time: "..time.."; Weather: "..weather.index)
+	this.debugLog("Getting output colours. Time: "..time.."; Weather: "..weather.name)
 
 	local weatherColour
 
@@ -296,7 +288,7 @@ function this.reColour(options)
 		for _, vfx in pairs(vfxRoot.children) do
 			if vfx then
 
-				this.debugLog("Recolouring immediately: from weather: "..fromWeather.index..", to weather: "..toWeather.index)
+				this.debugLog("Recolouring immediately: from weather: "..fromWeather.name..", to weather: "..toWeather.name)
 		
 				if vfx.name == "tew_"..type then
 					local fogColour = this.getOutputColours(toTime, toWeather, colours)
@@ -311,8 +303,8 @@ function this.reColour(options)
 		-- TODO: nuke?
 		this.debugLog("From time: "..fromTime)
 		this.debugLog("To time: "..toTime)
-		this.debugLog("From weather: "..fromWeather.index)
-		this.debugLog("To weather: "..toWeather.index)
+		this.debugLog("From weather: "..fromWeather.name)
+		this.debugLog("To weather: "..toWeather.name)
 
 		local fromColour = this.getOutputColours(fromTime, fromWeather, colours)
 		local toColour = this.getOutputColours(toTime, toWeather, colours)
@@ -360,7 +352,7 @@ function this.reColour(options)
 			lerp[fogType.name] = {}
 			lerp[fogType.name].colours = {from = fromColour, to = toColour}
 			lerp[fogType.name].name = fogType.name
-			this.debugLog("Prepared lerp for type "..fogType.name..", from "..fromTime..", "..fromWeather.index..", to "..toTime..", "..toWeather.index..".")
+			this.debugLog("Prepared lerp for type "..fogType.name..", from "..fromTime..", "..fromWeather.name..", to "..toTime..", "..toWeather.name..".")
 			this.debugLog("From colour: "..fromColour.r..", "..fromColour.g..", "..fromColour.b)
 			this.debugLog("To colour: "..toColour.r..", "..toColour.g..", "..toColour.b)
 		end
