@@ -111,15 +111,15 @@ this.fogTypes = {
                 return true
             end
 
+            if math.random(1, 100) <= config.randomCloudChance then
+                return false
+            end
+
             local weatherNow
             for name, w in pairs(tes3.weather) do
                 if weather.index == w then
                     weatherNow=name:sub(1,1):upper()..name:sub(2)
                 end
-            end
-
-            if math.random(1, 100) <= config.randomCloudChance then
-                return false
             end
 
             if config.mistyWeathers[weatherNow] and config.mistyWeathers[weatherNow] ~= nil  then
