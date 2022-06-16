@@ -130,7 +130,7 @@ function this.getTime(gameHour)
 end
 
 -- Appculling switch
-function this.switchFog(bool, type)
+function this.fogVisible(bool, type)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..type then
@@ -437,7 +437,7 @@ function this.addFog(options)
 			this.updateData(activeCell, type)
 		else
 			this.debugLog("Cell is already fogged. Showing fog.")
-			this.switchFog(false, type)
+			this.fogVisible(false, type)
 		end
 	end
 
@@ -446,7 +446,7 @@ end
 -- Removes fog from view by appculling - with fade out
 function this.removeFog(type)
     this.debugLog("Removing fog of type: "..type)
-	this.switchFog(true, type)
+	this.fogVisible(true, type)
 	this.purgeFoggedCells(type)
 end
 
@@ -536,7 +536,7 @@ function this.addInteriorFog(options)
 		this.updateData(cell, type)
 	else
 		this.debugLog("Cell is already fogged. Showing fog.")
-		this.switchFog(false, type)
+		this.fogVisible(false, type)
 	end
 
 end
