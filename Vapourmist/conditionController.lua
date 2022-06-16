@@ -81,6 +81,14 @@ local function conditionCheck(e)
 
 		-- Log fog type
 		debugLog("Fog type: "..fogType.name)
+
+		if fromWeather.index == toWeather.index
+		and fromTime == toTime
+		and fromRegion.id == toRegion.id
+		and (fogService.isCellFogged(cell, fogType.name)) then
+			debugLog("Conditions are the same. Returning.")
+			return
+		end
 		
 		local options = {
 			mesh = fogType.mesh,
@@ -98,14 +106,6 @@ local function conditionCheck(e)
 			debugLog("Fog: "..fogType.name.." not available.")
 			fogService.removeFog(options.type)
 			goto continue
-		end
-
-		if fromWeather.index == toWeather.index
-		and fromTime == toTime
-		and fromRegion.id == toRegion.id
-		and (fogService.isCellFogged(cell, fogType.name)) then
-			debugLog("Conditions are the same. Returning.")
-			break
 		end
 
 		if (fogService.isCellFogged(cell, fogType.name)) and not (fogService.isFogAppculled(fogType.name)) then
@@ -197,6 +197,9 @@ end
 local function onLoaded()
 	timer.start({duration = data.baseTimerDuration, callback = function() debugLog("================== timer ==================") conditionCheck() end, iterations = -1, type = timer.game})
 	debugLog("Timer started. Duration: "..data.baseTimerDuration)
+	fromWeather = nil
+	fromTime = nil
+	fromRegion = nil
 	fogService.removeAll()
 end
 
