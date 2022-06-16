@@ -7,7 +7,6 @@ this.lerpTime = 0.05
 this.speedCoefficient = 25
 this.minimumSpeed = 20
 this.minStaticCount = 5
-local WtC = tes3.worldController.weatherController
 
 local interiorStatics = {
     "in_moldcave",
@@ -48,21 +47,14 @@ this.fogTypes = {
         isAvailable = function(_, weather)
 
             if math.random(1, 100) <= config.randomCloudChance then
-                return true
-            end
-
-            local weatherNow
-            for name, w in pairs(tes3.weather) do
-                if weather.index == w then
-                    weatherNow=name:sub(1,1):upper()..name:sub(2)
-                end
-            end
-
-            if math.random(1, 100) <= config.randomCloudChance then
                 return false
             end
 
-            if config.cloudyWeathers[weatherNow] and config.cloudyWeathers[weatherNow] ~= nil then
+            if config.cloudyWeathers[weather.name] and config.cloudyWeathers[weather.name] ~= nil then
+                return true
+            end
+
+            if math.random(1, 100) <= config.randomCloudChance then
                 return true
             end
 
@@ -98,16 +90,13 @@ this.fogTypes = {
         initialSize = {200, 250, 300, 350, 400},
         isAvailable = function(gameHour, weather)
 
+            local WtC = tes3.worldController.weatherController
             if (
                 (
                 (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 2)
                 or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
-                and not (this.fogTypes["mist"].wetWeathers[weather.index] or weather.index == 8 or weather.index == 9 or weather.index == 6 or weather.index == 7)
+                and not (this.fogTypes["mist"].wetWeathers[weather.name] or weather.name == "Ash" or weather.name == "Blight" or weather.name == "Snow" or weather.name == "Blizzard")
                 ) then
-                return true
-            end
-
-            if math.random(1, 100) <= config.randomMistChance then
                 return true
             end
 
@@ -115,20 +104,17 @@ this.fogTypes = {
                 return false
             end
 
-            local weatherNow
-            for name, w in pairs(tes3.weather) do
-                if weather.index == w then
-                    weatherNow=name:sub(1,1):upper()..name:sub(2)
-                end
+            if config.mistyWeathers[weather.name] and config.mistyWeathers[weather.name] ~= nil then
+                return true
             end
 
-            if config.mistyWeathers[weatherNow] and config.mistyWeathers[weatherNow] ~= nil  then
+            if math.random(1, 100) <= config.randomMistChance then
                 return true
             end
 
             return false
         end,
-        wetWeathers = {[4] = true, [5] = true},
+        wetWeathers = {["Rain"] = true, ["Thunder"] = true},
         colours = {
             ["dawn"] = {
                 r = 0.06,
