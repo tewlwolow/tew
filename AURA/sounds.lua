@@ -1,29 +1,11 @@
 -- Library packaging
-local this={}
+local this = {}
 
 -- Imports
 local common=require("tew.AURA.common")
 
 -- Logger
 local debugLog = common.debugLog
-
--- Timer
-local blockTimer
-
--- Paths
-local AURAdir = "Data Files\\Sound\\tew\\A"
-local soundDir = "tew\\A"
-local climDir = "\\C\\"
-local comDir = "\\S\\"
-local popDir = "\\P\\"
-local interiorDir = "\\I\\"
-local wDir = "\\W\\"
-local quietDir = "q"
-local warmDir = "w"
-local coldDir = "c"
-
--- Load config
-local config = require("tew.AURA.config")
 
 -- Constants
 local STEP = 0.04
@@ -32,14 +14,16 @@ local MAX = 1
 local MIN = 0
 
 -- Array attributes
-local clear = {}
-local quiet = {}
-local warm = {}
-local cold = {}
+this.clear = {}
+this.quiet = {}
+this.warm = {}
+this.cold = {}
 
+-- Blocker
+local blockTimer
 local blocked = {}
 
-local populated = {
+this.populated = {
     ["ash"] = {},
     ["dae"] = {},
     ["dar"] = {},
@@ -49,7 +33,7 @@ local populated = {
     ["n"] = {}
 }
 
-local interior = {
+this.interior = {
     ["aba"] = {},
     ["alc"] = {},
 	["cou"] = {},
@@ -72,7 +56,7 @@ local interior = {
     }
 }
 
-local interiorWeather = {
+this.interiorWeather = {
 
     ["big"] = {
         [4] = nil,
@@ -97,17 +81,6 @@ local interiorWeather = {
     }
 }
 
-local function getWeatherSounds()
-	local ashSound = tes3.getSound("ashstorm")
-	local blightSound = tes3.getSound("Blight")
-	local blizzardSound = tes3.getSound("BM Blizzard")
-
-	for type in pairs(interiorWeather) do
-		table.insert(interiorWeather[type], 6, ashSound)
-		table.insert(interiorWeather[type], 7, blightSound)
-		table.insert(interiorWeather[type], 9, blizzardSound)
-	end
-end
 
 local modules = {
 	["outdoor"] = {
@@ -129,330 +102,6 @@ local modules = {
 }
 
 
-
--- Building tables --
-
--- General climate/time table --
-local function buildClearSounds()
-	mwse.log("\n")
-	debugLog("|---------------------- Building clear weather table. ----------------------|\n")
-	for climate in lfs.dir(AURAdir..climDir) do
-		if climate ~= ".." and climate ~= "." then
-			clear[climate]={}
-			for time in lfs.dir(AURAdir..climDir..climate) do
-				if time ~= ".." and time ~= "." then
-					clear[climate][time]={}
-					for soundfile in lfs.dir(AURAdir..climDir..climate.."\\"..time) do
-						if soundfile ~= ".." and soundfile ~= "." then
-							if string.endswith(soundfile, ".wav") then
-								local objectId = string.sub(climate.."_"..time.."_"..soundfile, 1, -5)
-								local filename = soundDir..climDir..climate.."\\"..time.."\\"..soundfile
-								debugLog("Adding file: "..soundfile)
-								debugLog("File id: "..objectId)
-								debugLog("Filename: "..filename.."\n---------------")
-								local sound = tes3.createObject{
-									id = objectId,
-									objectType = tes3.objectType.sound,
-									filename = filename,
-									getIfExists = config.safeFetchMode
-								}
-								table.insert(clear[climate][time], sound)
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
--- Weather-specific --
-local function buildContextSounds(dir, array)
-	mwse.log("\n")
-	debugLog("|---------------------- Building '"..dir.."' weather table. ----------------------|\n")
-	for soundfile in lfs.dir(AURAdir..comDir..dir) do
-		if string.endswith(soundfile, ".wav") then
-			local objectId = string.sub("S_"..dir.."_"..soundfile, 1, -5)
-			local filename = soundDir..comDir.."\\"..dir.."\\"..soundfile
-			debugLog("Adding file: "..soundfile)
-			debugLog("File id: "..objectId)
-			debugLog("Filename: "..filename.."\n---------------")
-			local sound = tes3.createObject{
-				id = objectId,
-				objectType = tes3.objectType.sound,
-				filename = filename,
-				getIfExists = config.safeFetchMode
-			}
-			table.insert(array, sound)
-		end
-	end
-end
-
--- Populated --
-local function buildPopulatedSounds()
-	mwse.log("\n")
-	debugLog("|---------------------- Building populated sounds table. ----------------------|\n")
-	for populatedType, _ in pairs(populated) do
-		for soundfile in lfs.dir(AURAdir..popDir..populatedType) do
-			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
-
-				local objectId = string.sub("P_"..populatedType.."_"..soundfile, 1, -5)
-				local filename = soundDir..popDir..populatedType.."\\"..soundfile
-				debugLog("Adding file: "..soundfile)
-				debugLog("File id: "..objectId)
-				debugLog("Filename: "..filename.."\n---------------")
-				local sound = tes3.createObject{
-					id = objectId,
-					objectType = tes3.objectType.sound,
-					filename = filename,
-					getIfExists = config.safeFetchMode
-				}
-				table.insert(populated[populatedType], sound)
-				debugLog("Adding populated file: "..soundfile)
-			end
-		end
-	end
-end
-
--- Interior --
-local function buildInteriorSounds()
-	mwse.log("\n")
-	debugLog("|---------------------- Building interior sounds table. ----------------------|\n")
-	for interiorType, _ in pairs(interior) do
-		for soundfile in lfs.dir(AURAdir..interiorDir..interiorType) do
-			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
-				local objectId = string.sub("I_"..interiorType.."_"..soundfile, 1, -5)
-				local filename = soundDir..interiorDir..interiorType.."\\"..soundfile
-				debugLog("Adding interior file: "..soundfile)
-				debugLog("File id: "..objectId)
-				debugLog("Filename: "..filename.."\n---------------")
-				local sound = tes3.createObject{
-					id = objectId,
-					objectType = tes3.objectType.sound,
-					filename = filename,
-					getIfExists = config.safeFetchMode
-				}
-
-				table.insert(interior[interiorType], sound)
-			end
-		end
-	end
-end
-
-local function buildTavernSounds()
-	mwse.log("\n")
-	debugLog("|---------------------- Building tavern sounds table. ----------------------|\n")
-	for folder in lfs.dir(AURAdir..interiorDir.."\\tav\\") do
-		for soundfile in lfs.dir(AURAdir..interiorDir.."\\tav\\"..folder) do
-			if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".wav") then
-				local objectId = string.sub("I_tav_"..folder.."_"..soundfile, 1, -5)
-				local filename = soundDir..interiorDir.."tav\\"..folder.."\\"..soundfile
-				debugLog("Adding tavern file: "..soundfile)
-				debugLog("File id: "..objectId)
-				debugLog("Filename: "..filename.."\n---------------")
-				local sound = tes3.createObject{
-					id = objectId,
-					objectType = tes3.objectType.sound,
-					filename = filename,
-					getIfExists = config.safeFetchMode
-				}
-				table.insert(interior["tav"][folder], sound)
-			end
-		end
-	end
-end
-
-local function buildWeatherSounds()
-    debugLog("|---------------------- Building interior weather sounds. ----------------------|\n")
-   
-    local sound, filename, objectId
-
-    filename = soundDir..wDir.."\\big\\r.wav"
-    objectId = "tew_b_rainheavy"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["big"][4] = sound
-
-    filename = soundDir..wDir.."\\big\\rh.wav"
-    objectId = "tew_b_rain"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["big"][5] = sound
-
-    filename = soundDir..wDir.."\\sma\\r.wav"
-    objectId = "tew_s_rain"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["sma"][4] = sound
-
-    filename = soundDir..wDir.."\\sma\\rh.wav"
-    objectId = "tew_s_rainheavy"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["sma"][5] = sound
-
-    filename = soundDir..wDir.."\\ten\\r.wav"
-    objectId = "tew_t_rain"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["ten"][4] = sound
-
-    filename = soundDir..wDir.."\\ten\\rh.wav"
-    objectId = "tew_t_rainheavy"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    sound = tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-    interiorWeather["ten"][5] = sound
-
-    filename = soundDir..wDir.."\\com\\wg.wav"
-    objectId = "tew_wind_gust"
-    debugLog("File id: "..objectId)
-    debugLog("Filename: "..filename.."\n---------------")
-    tes3.createObject{
-        id = objectId,
-        objectType = tes3.objectType.sound,
-        filename = filename,
-		getIfExists = config.safeFetchMode
-    }
-
-    sound, filename, objectId = nil, nil, nil
-
-    debugLog("|---------------------- Finished building interior weather sounds. ----------------------|\n")
-end
-
-
-local function buildMisc()
-	mwse.log("\n")
-	debugLog("|---------------------- Creating misc sound objects. ----------------------|\n")
-	
-	tes3.createObject{
-		id = "splash_lrg",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\envrn\\splash_lrg.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: splash_lrg")
-
-	tes3.createObject{
-		id = "splash_sml",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\envrn\\splash_sml.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: splash_sml")
-
-	tes3.createObject{
-		id = "tew_yurt",
-		objectType = tes3.objectType.sound,
-		filename = "tew\\A\\M\\yurtflap.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_yurt")
-
-	tes3.createObject{
-		id = "tew_boat",
-		objectType = tes3.objectType.sound,
-		filename = "tew\\A\\M\\serviceboat.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_boat")
-
-	tes3.createObject{
-		id = "tew_gondola",
-		objectType = tes3.objectType.sound,
-		filename = "tew\\A\\M\\servicegondola.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_gondola")
-
-	tes3.createObject{
-		id = "tew_clap",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\envrn\\ent_react04a.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_clap")
-
-	tes3.createObject{
-		id = "tew_potnpour",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\item\\potnpour.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_potnpour")
-
-	tes3.createObject{
-		id = "tew_shield",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\item\\shield.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_shield")
-
-	tes3.createObject{
-		id = "tew_blunt",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\item\\bluntOut.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_blunt")
-
-	tes3.createObject{
-		id = "tew_longblad",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\item\\longblad.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_longblad")
-
-	tes3.createObject{
-		id = "tew_spear",
-		objectType = tes3.objectType.sound,
-		filename = "Fx\\item\\spear.wav",
-		getIfExists = config.safeFetchMode
-	}
-	debugLog("Adding misc file: tew_spear")
-end
-
-----------------------------------------------------------------------------------------------------------
---//////////////////////////////////////////////////////////////////////////////////////////////////////--
-----------------------------------------------------------------------------------------------------------
-
 local function removeBlocked(track)
 	for k, v in pairs(blocked) do
 		if v == track then
@@ -473,6 +122,17 @@ local function fadeIn(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
 	if isBlocked(track) then
+		if not (blockTimer) or (blockTimer.state == timer.expired) then
+			blockTimer = timer.start
+			{
+				callback = function()
+					fadeIn(ref, volume, track, module)
+				end,
+				type = timer.real,
+				iterations = 2,
+				duration = 3
+			}
+		end
 		return
 	end
 
@@ -514,7 +174,7 @@ local function fadeIn(ref, volume, track, module)
 
 	timer.start{
 		iterations = 1,
-		duration = TIME,
+		duration = TIME + 0.1,
 		callback = queuer
 	}
 end
@@ -522,7 +182,7 @@ end
 local function fadeOut(ref, volume, track, module)
 
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
-	
+
 	if isBlocked(track) then
 		if not (blockTimer) or (blockTimer.state == timer.expired) then
 			blockTimer = timer.start
@@ -540,10 +200,10 @@ local function fadeOut(ref, volume, track, module)
 	if isBlocked(track) then
 		return
 	end
-	
+
 	debugLog("Running fade out for: "..track.id)
 	table.insert(blocked, track)
-	
+
 	local TIME = TICK*volume/STEP
 	local ITERS = math.ceil(volume/STEP)
 	local runs = ITERS
@@ -579,7 +239,7 @@ local function fadeOut(ref, volume, track, module)
 
 	timer.start{
 		iterations = 1,
-		duration = TIME,
+		duration = TIME + 0.1,
 		callback = queuer
 	}
 end
@@ -601,6 +261,7 @@ function this.removeImmediate(options)
 	then
 		tes3.removeSound{sound = modules[options.module].old, reference = ref}
 		debugLog(modules[options.module].old.id.." removed.")
+		modules[options.module].old = nil
 	else
 		debugLog("Old track not playing.")
 	end
@@ -610,6 +271,7 @@ function this.removeImmediate(options)
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
 	then
 		tes3.removeSound{sound = modules[options.module].new, reference = ref}
+		modules[options.module].old = modules[options.module].new
 		debugLog(modules[options.module].new.id.." removed.")
 	else
 		debugLog("New track not playing.")
@@ -647,37 +309,37 @@ local function getTrack(options)
 		if not (options.climate) or not (options.time) then
 			if options.type == "quiet" then
 				debugLog("Got quiet type.")
-				table = quiet
+				table = this.quiet
 			elseif options.type == "warm" then
 				debugLog("Got warm type.")
-				table = warm
+				table = this.warm
 			elseif options.type == "cold" then
 				debugLog("Got cold type.")
-				table = cold
+				table = this.cold
 			end
 		else
 			local climate = options.climate
 			local time = options.time
 			debugLog("Got "..climate.." climate and "..time.." time.")
-			table = clear[climate][time]
+			table = this.clear[climate][time]
 		end
 	elseif options.module == "populated" then
 		debugLog("Got populated module.")
 		if options.type == "night" then
 			debugLog("Got populated night.")
-			table = populated["n"]
+			table = this.populated["n"]
 		elseif options.type == "day" then
 			debugLog("Got populated day.")
-			table = populated[options.typeCell]
+			table = this.populated[options.typeCell]
 		end
 	elseif options.module == "interior" then
 		debugLog("Got interior module.")
 		if options.race then
 			debugLog("Got tavern for "..options.race.." race.")
-			table = interior["tav"][options.race]
+			table = this.interior["tav"][options.race]
 		else
 			debugLog("Got interior "..options.type.." type.")
-			table = interior[options.type]
+			table = this.interior[options.type]
 		end
 	elseif options.module == "interiorWeather" then
 		if options.type == "wind" then
@@ -685,7 +347,7 @@ local function getTrack(options)
 		end
 		debugLog("Got interior weather module.")
 		debugLog("Got interior type: "..options.type)
-		return interiorWeather[options.type][options.weather]
+		return this.interiorWeather[options.type][options.weather]
 	end
 
 	if not table then
@@ -766,23 +428,8 @@ function this.play(options)
 	else
 		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
 	end
-				
+
 end
 
-function this.build()
-	buildClearSounds()
-	buildContextSounds(quietDir, quiet)
-	buildContextSounds(warmDir, warm)
-	buildContextSounds(coldDir, cold)
-	buildPopulatedSounds()
-	buildInteriorSounds()
-	buildTavernSounds()
-	buildWeatherSounds()
-	buildMisc()
-	event.register("loaded", getWeatherSounds) -- Needed to do after initialisation, errors out otherwise
-
-	mwse.log("\n")
-	debugLog("|---------------------- Finished building sound objects. ----------------------|\n")
-end
 
 return this

@@ -4,7 +4,7 @@
 
 local modversion = require("tew.AURA.version")
 local version = modversion.version
-local sounds = require("tew\\AURA\\sounds")
+local soundBuilder = require("tew\\AURA\\soundBuilder")
 
 local function warning(e)
     if not e.newlyCreated then
@@ -30,8 +30,9 @@ local function init()
 
     event.register("uiActivated", warning, {filter="MenuAudio"})
 
-    mwse.log("[AURA "..version.."] Running file builder.")
-    sounds.build()
+    mwse.log("\n\n[AURA "..version.."] Running file builder.\n")
+    soundBuilder.build()
+    mwse.log("\n[AURA "..version.."] File builder finished.\n\n")
 
     if moduleAmbientOutdoor then
         mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")
