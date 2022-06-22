@@ -7,7 +7,7 @@ return mwse.loadConfig("AURA", {
     SVvol=200,
     Cvol=120,
     vsVol=200,
-    intVol=150,
+    intVol=100,
     popVol=100,
     tVol=200,
     moduleAmbientOutdoor=true,
@@ -47,6 +47,6 @@ return mwse.loadConfig("AURA", {
     PCBlight=true,
     PCtaunts=false,
     interiorMusic=false,
-    safeFetchMode=false,
+    rainSounds = true,
     disabledTaverns={}
 })
