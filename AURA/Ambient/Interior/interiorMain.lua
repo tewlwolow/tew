@@ -217,8 +217,6 @@ local function cellCheck()
     sounds.removeImmediate{module = moduleName}
 end
 
-
-
 -- Make sure any law-breakers, murderes and maniacs are covered
 -- Meaning the death of a publican means we recheck conditions
 local function deathCheck(e)
@@ -233,8 +231,14 @@ local function deathCheck(e)
     end
 end
 
+local function onCOC()
+	sounds.removeImmediate{module = moduleName}
+end
+
 
 event.register("cellChanged", cellCheck, { priority = -200 })
+event.register("weatherTransitionImmediate", onCOC, {priority=-160})
+event.register("weatherChangedImmediate", onCOC, {priority=-160})
 event.register("death", deathCheck)
 if interiorMusic then
     event.register("musicSelectTrack", onMusicSelection)

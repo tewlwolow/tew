@@ -89,10 +89,10 @@ local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 	if playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = 0.35*OAvol, pitch=0.9}
+		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.35*OAvol)-(0.01 * #windoors), pitch=0.8}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = 0.35*OAvol, pitch = 0.9, immediate = true}
+		weatherParser{reference = windoor, volume = (0.35*OAvol)-(0.01 * #windoors), pitch = 0.8, immediate = true}
 	end
 end
 
@@ -132,7 +132,7 @@ local function cellCheck()
 
 	local region
 
-	OAvol = config.OAvol/200	
+	OAvol = config.OAvol/200
 	
 	debugLog("Cell changed or time check triggered. Running cell check.")
 	
@@ -198,16 +198,16 @@ local function cellCheck()
 			debugLog("Time changed but weather didn't. Returning.")
 			return
 	end
-		
-	debugLog("Different conditions. Resetting sounds.")
 	
+	debugLog("Different conditions. Resetting sounds.")
+
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
 			sounds.removeImmediate{module=moduleName, reference=windoor}
 		end
 		debugLog("Clearing windoors.")
 	end
-	
+
 	if not cell.isInterior
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
@@ -236,11 +236,11 @@ local function cellCheck()
 				playInteriorSmall()
 			else
 				debugLog("Found big interior cell. Playing interior loops.")
-				sounds.removeImmediate{module = moduleName}
 				windoors=nil
 				windoors=common.getWindoors(cell)
 				if windoors ~= nil then
 					for _, windoor in ipairs(windoors) do
+						tes3.removeSound{reference=windoor}
 						playInteriorBig(windoor)
 					end
 					interiorTimer:resume()
@@ -248,7 +248,7 @@ local function cellCheck()
 			end
 		end
 	end
-		
+
 	-- Setting last values --
 	timeLast=timeNow
 	climateLast=climateNow
@@ -296,13 +296,17 @@ local function hackyCheck()
 	cellCheck()
 end
 
+local function onCOC()
+	sounds.removeImmediate{module = moduleName}
+end
+
 WtC = tes3.worldController.weatherController
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
 event.register("weatherTransitionFinished", cellCheck, {priority=-160})
-event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
-event.register("weatherChangedImmediate", cellCheck, {priority=-160})
+event.register("weatherTransitionImmediate", onCOC, {priority=-160})
+event.register("weatherChangedImmediate", onCOC, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
 event.register("AURA:conditionChanged", hackyCheck)
 debugLog("Outdoor Ambient Sounds module initialised.")

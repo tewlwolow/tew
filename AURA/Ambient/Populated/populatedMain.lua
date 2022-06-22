@@ -69,7 +69,7 @@ local function cellCheck()
         typeCellLast = nil
         return
     elseif (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
-        debugLog("Player in interior cell. Returning.")
+        debugLog("Player in interior cell. Removing sounds immediately.")
         sounds.removeImmediate{module = moduleName, volume = popVol}
         timeLast = nil
         typeCellLast = nil
@@ -133,8 +133,15 @@ local function populatedTimer()
     timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
 end
 
+local function onCOC()
+	sounds.removeImmediate{module = moduleName}
+end
+
+
 WtC = tes3.worldController.weatherController
 event.register("cellChanged", cellCheck, { priority = -190 })
+event.register("weatherTransitionImmediate", onCOC, {priority=-190})
+event.register("weatherChangedImmediate", onCOC, {priority=-190})
 event.register("loaded", populatedTimer)
 debugLog("Populated Sounds module initialised.")
 
