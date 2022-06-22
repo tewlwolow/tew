@@ -62,32 +62,32 @@ this.fogTypes = {
         end,
         colours = {
             ["dawn"] = {
-                r = -0.025,
-                g = -0.035,
-                b = -0.035
+                r = 0.015,
+                g = -0.01,
+                b = -0.01
             },
             ["day"] = {
-                r = -0.04,
-                g = -0.04,
-                b = -0.04
+                r = -0.018,
+                g = -0.018,
+                b = -0.017
             },
             ["dusk"] = {
-                r = -0.035,
-                g = -0.045,
-                b = -0.045
+                r = 0.015,
+                g = -0.01,
+                b = -0.01
             },
             ["night"] = {
-                r = 0.045,
-                g = 0.045,
-                b = 0.050
+                r = 0.035,
+                g = 0.035,
+                b = 0.042
             },
         }
     },
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 600,
-        initialSize = {200, 250, 300, 350, 400, 500},
+        height = 650,
+        initialSize = {200, 250, 260, 300, 325, 350, 400, 450, 500},
         isAvailable = function(gameHour, weather)
 
             local WtC = tes3.worldController.weatherController
@@ -117,7 +117,7 @@ this.fogTypes = {
         wetWeathers = {["Rain"] = true, ["Thunder"] = true},
         colours = {
             ["dawn"] = {
-                r = 0.06,
+                r = 0.07,
                 g = 0.05,
                 b = 0.05
             },
@@ -127,14 +127,14 @@ this.fogTypes = {
                 b = 0.02
             },
             ["dusk"] = {
-                r = 0.04,
-                g = 0.04,
-                b = 0.045
+                r = 0.07,
+                g = 0.05,
+                b = 0.05
             },
             ["night"] = {
                 r = 0.02,
                 g = 0.02,
-                b = 0.022
+                b = 0.024
             },
         }
     },
