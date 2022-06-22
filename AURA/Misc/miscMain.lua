@@ -6,6 +6,7 @@ local function init()
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
     local playSplash = config.playSplash
     local playYurtFlap = config.playYurtFlap
+    local rainSounds = config.rainSounds
 
     if playSplash and not moduleAmbientOutdoor then
         print("[AURA "..version.."] Loading file: waterSplash.lua")
@@ -19,6 +20,11 @@ local function init()
     if playYurtFlap then
         print("[AURA "..version.."] Loading file: yurtFlap.lua")
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\yurtFlap.lua")
+    end
+
+    if rainSounds then
+        print("[AURA "..version.."] Loading file: rainSounds.lua")
+        dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\rainSounds.lua")
     end
 end
 
