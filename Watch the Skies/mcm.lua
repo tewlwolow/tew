@@ -15,7 +15,7 @@ local template = mwse.mcm.createTemplate{
     name="Watch the Skies",
     headerImagePath="\\Textures\\tew\\Watch the Skies\\WtS_logo.tga"}
 
-    local page = template:createPage{label="Main Settings", noScroll=true}
+    local page = template:createPage{label="Main Settings"}
     page:createCategory{
         label = "Watch the Skies "..version.." by tewlwolow.\nLua-based weather overhaul.\n\nSettings:",
     }
@@ -59,8 +59,13 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("randomiseCloudsSpeed"),
         restartRequired=true
     }
+    page:createYesNoButton{
+        label = "Randomise rain mesh?",
+        variable = registerVariable("randomiseRainMesh"),
+        restartRequired=true
+    }
     page:createSlider{
-        label = "Changes % chance for a vanilla cloud texture to show up instead. Note that these might not go well with all presets - Intelligent Textures is recommended.\nDefault - 0%.\nChance %",
+        label = "Changes % chance for a vanilla cloud texture to show up instead.\nDefault - 0%.\nChance %",
         min = 0,
         max = 100,
         step = 1,
