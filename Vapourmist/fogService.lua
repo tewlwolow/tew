@@ -7,7 +7,7 @@ local VERSION = version.version
 local data = require("tew\\Vapourmist\\data")
 
 local WtC = tes3.worldController.weatherController
-local lerp, simulateRegistered
+local lerp, simulateRegistered, fogColour
 
 -- Print debug messages
 function this.debugLog(string)
@@ -71,7 +71,7 @@ function this.isFogAppculled(type)
 	end
 end
 
--- Determine fog position
+-- Determine fog position for exteriors
 local function getFogPosition(activeCell, height)
 	local average = 0
 	local denom = 0
@@ -93,7 +93,7 @@ local function getFogPosition(activeCell, height)
 	return (average/denom) + height
 end
 
--- Determine fog position
+-- Determine fog position for interiors
 local function getInteriorCellPosition(cell)
 	local pos = {x = 0, y = 0, z = 0}
 	local denom = 0
@@ -110,19 +110,19 @@ end
 
 -- Determine time of day
 function this.getTime(gameHour)
-	if (gameHour >= WtC.sunriseHour - 0.3) and (gameHour < WtC.sunriseHour + 1.9) then
+	if (gameHour >= WtC.sunriseHour - 0.2) and (gameHour < WtC.sunriseHour + 1.9) then
 		return "dawn"
 	elseif (gameHour >= WtC.sunriseHour + 1.9) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 1.8) then
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.5) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 1.8) or (gameHour < WtC.sunriseHour - 0.3) then
+	elseif (gameHour >= WtC.sunsetHour + 2.5) or (gameHour < WtC.sunriseHour - 0.2) then
 		return "night"
 	end
 end
 
 -- Appculling switch
-function this.fogVisible(bool, type)
+function this.cullFog(bool, type)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..type then
@@ -271,7 +271,9 @@ end
 
 -- Recolours fog nodes with slightly adjusted current fog colour by modifying colour keys in NiColorData and material property values
 function this.reColour(options)
-	if simulateRegistered then this.debugLog("Lerp in progress.") return end
+	if simulateRegistered then
+		lerp.time = 1
+	end
 
 	local fromTime = options.fromTime
 	local toTime = options.toTime
@@ -285,13 +287,13 @@ function this.reColour(options)
 	if (fromTime == toTime) and (fromWeather == toWeather) then
 		this.debugLog("Same conditions. Recolouring immediately.")
 		local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+		fogColour = this.getOutputColours(toTime, toWeather, colours)
 		for _, vfx in pairs(vfxRoot.children) do
 			if vfx then
 
 				this.debugLog("Recolouring immediately: from weather: "..fromWeather.name..", to weather: "..toWeather.name)
 		
 				if vfx.name == "tew_"..type then
-					local fogColour = this.getOutputColours(toTime, toWeather, colours)
 					this.reColourImmediate(vfx, fogColour)
 				end
 
@@ -357,11 +359,12 @@ function this.reColour(options)
 			this.debugLog("To colour: "..toColour.r..", "..toColour.g..", "..toColour.b)
 		end
 
-		if not simulateRegistered then
-			simulateRegistered = true
-			event.register("simulate", lerpFogColours)
-			this.debugLog("Lerp registered for "..type)
+		if simulateRegistered then
+			lerp.time = 1
 		end
+		simulateRegistered = true
+		event.register("simulate", lerpFogColours)
+		this.debugLog("Lerp registered for "..type)
 	end
 
 end
@@ -394,7 +397,7 @@ function this.addFog(options)
 			)
 
 			vfxRoot:attachChild(fogMesh, true)
-
+			fogColour = this.getOutputColours(toTime, toWeather, colours)
 			for _, vfx in pairs(vfxRoot.children) do
 				if vfx then
 					if vfx.name == "tew_"..options.type then
@@ -415,10 +418,9 @@ function this.addFog(options)
 								local windVector = WtC.windVelocityCurrWeather:normalized()
 								controller.planarAngle = windVector.y * math.pi * 2
 							end
-							local fogColour = this.getOutputColours(toTime, toWeather, colours)
 							this.reColourImmediate(vfx, fogColour)
 						end
-					end	
+					end
 				end
 			end
 
@@ -429,7 +431,7 @@ function this.addFog(options)
 			this.updateData(activeCell, type)
 		else
 			this.debugLog("Cell is already fogged. Showing fog.")
-			this.fogVisible(false, type)
+			this.cullFog(false, type)
 		end
 	end
 
@@ -438,7 +440,7 @@ end
 -- Removes fog from view by appculling - with fade out
 function this.removeFog(type)
     this.debugLog("Removing fog of type: "..type)
-	this.fogVisible(true, type)
+	this.cullFog(true, type)
 	this.purgeFoggedCells(type)
 end
 
@@ -452,11 +454,10 @@ function this.removeFogImmediate(options)
 	if lerp then lerp.time = 1 end
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-
+	fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
 	for _, vfx in pairs(vfxRoot.children) do
 		if vfx then
 			if vfx.name == "tew_"..options.type then
-				local fogColour = this.getOutputColours(options.toTime, options.toWeather, options.colours)
 				this.reColourImmediate(vfx, fogColour)
 			end
 		end
@@ -508,14 +509,13 @@ function this.addInteriorFog(options)
 		)
 
 		vfxRoot:attachChild(fogMesh, true)
-
+		fogColour = getInteriorColour(cell, colours)
 		for _, vfx in pairs(vfxRoot.children) do
 			if vfx then
 				if vfx.name == "tew_"..type then
 					local particleSystem = vfx:getObjectByName("MistEffect")
 					local controller = particleSystem.controller
-					controller.initialSize = table.choice(data.interiorFog.initialSize)
-					local fogColour = getInteriorColour(cell, colours)
+					controller.initialSize = table.choice(data.interiorFog.initialSize) 
 					this.reColourImmediate(vfx, fogColour)
 				end
 			end
@@ -528,7 +528,7 @@ function this.addInteriorFog(options)
 		this.updateData(cell, type)
 	else
 		this.debugLog("Cell is already fogged. Showing fog.")
-		this.fogVisible(false, type)
+		this.cullFog(false, type)
 	end
 
 end
@@ -540,15 +540,13 @@ function this.removeAll()
 	for _, node in pairs(vfxRoot.children) do
 		if node then
 			if string.startswith(node.name, "tew_") then
-
 				local type = string.sub(node.name, 5)
 				vfxRoot:detachChild(node)
 				this.purgeFoggedCells(type)
-
 			end
 		end
 	end
-
+	this.debugLog("Fog detached.")
 end
 
 return this
