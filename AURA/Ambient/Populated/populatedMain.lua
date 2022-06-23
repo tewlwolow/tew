@@ -2,7 +2,10 @@ local data = require("tew.AURA.Ambient.Populated.populatedData")
 local config = require("tew.AURA.config")
 local sounds = require("tew.AURA.sounds")
 local common=require("tew.AURA.common")
+local tewLib = require("tew.tewLib.tewLib")
 local popVol = config.popVol/200
+local isOpenPlaza=tewLib.isOpenPlaza
+
 
 local time, timeLast, typeCellLast, weatherNow, weatherLast
 
@@ -68,7 +71,7 @@ local function cellCheck()
         timeLast = nil
         typeCellLast = nil
         return
-    elseif (cell.isInterior and not cell.behavesAsExterior and not string.find(cell.name, "Plaza")) then
+    elseif not (cell.isOrBehavesAsExterior and not isOpenPlaza(cell)) then
         debugLog("Player in interior cell. Removing sounds immediately.")
         sounds.removeImmediate{module = moduleName, volume = popVol}
         timeLast = nil
@@ -134,7 +137,7 @@ local function populatedTimer()
 end
 
 local function onCOC()
-	sounds.removeImmediate{module = moduleName}
+	-- sounds.removeImmediate{module = moduleName}
     cellCheck()
 end
 

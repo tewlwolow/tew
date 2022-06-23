@@ -89,10 +89,10 @@ local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 	if playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.35*OAvol)-(0.005 * #windoors), pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.55*OAvol)-(0.005 * #windoors), pitch=0.8}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = (0.35*OAvol)-(0.005 * #windoors), pitch = 0.8, immediate = true}
+		weatherParser{reference = windoor, volume = (0.55*OAvol)-(0.005 * #windoors), pitch = 0.8, immediate = true}
 	end
 end
 
@@ -133,9 +133,9 @@ local function cellCheck()
 	local region
 
 	OAvol = config.OAvol/200
-	
+
 	debugLog("Cell changed or time check triggered. Running cell check.")
-	
+
 	-- Getting rid of timers on cell check --
 	if not interiorTimer then
 		interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig, type=timer.real})
@@ -143,27 +143,28 @@ local function cellCheck()
 	else
 		interiorTimer:pause()
 	end
-	
+
 	local cell = tes3.getPlayerCell()
 	if (not cell) then debugLog("No cell detected. Returning.") return end
-	
+
 	if cell.isInterior then
 		region = tes3.getRegion({useDoors=true}).name
 	else
 		region = tes3.getRegion().name
 	end
-	
+
 	if region == nil then debugLog("No region detected. Returning.") return end
-	
+
 	-- Checking climate --
 	for kRegion, vClimate in pairs(climates.regions) do
 		if kRegion==region then
 			climateNow=vClimate
 		end
 	end
+
 	if not climateNow then debugLog ("Blacklisted region - no climate detected. Returning.") return end
 	debugLog("Climate: "..climateNow)
-	
+
 	-- Checking time --
 	local gameHour=tes3.worldController.hour.value
 	if (gameHour >= WtC.sunriseHour - 1.5) and (gameHour < WtC.sunriseHour + 1.5) then
@@ -176,11 +177,11 @@ local function cellCheck()
 		timeNow = "n"
 	end
 	debugLog("Time: "..timeNow)
-	
+
 	-- Checking current weather --
 	weatherNow = tes3.getRegion({useDoors=true}).weather.index
 	debugLog("Weather: "..weatherNow)
-	
+
 	-- Transition filter chunk --
 	if
 		timeNow==timeLast
@@ -209,9 +210,7 @@ local function cellCheck()
 	end
 
 	local useLast = false
-	if not cell.isInterior
-	or (cell.isInterior) and (cell.behavesAsExterior
-	and not isOpenPlaza(cell)) then
+	if cell.isOrBehavesAsExterior and not isOpenPlaza(cell) then
 		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 		and weatherNow==weatherLast and climateNow==climateLast
 		and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
@@ -302,7 +301,7 @@ local function hackyCheck()
 end
 
 local function onCOC()
-	sounds.removeImmediate{module = moduleName}
+	-- sounds.removeImmediate{module = moduleName}
 	cellCheck()
 end
 
@@ -310,6 +309,7 @@ WtC = tes3.worldController.weatherController
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
+event.register("weatherTransitionStarted", cellCheck, {priority=-160})
 event.register("weatherTransitionFinished", cellCheck, {priority=-160})
 event.register("weatherTransitionImmediate", onCOC, {priority=-160})
 event.register("weatherChangedImmediate", onCOC, {priority=-160})
