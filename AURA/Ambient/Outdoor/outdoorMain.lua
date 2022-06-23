@@ -179,7 +179,11 @@ local function cellCheck()
 	debugLog("Time: "..timeNow)
 
 	-- Checking current weather --
-	weatherNow = tes3.getRegion({useDoors=true}).weather.index
+	if WtC.nextWeather then
+		weatherNow = WtC.nextWeather.index
+	else
+		weatherNow = WtC.currentWeather.index
+	end
 	debugLog("Weather: "..weatherNow)
 
 	-- Transition filter chunk --
@@ -210,7 +214,7 @@ local function cellCheck()
 	end
 
 	local useLast = false
-	if cell.isOrBehavesAsExterior and not isOpenPlaza(cell) then
+	if (cell.isOrBehavesAsExterior and not isOpenPlaza(cell)) then
 		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 		and weatherNow==weatherLast and climateNow==climateLast
 		and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
@@ -227,28 +231,25 @@ local function cellCheck()
 			weatherParser{volume=OAvol}
 		end
 	elseif cell.isInterior then
-		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
-			debugLog("Found interior cell. Removing sounds.")
+		debugLog("Found interior cell.")
+		sounds.removeImmediate{module = moduleName}
+		if ((weatherNow > 3 or (WtC.nextWeather and WtC.nextWeather.index > 3)) and not (weatherNow == 8 or (WtC.nextWeather and WtC.nextWeather.index == 8))) then return end
+		if common.getCellType(cell, common.cellTypesSmall)==true
+		or common.getCellType(cell, common.cellTypesTent)==true then
+			debugLog("Found small interior cell. Playing interior loops.")
 			sounds.removeImmediate{module = moduleName}
+			playInteriorSmall()
 		else
-			if weatherNow > 3 and not weatherNow == 8 then return end
-			if common.getCellType(cell, common.cellTypesSmall)==true
-			or common.getCellType(cell, common.cellTypesTent)==true then
-				debugLog("Found small interior cell. Playing interior loops.")
-				sounds.removeImmediate{module = moduleName}
-				playInteriorSmall()
-			else
-				debugLog("Found big interior cell. Playing interior loops.")
-				windoors=nil
-				windoors=common.getWindoors(cell)
-				if windoors ~= nil then
-					for _, windoor in ipairs(windoors) do
-						tes3.removeSound{reference=windoor}
-						playInteriorBig(windoor, useLast)
-						useLast = true
-					end
-					interiorTimer:resume()
+			debugLog("Found big interior cell. Playing interior loops.")
+			windoors=nil
+			windoors=common.getWindoors(cell)
+			if windoors ~= nil then
+				for _, windoor in ipairs(windoors) do
+					tes3.removeSound{reference=windoor}
+					playInteriorBig(windoor, useLast)
+					useLast = true
 				end
+				interiorTimer:resume()
 			end
 		end
 	end
