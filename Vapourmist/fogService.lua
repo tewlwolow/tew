@@ -271,9 +271,7 @@ end
 
 -- Recolours fog nodes with slightly adjusted current fog colour by modifying colour keys in NiColorData and material property values
 function this.reColour(options)
-	if simulateRegistered then
-		lerp.time = 1
-	end
+	if simulateRegistered then this.debugLog("Lerp in progress.") return end
 
 	local fromTime = options.fromTime
 	local toTime = options.toTime
@@ -359,12 +357,11 @@ function this.reColour(options)
 			this.debugLog("To colour: "..toColour.r..", "..toColour.g..", "..toColour.b)
 		end
 
-		if simulateRegistered then
-			lerp.time = 1
+		if not (simulateRegistered) then
+			simulateRegistered = true
+			event.register("simulate", lerpFogColours)
+			this.debugLog("Lerp registered for "..type)
 		end
-		simulateRegistered = true
-		event.register("simulate", lerpFogColours)
-		this.debugLog("Lerp registered for "..type)
 	end
 
 end
