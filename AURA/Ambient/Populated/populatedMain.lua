@@ -80,7 +80,11 @@ local function cellCheck()
     end
 
     -- Checking current weather --
-	weatherNow = tes3.getRegion({useDoors=true}).weather.index
+	if WtC.nextWeather then
+		weatherNow = WtC.nextWeather.index
+	else
+		weatherNow = WtC.currentWeather.index
+	end
 	debugLog("Weather: "..weatherNow)
 
     if (weatherNow >= 4 and weatherNow <= 7) or (weatherNow == 8) and weatherNow ~= weatherLast then
