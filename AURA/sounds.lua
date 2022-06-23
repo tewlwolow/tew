@@ -130,7 +130,7 @@ local function fadeIn(ref, volume, track, module)
 				end,
 				type = timer.real,
 				iterations = 2,
-				duration = 3
+				duration = 1
 			}
 		end
 		return
@@ -191,8 +191,8 @@ local function fadeOut(ref, volume, track, module)
 					fadeOut(ref, volume, track, module)
 				end,
 				type = timer.real,
-				iterations = 2,
-				duration = 3
+				iterations = 3,
+				duration = 2
 			}
 		end
 	end
