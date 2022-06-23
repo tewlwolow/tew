@@ -9,14 +9,23 @@ local sounds = require("tew.AURA.sounds")
 
 local IWvol = config.IWvol/200
 
-local cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, thunderTime, interiorType, weather, weatherLast
+local cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, thunderTime, interiorType, weather, weatherLast, scalarTimer
 local thunArray=common.thunArray
 
 local debugLog = common.debugLog
 local isOpenPlaza=tewLib.isOpenPlaza
 local moduleName = "interiorWeather"
 
-local immediate
+local immediate = false
+
+local function immediateParser(options)
+	immediate = immediate or options.immediate
+	if immediate then
+		sounds.playImmediate{weather = options.weather, module = moduleName, volume = options.volume, type = options.type}
+	else
+		sounds.play{weather = options.weather, module = moduleName, volume = options.volume, type = options.type}
+	end
+end
 
 local function playThunder()
 	local thunVol, thunPitch
@@ -68,8 +77,8 @@ local function playInteriorSmall(cell)
 	end
 
 	if weather == 5 then
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 1.0*IWvol+volBoost, type = interiorType}
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
+		immediateParser{weather = weather, module = moduleName, volume = 1.0*IWvol+volBoost, type = interiorType}
+		immediateParser{weather = weather, module = moduleName, volume = 0.6*IWvol+volBoost, type = "wind"}
 		thunRef=cell
 		debugLog("Playing small interior storm, wind and thunder loops.")
 		if isOpenPlaza(cell)==true then
@@ -77,29 +86,29 @@ local function playInteriorSmall(cell)
 		end
 	elseif weather == 4 then
 		debugLog("Playing small interior rain loop.")
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol+volBoost, type = interiorType}
+		immediateParser{weather = weather, module = moduleName, volume = 0.9*IWvol+volBoost, type = interiorType}
 	elseif weather == 6 or weather == 7 or weather == 9 then
 		debugLog("Playing small interior ash, blight or blizzard loop.")
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.7*IWvol, pitch = 0.7, type = interiorType}
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.4*IWvol+volBoost, type = "wind"}
+		immediateParser{weather = weather, module = moduleName, volume = 0.7*IWvol, pitch = 0.7, type = interiorType}
+		immediateParser{weather = weather, module = moduleName, volume = 0.4*IWvol+volBoost, type = "wind"}
 	else
 		debugLog("Playing small interior weather loop.")
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
+		immediateParser{weather = weather, module = moduleName, volume = 0.5*IWvol, pitch = 0.6, type = interiorType}
 	end
 end
 
-local function playInteriorBig(windoor)
+local function playInteriorBig(windoor, updateImmediate)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 
 	if weather == 4 then
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor}
+		immediateParser{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor, flag = updateImmediate}
 		debugLog("Playing big interior rain loop.")
 	elseif weather == 5 then
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor}
+		immediateParser{weather = weather, module = moduleName, volume = 0.9*IWvol, pitch = 1.0, type = interiorType, reference=windoor, flag = updateImmediate}
 		debugLog("Playing big interior storm loop.")
 	else
 		debugLog("Playing big interior loop.")
-		sounds.playImmediate{weather = weather, module = moduleName, volume = 0.4*IWvol, pitch = 0.7, type = interiorType, reference=windoor}
+		immediateParser{weather = weather, module = moduleName, volume = 0.4*IWvol, pitch = 0.7, type = interiorType, reference=windoor, flag = updateImmediate}
 	end
 end
 
@@ -108,12 +117,14 @@ local function updateInteriorBig()
 	local playerPos=tes3.player.position
 	for _, windoor in ipairs(windoors) do
 		if common.getDistance(playerPos, windoor.position) > 2048 then
-			playInteriorBig(windoor)
+			playInteriorBig(windoor, true)
 		end
 	end
 end
 
 local function cellCheck()
+
+	debugLog("Starting cell check for module: "..moduleName)
 
 	IWvol = config.IWvol/200
 	thunderTime = math.random(1,15)
@@ -128,9 +139,8 @@ local function cellCheck()
 	local cell = tes3.getPlayerCell()
 	if not cell then debugLog("No cell detected. Returning.") return end
 
-	if (not cell.isInterior or cell.behavesAsExterior)
-	and (isOpenPlaza(cell)==false
-	and common.checkCellDiff(cell, cellLast)==true) then
+	if (cell.isOrBehavesAsExterior)
+	and (isOpenPlaza(cell)==false) then
 		debugLog("Found exterior cell. Removing sounds and returning.")
 		-- Only need to remove from small types here, the rest is handled automatically in the engine
 		sounds.removeImmediate{module = moduleName, type = "small"}
@@ -140,7 +150,7 @@ local function cellCheck()
 			thunderTimerBig:cancel()
 			thunderTimerBig = nil
 		end
-		if thunderTimerBig then
+		if thunderTimerSmall then
 			thunderTimerSmall:pause()
 			thunderTimerSmall:cancel()
 			thunderTimerSmall = nil
@@ -148,8 +158,35 @@ local function cellCheck()
 		return
 	end
 
-	weather = tes3.getRegion({useDoors=true}).weather.index
+	if (WtC.nextWeather) then
+		if WtC.transitionScalar <= 0.7 then
+			scalarTimer = timer.start {
+				duration = 0.05,
+				type = timer.game,
+				iterations = 1,
+				callback = cellCheck
+			}
+			return
+		else
+			if scalarTimer then
+				scalarTimer:pause()
+				scalarTimer:cancel()
+				scalarTimer = nil
+			end
+			weather = WtC.nextWeather.index
+			immediate = false
+		end
+	else
+		if scalarTimer then
+			scalarTimer:pause()
+			scalarTimer:cancel()
+			scalarTimer = nil
+		end
+		weather = WtC.currentWeather.index
+		immediate = true
+	end
 	debugLog("Weather: "..weather)
+	debugLog("Immediate flag: "..tostring(immediate))
 
 	if weather ~= weatherLast then
 		sounds.removeImmediate{module = moduleName, type = "small"}
@@ -225,12 +262,14 @@ local function cellCheck()
 
 	weatherLast = weather
 	cellLast = cell
+	immediate = true
 end
 
-
+WtC = tes3.worldController.weatherController
 debugLog("Interior Weather module initialised.")
 
 event.register("cellChanged", cellCheck, { priority = -165 })
 event.register("weatherTransitionFinished", cellCheck, { priority = -165 })
 event.register("weatherTransitionStarted", cellCheck, { priority = -165 })
 event.register("weatherChangedImmediate", cellCheck, { priority = -165 })
+event.register("weatherTransitionImmediate", cellCheck, { priority = -165 })
