@@ -143,7 +143,7 @@ local function cellCheck()
 
     local cell = tes3.getPlayerCell()
 
-    if not (cell) or not (cell.isOrBehavesAsExterior) then
+    if not (cell) or (cell.isOrBehavesAsExterior) then
         debugLog("Exterior cell. Removing sound.")
         sounds.removeImmediate{module = moduleName}
         if interiorMusic and played == true then
