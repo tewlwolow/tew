@@ -89,10 +89,10 @@ local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 	if playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.35*OAvol)-(0.01 * #windoors), pitch=0.8}
+		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.35*OAvol)-(0.005 * #windoors), pitch=0.8}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = (0.35*OAvol)-(0.01 * #windoors), pitch = 0.8, immediate = true}
+		weatherParser{reference = windoor, volume = (0.35*OAvol)-(0.005 * #windoors), pitch = 0.8, immediate = true}
 	end
 end
 
@@ -198,7 +198,7 @@ local function cellCheck()
 			debugLog("Time changed but weather didn't. Returning.")
 			return
 	end
-	
+
 	debugLog("Different conditions. Resetting sounds.")
 
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
@@ -208,6 +208,7 @@ local function cellCheck()
 		debugLog("Clearing windoors.")
 	end
 
+	local useLast = false
 	if not cell.isInterior
 	or (cell.isInterior) and (cell.behavesAsExterior
 	and not isOpenPlaza(cell)) then
@@ -215,9 +216,12 @@ local function cellCheck()
 		and weatherNow==weatherLast and climateNow==climateLast
 		and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
 		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
-			debugLog("Found same cell. Immediately playing last sound.")
+			debugLog("Found same cell. Using last sound.")
+			useLast = true
 			sounds.removeImmediate{module = moduleName}
-			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
+			if cell.isOrBehavesAsExterior then
+				sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
+			end
 		else
 			debugLog("Found exterior cell.")
 			sounds.remove{module = moduleName, volume=OAvol}
@@ -241,7 +245,8 @@ local function cellCheck()
 				if windoors ~= nil then
 					for _, windoor in ipairs(windoors) do
 						tes3.removeSound{reference=windoor}
-						playInteriorBig(windoor)
+						playInteriorBig(windoor, useLast)
+						useLast = true
 					end
 					interiorTimer:resume()
 				end
@@ -298,6 +303,7 @@ end
 
 local function onCOC()
 	sounds.removeImmediate{module = moduleName}
+	cellCheck()
 end
 
 WtC = tes3.worldController.weatherController

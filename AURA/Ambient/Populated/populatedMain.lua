@@ -135,6 +135,7 @@ end
 
 local function onCOC()
 	sounds.removeImmediate{module = moduleName}
+    cellCheck()
 end
 
 
