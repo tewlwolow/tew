@@ -24,61 +24,61 @@ local blockTimer
 local blocked = {}
 
 this.populated = {
-    ["ash"] = {},
-    ["dae"] = {},
-    ["dar"] = {},
-    ["dwe"] = {},
-    ["imp"] = {},
-    ["nor"] = {},
-    ["n"] = {}
+	["ash"] = {},
+	["dae"] = {},
+	["dar"] = {},
+	["dwe"] = {},
+	["imp"] = {},
+	["nor"] = {},
+	["n"] = {}
 }
 
 this.interior = {
-    ["aba"] = {},
-    ["alc"] = {},
+	["aba"] = {},
+	["alc"] = {},
 	["cou"] = {},
-    ["cav"] = {},
-    ["clo"] = {},
-    ["dae"] = {},
-    ["dwe"] = {},
-    ["ice"] = {},
-    ["mag"] = {},
-    ["fig"] = {},
-    ["tem"] = {},
-    ["lib"] = {},
-    ["smi"] = {},
-    ["tra"] = {},
-    ["tom"] = {},
-    ["tav"] = {
-        ["imp"] = {},
-        ["dar"] = {},
-        ["nor"] = {},
-    }
+	["cav"] = {},
+	["clo"] = {},
+	["dae"] = {},
+	["dwe"] = {},
+	["ice"] = {},
+	["mag"] = {},
+	["fig"] = {},
+	["tem"] = {},
+	["lib"] = {},
+	["smi"] = {},
+	["tra"] = {},
+	["tom"] = {},
+	["tav"] = {
+		["imp"] = {},
+		["dar"] = {},
+		["nor"] = {},
+	}
 }
 
 this.interiorWeather = {
 
-    ["big"] = {
-        [4] = nil,
-        [5] = nil,
-        [6] = nil,
-        [7] = nil,
-        [9] = nil
-    },
-    ["sma"] = {
-        [4] = nil,
-        [5] = nil,
-        [6] = nil,
-        [7] = nil,
-        [9] = nil
-    },
-    ["ten"] = {
-        [4] = nil,
-        [5] = nil,
-        [6] = nil,
-        [7] = nil,
-        [9] = nil
-    }
+	["big"] = {
+		[4] = nil,
+		[5] = nil,
+		[6] = nil,
+		[7] = nil,
+		[9] = nil
+	},
+	["sma"] = {
+		[4] = nil,
+		[5] = nil,
+		[6] = nil,
+		[7] = nil,
+		[9] = nil
+	},
+	["ten"] = {
+		[4] = nil,
+		[5] = nil,
+		[6] = nil,
+		[7] = nil,
+		[9] = nil
+	}
 }
 
 
@@ -118,7 +118,7 @@ end
 
 -- Play/Stop handling --
 local function fadeIn(ref, volume, track, module)
-	
+
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
 	if isBlocked(track) then
@@ -265,7 +265,7 @@ function this.removeImmediate(options)
 	else
 		debugLog("Old track not playing.")
 	end
-	
+
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
@@ -288,7 +288,7 @@ function this.remove(options)
 	then
 		fadeOut(ref, volume, modules[options.module].old, options.module)
 	end
-	
+
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
