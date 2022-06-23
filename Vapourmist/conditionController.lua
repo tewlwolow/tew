@@ -160,7 +160,7 @@ end
 
 -- On travelling, waiting etc.
 local function onImmediateChange()
-	debug.log("Weather changed immediate. Removing fog.")
+	debugLog("Weather changed immediate. Removing fog.")
 	fogService.removeAll()
 	conditionCheck()
 end
