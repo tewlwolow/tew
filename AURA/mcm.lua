@@ -1,5 +1,6 @@
 local configPath = "AURA"
 local config = require("tew.AURA.config")
+local defaults = require("tew.AURA.defaults")
 mwse.loadConfig("AURA")
 local modversion = require("tew.AURA.version")
 local version = modversion.version
@@ -83,7 +84,7 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays ambient sounds in accordance with local climate, weather, player position, and time.\n\nSettings:"
 	}
 	pageOA:createSlider{
-		label = string.format("Changes %% volume for Outdoor Ambient module. Default = %s%%.\nRequires restart. Volume %%", config.OAvol),
+		label = string.format("Changes %% volume for Outdoor Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.OAvol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -91,7 +92,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("OAvol")
 	}
 	pageOA:createSlider{
-		label = string.format("Changes %% chance for a quiet track to play instead of the regular one. Default = %s%%.\nRequires restart. Chance %%", config.quietChance),
+		label = string.format("Changes %% chance for a quiet track to play instead of the regular one. Default = %s%%.\nRequires restart. Chance %%", defaults.quietChance),
 		min = 0,
 		max = 100,
 		step = 1,
@@ -114,7 +115,7 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.\n\nSettings:"
 	}
 	pageIA:createSlider{
-		label = string.format("Changes %% volume for Interior Ambient module. Default = %s%%.\nRequires restart. Volume %%", config.intVol),
+		label = string.format("Changes %% volume for Interior Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.intVol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -185,7 +186,7 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"
 	}
 	pagePA:createSlider{
-		label = string.format("Changes %% volume for Populated Ambient module. Default = %s%%.\nRequires restart. Volume %%", config.popVol),
+		label = string.format("Changes %% volume for Populated Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.popVol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -198,7 +199,7 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays weather sounds in interiors.\n\nSettings:"
 	}
 	pageIW:createSlider{
-		label = string.format("Changes %% volume for Interior Weather module. Default = %s%%.\nRequires restart. Volume %%", config.IWvol),
+		label = string.format("Changes %% volume for Interior Weather module. Default = %s%%.\nRequires restart. Volume %%", defaults.IWvol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -239,7 +240,7 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("serviceBarter"),
 	}
 	pageSV:createSlider{
-		label = string.format("Changes %% volume for Service Voices module. Default = %s%%.\nRequires restart. Volume %%", config.SVvol),
+		label = string.format("Changes %% volume for Service Voices module. Default = %s%%.\nRequires restart. Volume %%", defaults.SVvol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -276,7 +277,7 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("PCtaunts"),
 	}
 	pagePC:createSlider{
-		label = string.format("Changes %% volume for for vital signs (health, fatigue, magicka, disease, blight). Default = %s%%.\nRequires restart. Volume %%", config.vsVol),
+		label = string.format("Changes %% volume for for vital signs (health, fatigue, magicka, disease, blight). Default = %s%%.\nRequires restart. Volume %%", defaults.vsVol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -285,7 +286,7 @@ local template = mwse.mcm.createTemplate{
 	}
 	pagePC:createSlider{
 
-		label = string.format("Changes %% chance for a battle taunt to play. Default = %s%%.\nRequires restart. Chance %%", config.tauntChance),
+		label = string.format("Changes %% chance for a battle taunt to play. Default = %s%%.\nRequires restart. Chance %%", defaults.tauntChance),
 		min = 0,
 		max = 100,
 		step = 1,
@@ -293,7 +294,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("tauntChance")
 	}
 	pagePC:createSlider{
-		label = string.format("Changes %% volume for player battle taunts. Default = %s%%.\nRequires restart. Volume %%", config.tVol),
+		label = string.format("Changes %% volume for player battle taunts. Default = %s%%.\nRequires restart. Volume %%", defaults.tVol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -306,7 +307,7 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays container sound on open/close.\n\nSettings:"
 	}
 	pageC:createSlider{
-		label = string.format("Changes %% volume for Containers module. Default = %s%%.\nRequires restart. Volume %%", config.Cvol),
+		label = string.format("Changes %% volume for Containers module. Default = %s%%.\nRequires restart. Volume %%", defaults.Cvol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -339,7 +340,7 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("UIEating"),
 	}
 	pageUI:createSlider{
-		label = string.format("Changes %% volume for UI module. Default = %s%%.\nRequires restart. Volume %%", config.UIvol),
+		label = string.format("Changes %% volume for UI module. Default = %s%%.\nRequires restart. Volume %%", defaults.UIvol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -360,7 +361,7 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("playSplash"),
 	}
 	pageMisc:createSlider{
-		label = string.format("Changes %% volume for splash sounds. Default = %s%%.\nRequires restart. Volume %%", config.splashVol),
+		label = string.format("Changes %% volume for splash sounds. Default = %s%%.\nRequires restart. Volume %%", defaults.splashVol),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -372,7 +373,7 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("playYurtFlap"),
 	}
 	pageMisc:createSlider{
-		label = string.format("Changes %% volume for yurt and bear skins flaps. Default = %s%%.\nRequires restart. Volume %%", config.yurtVol),
+		label = string.format("Changes %% volume for yurt and bear skins flaps. Default = %s%%.\nRequires restart. Volume %%", defaults.yurtVol),
 		min = 0,
 		max = 200,
 		step = 1,
