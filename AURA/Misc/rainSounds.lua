@@ -52,7 +52,7 @@ local function changeRainSounds(e)
         end
         if not particleAmount then return end
         local rainType
-        if particleAmount < 550 then
+        if particleAmount < 500 then
             rainType = "light"
         elseif particleAmount < 950 then
             rainType = "medium"
@@ -62,8 +62,8 @@ local function changeRainSounds(e)
             rainType = "light"
         end
 
-        WtC.weathers[5].rainLoopSound = tes3.getSound(rainLoops[weatherName][rainType])
-        WtC.weathers[6].rainLoopSound = tes3.getSound(rainLoops[weatherName][rainType])
+        WtC.weathers[5].rainLoopSound = tes3.getSound(rainLoops["Rain"][rainType])
+        WtC.weathers[6].rainLoopSound = tes3.getSound(rainLoops["Thunder"][rainType])
 
         if config.moduleInteriorWeather then
             if weatherName == "Thunder" then rainType = "thunder" end
