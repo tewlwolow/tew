@@ -37,19 +37,24 @@ end
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
 	["rain"] = {
-		100,
-		200,
+		250,
 		260,
 		300,
+		360,
 		400,
+		500,
 		550,
 		600,
+		650,
 		700,
 		740,
 		800,
+		900,
 		950,
 		1000,
+		1100,
 		1200,
+		1300
 	},
 	["thunder"] = {
 		300,
@@ -57,9 +62,14 @@ local particleAmount = {
 		450,
 		500,
 		600,
+		700,
+		800,
 		900,
+		1000,
 		1200,
+		1300,
 		1400,
+		1550,
 		1700,
 	},
 	["snow"] = {
