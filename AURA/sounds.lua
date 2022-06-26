@@ -191,8 +191,8 @@ local function fadeOut(ref, volume, track, module)
 					fadeOut(ref, volume, track, module)
 				end,
 				type = timer.real,
-				iterations = 3,
-				duration = 2
+				iterations = 5,
+				duration = 1.5
 			}
 		end
 	end
