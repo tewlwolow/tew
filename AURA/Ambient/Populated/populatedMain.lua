@@ -42,7 +42,7 @@ local function getTypeCell(maxCount, cell)
                 if string.startswith(stat.object.id:lower(), statName) then
                     count = count + 1
                     typeCell = cellType
-                    if count >= maxCount then debugLog("Enough statics. Cell type: "..typeCell) return typeCell end
+                    if count >= maxCount then debugLog("Enough statics. Cell: "..cell.name..", cell type: "..typeCell) return typeCell end
                 end
             end
         end
@@ -111,9 +111,9 @@ local function cellCheck()
     sounds.remove{module = moduleName, volume = popVol}
     timeLast = nil
 
-    if typeCell ~= nil and getPopulatedCell(3, cell) == true then
+    if typeCell ~= nil and getPopulatedCell(5, cell) == true then
         if typeCell~="dae" and
-        typeCell~="dae" and
+        typeCell~="dwe" and
         time == "night" then
             debugLog("Found appropriate cell at night. Playing populated ambient night sound.")
             sounds.play{module = moduleName, volume = popVol, type = "night"}
@@ -130,6 +130,10 @@ local function cellCheck()
             return
         end
     end
+
+    timeLast = time
+    typeCellLast = typeCell
+    weatherLast = weatherNow
 
     debugLog("No appropriate cell detected.")
 end
