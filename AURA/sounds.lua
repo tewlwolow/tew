@@ -20,8 +20,10 @@ this.warm = {}
 this.cold = {}
 
 -- Blocker
-local blockTimer
+local blockTimerOut, blockTimerIn
 local blocked = {}
+local BLOCK_ITER = 5
+local BLOCK_DUR = 1.5
 
 this.populated = {
 	["ash"] = {},
@@ -122,15 +124,15 @@ local function fadeIn(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
 	if isBlocked(track) then
-		if not (blockTimer) or (blockTimer.state == timer.expired) then
-			blockTimer = timer.start
+		if not (blockTimerIn) or (blockTimerIn.state == timer.expired) then
+			blockTimerIn = timer.start
 			{
 				callback = function()
 					fadeIn(ref, volume, track, module)
 				end,
 				type = timer.real,
-				iterations = 2,
-				duration = 1
+				iterations = BLOCK_ITER,
+				duration = BLOCK_DUR
 			}
 		end
 		return
@@ -184,20 +186,17 @@ local function fadeOut(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
 
 	if isBlocked(track) then
-		if not (blockTimer) or (blockTimer.state == timer.expired) then
-			blockTimer = timer.start
+		if not (blockTimerOut) or (blockTimerOut.state == timer.expired) then
+			blockTimerOut = timer.start
 			{
 				callback = function()
 					fadeOut(ref, volume, track, module)
 				end,
 				type = timer.real,
-				iterations = 5,
-				duration = 1.5
+				iterations = BLOCK_ITER,
+				duration = BLOCK_DUR
 			}
 		end
-	end
-
-	if isBlocked(track) then
 		return
 	end
 
@@ -261,7 +260,6 @@ function this.removeImmediate(options)
 	then
 		tes3.removeSound{sound = modules[options.module].old, reference = ref}
 		debugLog(modules[options.module].old.id.." removed.")
-		modules[options.module].old = nil
 	else
 		debugLog("Old track not playing.")
 	end
@@ -279,6 +277,7 @@ function this.removeImmediate(options)
 end
 
 function this.remove(options)
+	debugLog("Removing sounds for module: "..options.module)
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
 
@@ -287,6 +286,8 @@ function this.remove(options)
 		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
 	then
 		fadeOut(ref, volume, modules[options.module].old, options.module)
+	else
+		debugLog("Old track not playing.")
 	end
 
 	if
@@ -294,6 +295,8 @@ function this.remove(options)
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
 	then
 		fadeOut(ref, volume, modules[options.module].new, options.module)
+	else
+		debugLog("New track not playing.")
 	end
 end
 
