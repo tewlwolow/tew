@@ -222,9 +222,7 @@ local function cellCheck()
 			debugLog("Found same cell. Using last sound.")
 			useLast = true
 			sounds.removeImmediate{module = moduleName}
-			if cell.isOrBehavesAsExterior then
-				sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
-			end
+			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
 		else
 			debugLog("Found exterior cell.")
 			sounds.remove{module = moduleName, volume=OAvol}
@@ -233,7 +231,6 @@ local function cellCheck()
 	elseif cell.isInterior then
 		debugLog("Found interior cell.")
 		sounds.removeImmediate{module = moduleName}
-		if ((weatherNow > 3 or (WtC.nextWeather and WtC.nextWeather.index > 3)) and not (weatherNow == 8 or (WtC.nextWeather and WtC.nextWeather.index == 8))) then return end
 		if common.getCellType(cell, common.cellTypesSmall)==true
 		or common.getCellType(cell, common.cellTypesTent)==true then
 			debugLog("Found small interior cell. Playing interior loops.")
