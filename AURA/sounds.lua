@@ -20,10 +20,7 @@ this.warm = {}
 this.cold = {}
 
 -- Blocker
-local blockTimerOut, blockTimerIn
 local blocked = {}
-local BLOCK_ITER = 5
-local BLOCK_DUR = 1.5
 
 this.populated = {
 	["ash"] = {},
@@ -124,17 +121,14 @@ local function fadeIn(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
 	if isBlocked(track) then
-		if not (blockTimerIn) or (blockTimerIn.state == timer.expired) then
-			blockTimerIn = timer.start
-			{
-				callback = function()
-					fadeIn(ref, volume, track, module)
-				end,
-				type = timer.real,
-				iterations = BLOCK_ITER,
-				duration = BLOCK_DUR
-			}
-		end
+		timer.start{
+			callback = function()
+				fadeIn(ref, volume, track, module)
+			end,
+			type = timer.real,
+			iterations = 1,
+			duration = 2
+		}
 		return
 	end
 
@@ -186,17 +180,14 @@ local function fadeOut(ref, volume, track, module)
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
 
 	if isBlocked(track) then
-		if not (blockTimerOut) or (blockTimerOut.state == timer.expired) then
-			blockTimerOut = timer.start
-			{
-				callback = function()
-					fadeOut(ref, volume, track, module)
-				end,
-				type = timer.real,
-				iterations = BLOCK_ITER,
-				duration = BLOCK_DUR
-			}
-		end
+		timer.start{
+			callback = function()
+				fadeOut(ref, volume, track, module)
+			end,
+			type = timer.real,
+			iterations = 1,
+			duration = 2
+		}
 		return
 	end
 
