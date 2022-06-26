@@ -58,6 +58,7 @@ local particleAmount = {
 	},
 	["thunder"] = {
 		300,
+		350,
 		400,
 		450,
 		500,
