@@ -21,9 +21,9 @@ local immediate = false
 local function immediateParser(options)
 	immediate = immediate or options.immediate
 	if immediate then
-		sounds.playImmediate{weather = options.weather, module = moduleName, volume = options.volume, type = options.type}
+		sounds.playImmediate{weather = options.weather, module = moduleName, volume = options.volume, type = options.type, reference = options.reference, pitch = options.pitch}
 	else
-		sounds.play{weather = options.weather, module = moduleName, volume = options.volume, type = options.type}
+		sounds.play{weather = options.weather, module = moduleName, volume = options.volume, type = options.type, reference = options.reference, pitch = options.pitch}
 	end
 end
 
@@ -247,7 +247,7 @@ local function cellCheck()
 	else
 		interiorType = "big"
 		if windoors and windoors[1] ~= nil then
-			debugLog("Playing big interior sound.")
+			debugLog("Playing big interior sounds.")
 			for _, windoor in ipairs(windoors) do
 				sounds.removeImmediate{module = moduleName, reference=windoor, type = interiorType}
 				playInteriorBig(windoor)
