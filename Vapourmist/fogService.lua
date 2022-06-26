@@ -512,7 +512,7 @@ function this.addInteriorFog(options)
 				if vfx.name == "tew_"..type then
 					local particleSystem = vfx:getObjectByName("MistEffect")
 					local controller = particleSystem.controller
-					controller.initialSize = table.choice(data.interiorFog.initialSize) 
+					controller.initialSize = table.choice(data.interiorFog.initialSize)
 					this.reColourImmediate(vfx, fogColour)
 				end
 			end
@@ -533,17 +533,27 @@ end
 function this.removeAll()
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-
-	for _, node in pairs(vfxRoot.children) do
-		if node then
-			if string.startswith(node.name, "tew_") then
-				local type = string.sub(node.name, 5)
-				vfxRoot:detachChild(node)
-				this.purgeFoggedCells(type)
-			end
-		end
+	if (lerp and lerp.time) then
+		lerp.time = 1
 	end
-	this.debugLog("Fog detached.")
+
+	timer.start{
+		type = timer.real,
+		duration = 0.1,
+		callback = function()
+			for _, node in pairs(vfxRoot.children) do
+				if node then
+					if string.startswith(node.name, "tew_") then
+						local type = string.sub(node.name, 5)
+						vfxRoot:detachChild(node)
+						this.purgeFoggedCells(type)
+					end
+				end
+			end
+			this.debugLog("Fog detached.")
+		end
+	}
+
 end
 
 return this
