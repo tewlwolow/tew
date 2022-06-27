@@ -37,11 +37,10 @@ end
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
 	["rain"] = {
-		250,
-		260,
 		300,
 		360,
 		400,
+		450,
 		500,
 		550,
 		600,
@@ -57,7 +56,6 @@ local particleAmount = {
 		1300
 	},
 	["thunder"] = {
-		300,
 		350,
 		400,
 		450,
@@ -241,20 +239,20 @@ local function skyChoice(e)
 	local vanChance=config.vanChance/100
 	local texPath
 	if vanChance<math.random() then
-		local sArray=weathers.customWeathers[e.to.index]
+		local sArray=weathers.customWeathers[e.from.index]
 		for weather, index in pairs(tes3.weather) do
-			if e.to.index==index then
+			if e.from.index==index then
 				texPath=weather
 			end
 		end
 		if texPath~=nil and sArray[1]~=nil then
-			e.to.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-			debugLog("Cloud texture path set to: "..e.to.cloudTexture)
+			e.from.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+			debugLog("Cloud texture path set to: "..e.from.cloudTexture)
 		end
 	else
-		texPath = weathers.vanillaWeathers[e.to.index]
-		e.to.cloudTexture = "Data Files\\Textures\\"..texPath
-			debugLog("Using vanilla texture: "..e.to.cloudTexture)
+		texPath = weathers.vanillaWeathers[e.from.index]
+		e.from.cloudTexture = "Data Files\\Textures\\"..texPath
+			debugLog("Using vanilla texture: "..e.from.cloudTexture)
 	end
 
 	-- Change hours between weather changes --
