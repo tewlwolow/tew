@@ -128,8 +128,8 @@ local function conditionCheck(e)
 					goto continue
 				end
 
-				if (fogService.isCellFogged(cell, fogType.name)) and not (fogService.isFogAppculled(fogType.name)) then
-					debugLog("Cell already fogged and not appculled. Recolouring.")
+				if (fogService.isCellFogged(cell, fogType.name)) then
+					debugLog("Cell already fogged. Recolouring.")
 					fogService.reColour(options)
 				end
 
