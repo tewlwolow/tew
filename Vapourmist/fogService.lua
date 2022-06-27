@@ -114,9 +114,9 @@ function this.getTime(gameHour)
 		return "dawn"
 	elseif (gameHour >= WtC.sunriseHour + 1.9) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.5) then
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.8) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 2.5) or (gameHour < WtC.sunriseHour - 0.2) then
+	elseif (gameHour >= WtC.sunsetHour + 2.8) or (gameHour < WtC.sunriseHour - 0.2) then
 		return "night"
 	end
 end
@@ -142,7 +142,7 @@ end
 -- Apply colour changes in simulate
 local function lerpFogColours(e)
 
-	-- this.debugLog("Lerping fog colours. Time: "..lerp.time)
+	this.debugLog("Lerping fog colours. Time: "..tostring(lerp.time))
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	
@@ -177,12 +177,11 @@ local function lerpFogColours(e)
 
 				local materialProperty = particleSystem.materialProperty
 				materialProperty.emissive = {deltaR, deltaG, deltaB}
-				-- TODO: Check what gives us the white fog
 				materialProperty.specular = {deltaR, deltaG, deltaB}
 				materialProperty.diffuse = {deltaR, deltaG, deltaB}
 				materialProperty.ambient = {deltaR, deltaG, deltaB}
 
-				--this.debugLog("Current colours: "..materialProperty.emissive.r..", "..materialProperty.emissive.g..", "..materialProperty.emissive.b)
+				this.debugLog("Current colours: "..deltaR.." "..deltaG.." "..deltaB)
 
 				particleSystem:updateNodeEffects()
 
@@ -424,11 +423,11 @@ function this.addFog(options)
 			fogMesh:update()
 			fogMesh:updateProperties()
 			fogMesh:updateNodeEffects()
-
 			this.updateData(activeCell, type)
 		else
 			this.debugLog("Cell is already fogged. Showing fog.")
 			this.cullFog(false, type)
+
 		end
 	end
 
