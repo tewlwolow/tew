@@ -74,7 +74,11 @@ local template = mwse.mcm.createTemplate{
                     function()
                         local weatherNames = {}
                         for weather, _ in pairs(tes3.weather) do
-                            table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            if weather == "thunder" then
+                                table.insert(weatherNames, "Thunderstorm")
+                            else
+                                table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            end
                         end
                         return weatherNames
                     end
@@ -104,7 +108,11 @@ local template = mwse.mcm.createTemplate{
                     function()
                         local weatherNames = {}
                         for weather, _ in pairs(tes3.weather) do
-                            table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            if weather == "thunder" then
+                                table.insert(weatherNames, "Thunderstorm")
+                            else
+                                table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            end
                         end
                         return weatherNames
                     end
