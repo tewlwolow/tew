@@ -110,13 +110,13 @@ end
 
 -- Determine time of day
 function this.getTime(gameHour)
-	if (gameHour >= WtC.sunriseHour - 0.2) and (gameHour < WtC.sunriseHour + 1.9) then
+	if (gameHour >= WtC.sunriseHour - 0.2) and (gameHour < WtC.sunriseHour + 1.7) then
 		return "dawn"
-	elseif (gameHour >= WtC.sunriseHour + 1.9) and (gameHour < WtC.sunsetHour - 0.5) then
+	elseif (gameHour >= WtC.sunriseHour + 1.7) and (gameHour < WtC.sunsetHour - 0.5) then
 		return "day"
-	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.8) then
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.3) then
 		return "dusk"
-	elseif (gameHour >= WtC.sunsetHour + 2.8) or (gameHour < WtC.sunriseHour - 0.2) then
+	elseif (gameHour >= WtC.sunsetHour + 2.3) or (gameHour < WtC.sunriseHour - 0.2) then
 		return "night"
 	end
 end
