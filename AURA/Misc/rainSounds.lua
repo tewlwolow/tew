@@ -14,7 +14,7 @@ local rainLoops = {
         ["medium"] = "tew_rain_medium",
         ["heavy"] = "tew_rain_heavy"
     },
-    ["Thunder"] = {
+    ["Thunderstorm"] = {
         ["light"] = "tew_thunder_light",
         ["medium"] = "tew_thunder_medium",
         ["heavy"] = "tew_thunder_heavy"
@@ -55,7 +55,7 @@ local function getRainType(particleAmount)
 end
 
 local function changeRainSounds(e)
-    if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunder") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunder")) then
+    if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm")) then
         local weather
         if e and e.to then
             weather = e.to
@@ -73,15 +73,20 @@ local function changeRainSounds(e)
         debugLog("Rain type: "..rainyType)
         debugLog("Storm type: "..stormyType)
 
-        rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
-        stormy.rainLoopSound = tes3.getSound(rainLoops["Thunder"][stormyType])
+        if WtC.currentWeather.name == "Rain" then
+            rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
+        elseif WtC.currentWeather.name == "Thunderstorm" then
+            rainy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][rainyType])
+        end
 
-        local interiorRainType = getRainType(weather.maxParticles)
-        if config.moduleInteriorWeather then
-            if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
-            for interiorType, array in pairs(sounds.interiorWeather) do
-                array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
-                array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
+        if weather.maxParticles then
+            local interiorRainType = getRainType(weather.maxParticles)
+            if config.moduleInteriorWeather then
+                if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
+                for interiorType, array in pairs(sounds.interiorWeather) do
+                    array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
+                    array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
+                end
             end
         end
 	end
