@@ -3,7 +3,7 @@ local this = {}
 local config = require("tew.Vapourmist.config")
 
 this.baseTimerDuration = 0.4
-this.lerpTime = 0.015
+this.lerpTime = 0.012
 this.speedCoefficient = 25
 this.minimumSpeed = 20
 this.minStaticCount = 5
@@ -43,7 +43,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 4500,
-        initialSize = {300, 350, 420, 450, 500, 510, 550},
+        initialSize = {420, 450, 500, 510, 550, 600, 640},
         isAvailable = function(_, weather)
 
             if math.random(1, 100) <= config.randomCloudChance then
@@ -86,7 +86,7 @@ this.fogTypes = {
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
-        height = 650,
+        height = 550,
         initialSize = {200, 250, 260, 300, 325, 350, 400, 450, 500},
         isAvailable = function(gameHour, weather)
 
@@ -114,7 +114,7 @@ this.fogTypes = {
 
             return false
         end,
-        wetWeathers = {["Rain"] = true, ["Thunder"] = true},
+        wetWeathers = {["Rain"] = true, ["Thunderstorm"] = true},
         colours = {
             ["dawn"] = {
                 r = 0.07,
