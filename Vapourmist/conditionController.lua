@@ -76,10 +76,16 @@ local function conditionCheck(e)
 			blockTimer = timer.start
 			{
 				callback = conditionCheck,
-				type = timer.real,
-				duration = 1
+				type = timer.game,
+				duration = 0.05
 			}
+			fromWeather = toWeather
+			fromTime = toTime
+			fromRegion = toRegion
+			fromTime = toTime
+			return
 		end
+
 		if not (
 		fromWeather.name == toWeather.name
 		and fromTime == toTime
@@ -153,6 +159,7 @@ local function conditionCheck(e)
 			fromWeather = toWeather
 			fromTime = toTime
 			fromRegion = toRegion
+			fromTime = toTime
 
 		end
 	}
