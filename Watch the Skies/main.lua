@@ -145,7 +145,7 @@ end
 local function changeRainMesh()
 
 	-- Set rain shuffled flag to false --
-	if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunder") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunder")) then
+	if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm")) then
 		rainShuffledFlag = false
 		return
 	end
@@ -232,27 +232,32 @@ end
 -- Main function controlling cloud texture swap on weather transitions--
 local function skyChoice(e)
 	-- Buzz off if the event doesn't have any weather data --
-	if not e then return end
+	local weatherNow
+	if e.from then
+		weatherNow = e.from.name
+	else
+		weatherNow = WtC.currentWeather
+	end
 
 	-- Check against config chances, do nothing if dice roll determines we should use vanilla instead --
 	debugLog("Starting cloud texture randomisation.")
 	local vanChance=config.vanChance/100
 	local texPath
 	if vanChance<math.random() then
-		local sArray=weathers.customWeathers[e.from.index]
+		local sArray=weathers.customWeathers[weatherNow.index]
 		for weather, index in pairs(tes3.weather) do
-			if e.from.index==index then
+			if weatherNow.index==index then
 				texPath=weather
 			end
 		end
 		if texPath~=nil and sArray[1]~=nil then
-			e.from.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-			debugLog("Cloud texture path set to: "..e.from.cloudTexture)
+			weatherNow.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+			debugLog("Cloud texture path set to: "..weatherNow.cloudTexture)
 		end
 	else
-		texPath = weathers.vanillaWeathers[e.from.index]
-		e.from.cloudTexture = "Data Files\\Textures\\"..texPath
-			debugLog("Using vanilla texture: "..e.from.cloudTexture)
+		texPath = weathers.vanillaWeathers[weatherNow.index]
+		weatherNow.cloudTexture = "Data Files\\Textures\\"..texPath
+			debugLog("Using vanilla texture: "..weatherNow.cloudTexture)
 	end
 
 	-- Change hours between weather changes --
