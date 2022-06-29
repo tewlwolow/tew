@@ -63,17 +63,22 @@ local function changeRainSounds(e)
             weather = WtC.currentWeather
         end
 
+        debugLog("Current particle amount: "..tostring(weather.maxParticles))
+
         local rainy = WtC.weathers[5]
         local rainyType = getRainType(rainy.maxParticles)
         local stormy = WtC.weathers[6]
         local stormyType = getRainType(stormy.maxParticles)
+
+        debugLog("Rain type: "..rainyType)
+        debugLog("Storm type: "..stormyType)
 
         rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
         stormy.rainLoopSound = tes3.getSound(rainLoops["Thunder"][stormyType])
 
         local interiorRainType = getRainType(weather.maxParticles)
         if config.moduleInteriorWeather then
-            if weather.name == "Thunder" then interiorRainType = "thunder" end
+            if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
             for interiorType, array in pairs(sounds.interiorWeather) do
                 array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
                 array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
