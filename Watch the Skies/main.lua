@@ -11,7 +11,6 @@ local isOpenPlaza=tewLib.isOpenPlaza
 
 local stash = "Data Files\\Meshes\\tew\\Watch the Skies\\stash"
 local raindropsPath = "Data Files\\Meshes\\tew\\Watch the Skies\\raindrops"
-local currentRaindropPath = "Data Files\\Meshes\\Raindrop.nif"
 local raindrops = {}
 local rainShuffledFlag = false
 
@@ -132,15 +131,6 @@ local function getMQState()
 	return questStage
 end
 
--- Update nodes --
-local function updateNode(node)
-	node:update()
-	node:updateEffects()
-	node:updateProperties()
-	node:updateNodeEffects()
-end
-
-
 -- Randomise rain mesh --
 local function changeRainMesh()
 
@@ -151,56 +141,34 @@ local function changeRainMesh()
 	end
 
 	-- Randomise rain mesh --
-	if not (rainShuffledFlag) then
-		debugLog("Randomising rain mesh.")
-		local randomRain = table.choice(raindrops)
-		local raindrop = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRain):clone()
-		raindrop:saveBinary(currentRaindropPath)
+	if not (rainShuffledFlag) then	
+		local randomRaindrop = table.choice(raindrops)
+		local newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop)
+
+		local function swapNode(particle)
+			local old = particle.object
+			particle.rainRoot:detachChild(old)
+
+			local new = newRainMesh:clone()
+			particle.rainRoot:attachChild(new)
+			new.appCulled = old.appCulled
+
+			particle.object = new
+		end
+
+		local weatherController = tes3.worldController.weatherController
+		for _, particle in pairs(weatherController.particlesActive) do
+			swapNode(particle)
+		end
+
+		for _, particle in pairs(weatherController.particlesInactive) do
+			swapNode(particle)
+		end
+
+		weatherController.sceneRainRoot:updateEffects()
 		rainShuffledFlag = true
-		updateNode(raindrop)
-		updateNode(tes3.worldController.weatherController.sceneRainRoot)
-		debugLog("Rain mesh changed to "..randomRain)
-		rainShuffledFlag = true
+		debugLog("Rain mesh changed to "..randomRaindrop)
 	end
-
-
-	-- WIP stuff, doesn't work because translation and rotation is set later on --
-	-- local rainRoot = tes3.worldController.weatherController.sceneRainRoot
-	-- local raindropParent = rainRoot:getObjectByName("Precipitation Rain Root")
-
-	-- -- Get proper nodes to attach --
-	-- local randomRaindrop = table.choice(raindrops)
-	-- local newRain = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop):clone()
-	-- local raindropNode = newRain:getObjectByName("Tri Raindrop"):clone()
-
-	-- raindropParent.alphaProperty = raindropNode.alphaProperty
-	-- raindropParent.materialProperty = raindropNode.materialProperty
-	-- raindropParent.texturingProperty = raindropNode.texturingProperty
-	-- raindropNode.alphaProperty = nil
-	-- raindropNode.materialProperty = nil
-	-- raindropNode.texturingProperty = nil
-
-	-- for _, raindrop in ipairs(raindropParent.children) do
-	-- 	if (raindrop) and (raindrop.name == "Raindrop") then
-	-- 		local translation = raindrop.translation:copy()
-	-- 		debug.log(translation)
-	-- 		local rotation = raindrop.rotation:copy()
-	-- 		local scale = raindrop.scale
-	-- 		raindropParent:detachChild(raindrop)
-
-	-- 		local raindropShape = raindropNode:clone()
-	-- 		raindropShape.translation = translation
-	-- 		debug.log(raindropShape.translation)
-	-- 		raindropShape.rotation = rotation
-	-- 		raindropShape.scale = scale
-	-- 		raindropShape.name = "Raindrop"
-	-- 		raindropParent:attachChild(raindropShape:clone(), true)
-	-- 		updateNode(raindropShape)
-	-- 		updateNode(raindropParent)
-	-- 	end
-	-- end
-	-- updateNode(rainRoot)
-	-- debugLog("Raindrops changed to "..randomRaindrop)
 end
 
 -- Randomise particle amount --
@@ -569,8 +537,8 @@ local function seasonalTimer()
 end
 
 local function rainMeshTimer()
-	changeRainMesh()
 	timer.start({duration=1, callback=changeRainMesh, iterations=-1, type=timer.game})
+	changeRainMesh()
 end
 
 -- Run daytime timer on loaded --
@@ -587,17 +555,11 @@ local function init()
 
 	-- Get available raindrops --
 	if config.randomiseRainMesh then
-		if not lfs.fileexists(stash.."\\".."Raindrop.nif") then
-			local orgMesh = tes3.loadMesh("Raindrop.nif")
-			orgMesh:saveBinary(stash.."\\".."Raindrop.nif")
-		end
-
 		for raindrop in lfs.dir(raindropsPath) do
 			if raindrop and raindrop ~= ".." and raindrop ~= "." and string.endswith(raindrop, ".nif") then
 				table.insert(raindrops, raindrop)
 			end
 		end
-
 		event.register("loaded", rainMeshTimer)
 	end
 
