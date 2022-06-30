@@ -9,10 +9,8 @@ local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
-local stash = "Data Files\\Meshes\\tew\\Watch the Skies\\stash"
 local raindropsPath = "Data Files\\Meshes\\tew\\Watch the Skies\\raindrops"
 local raindrops = {}
-local rainShuffledFlag = false
 
 local function debugLog(string)
 	if debugLogOn then
@@ -29,6 +27,19 @@ local function checkVv(region)
 		if region == v then
 			return true
 		end
+	end
+end
+
+-- Determine time of day
+local function getTime(gameHour)
+	if (gameHour >= WtC.sunriseHour - 0.2) and (gameHour < WtC.sunriseHour + 1.7) then
+		return "dawn"
+	elseif (gameHour >= WtC.sunriseHour + 1.7) and (gameHour < WtC.sunsetHour - 0.5) then
+		return "day"
+	elseif (gameHour >= WtC.sunsetHour - 0.5) and (gameHour < WtC.sunsetHour + 2.3) then
+		return "dusk"
+	elseif (gameHour >= WtC.sunsetHour + 2.3) or (gameHour < WtC.sunriseHour - 0.2) then
+		return "night"
 	end
 end
 
@@ -131,44 +142,59 @@ local function getMQState()
 	return questStage
 end
 
+
 -- Randomise rain mesh --
-local function changeRainMesh()
+local function changeRainMesh(weatherNow)
 
-	-- Set rain shuffled flag to false --
-	if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm")) then
-		rainShuffledFlag = false
-		return
+	local randomRaindrop = table.choice(raindrops)
+	local newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop):clone()
+	local weatherColour
+	
+	local time = getTime(tes3.worldController.hour.value)
+
+	if time == "dawn" then
+		weatherColour = weatherNow.fogSunriseColor
+	elseif time == "day" then
+		weatherColour = weatherNow.fogDayColor
+	elseif time == "dusk" then
+		weatherColour = weatherNow.fogSunsetColor
+	elseif time == "night" then
+		weatherColour = weatherNow.fogNightColor
 	end
 
-	-- Randomise rain mesh --
-	if not (rainShuffledFlag) then	
-		local randomRaindrop = table.choice(raindrops)
-		local newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop)
+	local colours = {
+		r = math.clamp(weatherColour.r + 0.1, 0.1, 0.9),
+		g = math.clamp(weatherColour.g + 0.11, 0.1, 0.9),
+		b = math.clamp(weatherColour.b + 0.12, 0.1, 0.9)
+	}
 
-		local function swapNode(particle)
-			local old = particle.object
-			particle.rainRoot:detachChild(old)
+	local materialProperty = newRainMesh:getObjectByName("Tri Raindrop").materialProperty
+	materialProperty.emissive = colours
+	materialProperty.specular = colours
+	materialProperty.diffuse = colours
+	materialProperty.ambient = colours
 
-			local new = newRainMesh:clone()
-			particle.rainRoot:attachChild(new)
-			new.appCulled = old.appCulled
+	local function swapNode(particle)
+		local old = particle.object
+		particle.rainRoot:detachChild(old)
 
-			particle.object = new
-		end
+		local new = newRainMesh:clone()
+		particle.rainRoot:attachChild(new)
+		new.appCulled = old.appCulled
 
-		local weatherController = tes3.worldController.weatherController
-		for _, particle in pairs(weatherController.particlesActive) do
-			swapNode(particle)
-		end
-
-		for _, particle in pairs(weatherController.particlesInactive) do
-			swapNode(particle)
-		end
-
-		weatherController.sceneRainRoot:updateEffects()
-		rainShuffledFlag = true
-		debugLog("Rain mesh changed to "..randomRaindrop)
+		particle.object = new
 	end
+
+	for _, particle in pairs(WtC.particlesActive) do
+		swapNode(particle)
+	end
+
+	for _, particle in pairs(WtC.particlesInactive) do
+		swapNode(particle)
+	end
+
+	WtC.sceneRainRoot:updateEffects()
+	debugLog("Rain mesh changed to "..randomRaindrop)
 end
 
 -- Randomise particle amount --
@@ -536,16 +562,24 @@ local function seasonalTimer()
 	timer.start({duration=7, callback=changeSeasonal, iterations=-1, type=timer.game})
 end
 
-local function rainMeshTimer()
-	timer.start({duration=1, callback=changeRainMesh, iterations=-1, type=timer.game})
-	changeRainMesh()
-end
-
 -- Run daytime timer on loaded --
 local function daytimeTimer()
 	monthLast = nil
 	changeDaytime()
 	timer.start({duration=6, callback=changeDaytime, iterations=-1, type=timer.game})
+end
+
+
+local function rainMeshChecker(e)
+	local weatherNow
+	if e and e.to then
+		weatherNow = e.to
+	else
+		weatherNow = WtC.currentWeather
+	end
+	if (weatherNow.name == "Rain" or weatherNow.name == "Thunderstorm") then
+		changeRainMesh(weatherNow)
+	end
 end
 
 -- Change values also on initialised to ensure we won't end up with vanilla on load --
@@ -560,12 +594,13 @@ local function init()
 				table.insert(raindrops, raindrop)
 			end
 		end
-		event.register("loaded", rainMeshTimer)
+		event.register("weatherTransitionStarted", rainMeshChecker, {priority = -250})
+		event.register("weatherTransitionImmediate", rainMeshChecker, {priority = -250})
+		event.register("weatherChangedImmediate", rainMeshChecker, {priority = -250})
 	end
 
 	-- Populate data tables --
 	if config.alterClouds then
-		event.register("loaded", function() rainShuffledFlag = false end)
 		print("Watch the Skies version "..version.." initialised.")
 		for weather, index in pairs(tes3.weather) do
 			debugLog("Weather: "..weather)
