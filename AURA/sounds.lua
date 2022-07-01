@@ -417,7 +417,7 @@ function this.play(options)
 		pitch = options.pitch or MAX
 	}
 
-	if not modules[options.module].old then
+	if not modules[options.module].old or not tes3.getSoundPlaying{sound = newTrack} then
 		fadeIn(ref, volume, newTrack, options.module)
 	else
 		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
