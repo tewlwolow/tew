@@ -92,8 +92,14 @@ local function changeRainSounds(e)
 	end
 end
 
+local function rainStartCheck(e)
+    if e.to.name == "Rain" or e.to.name == "Thunderstorm" then
+        changeRainSounds(e)
+    end
+end
+
 print("[AURA "..version.."] Rain sounds initialised.")
 WtC=tes3.worldController.weatherController
 event.register("weatherChangedImmediate", changeRainSounds, {priority=-180})
 event.register("weatherTransitionImmediate", changeRainSounds, {priority=-180})
-event.register("weatherTransitionStarted", changeRainSounds, {priority=-180})
+event.register("weatherTransitionStarted", rainStartCheck, {priority=-180})
