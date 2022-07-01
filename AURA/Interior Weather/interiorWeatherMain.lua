@@ -1,7 +1,3 @@
--- TODOS:
--- Use weatherTransition scalar to determine fade-in?
--- do not fade in if cell changed, but weather did not
-
 local config = require("tew.AURA.config")
 local common=require("tew.AURA.common")
 local tewLib = require("tew.tewLib.tewLib")
