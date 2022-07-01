@@ -146,55 +146,62 @@ end
 -- Randomise rain mesh --
 local function changeRainMesh(weatherNow)
 
-	local randomRaindrop = table.choice(raindrops)
-	local newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop):clone()
-	local weatherColour
-	
-	local time = getTime(tes3.worldController.hour.value)
+	timer.start{
+		type = timer.real,
+		duration = 0.3,
+		callback = function()
 
-	if time == "dawn" then
-		weatherColour = weatherNow.fogSunriseColor
-	elseif time == "day" then
-		weatherColour = weatherNow.fogDayColor
-	elseif time == "dusk" then
-		weatherColour = weatherNow.fogSunsetColor
-	elseif time == "night" then
-		weatherColour = weatherNow.fogNightColor
-	end
+			local randomRaindrop = table.choice(raindrops)
+			local newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop):clone()
+			local weatherColour
+			
+			local time = getTime(tes3.worldController.hour.value)
 
-	local colours = {
-		r = math.clamp(weatherColour.r + 0.1, 0.1, 0.9),
-		g = math.clamp(weatherColour.g + 0.11, 0.1, 0.9),
-		b = math.clamp(weatherColour.b + 0.12, 0.1, 0.9)
+			if time == "dawn" then
+				weatherColour = weatherNow.fogSunriseColor
+			elseif time == "day" then
+				weatherColour = weatherNow.fogDayColor
+			elseif time == "dusk" then
+				weatherColour = weatherNow.fogSunsetColor
+			elseif time == "night" then
+				weatherColour = weatherNow.fogNightColor
+			end
+
+			local colours = {
+				r = math.clamp(weatherColour.r + 0.11, 0.1, 0.9),
+				g = math.clamp(weatherColour.g + 0.12, 0.1, 0.9),
+				b = math.clamp(weatherColour.b + 0.13, 0.1, 0.9)
+			}
+
+			local materialProperty = newRainMesh:getObjectByName("Tri Raindrop").materialProperty
+			materialProperty.emissive = colours
+			materialProperty.specular = colours
+			materialProperty.diffuse = colours
+			materialProperty.ambient = colours
+
+			local function swapNode(particle)
+				local old = particle.object
+				particle.rainRoot:detachChild(old)
+
+				local new = newRainMesh:clone()
+				particle.rainRoot:attachChild(new)
+				new.appCulled = old.appCulled
+
+				particle.object = new
+			end
+
+			for _, particle in pairs(WtC.particlesActive) do
+				swapNode(particle)
+			end
+
+			for _, particle in pairs(WtC.particlesInactive) do
+				swapNode(particle)
+			end
+
+			WtC.sceneRainRoot:updateEffects()
+			debugLog("Rain mesh changed to "..randomRaindrop)
+		end
 	}
-
-	local materialProperty = newRainMesh:getObjectByName("Tri Raindrop").materialProperty
-	materialProperty.emissive = colours
-	materialProperty.specular = colours
-	materialProperty.diffuse = colours
-	materialProperty.ambient = colours
-
-	local function swapNode(particle)
-		local old = particle.object
-		particle.rainRoot:detachChild(old)
-
-		local new = newRainMesh:clone()
-		particle.rainRoot:attachChild(new)
-		new.appCulled = old.appCulled
-
-		particle.object = new
-	end
-
-	for _, particle in pairs(WtC.particlesActive) do
-		swapNode(particle)
-	end
-
-	for _, particle in pairs(WtC.particlesInactive) do
-		swapNode(particle)
-	end
-
-	WtC.sceneRainRoot:updateEffects()
-	debugLog("Rain mesh changed to "..randomRaindrop)
 end
 
 -- Randomise particle amount --
@@ -251,7 +258,7 @@ local function skyChoice(e)
 	else
 		texPath = weathers.vanillaWeathers[weatherNow.index]
 		weatherNow.cloudTexture = "Data Files\\Textures\\"..texPath
-			debugLog("Using vanilla texture: "..weatherNow.cloudTexture)
+		debugLog("Using vanilla texture: "..weatherNow.cloudTexture)
 	end
 
 	-- Change hours between weather changes --
