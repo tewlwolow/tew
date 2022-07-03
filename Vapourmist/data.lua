@@ -2,9 +2,8 @@ local this = {}
 
 local config = require("tew.Vapourmist.config")
 
-this.baseTimerDuration = 0.4
-this.lerpTime = 0.012
-this.speedCoefficient = 25
+this.baseTimerDuration = 0.5
+this.speedCoefficient = 1.5
 this.minimumSpeed = 20
 this.minStaticCount = 5
 
@@ -43,7 +42,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 4500,
-        initialSize = {420, 450, 500, 510, 550, 600, 640},
+        initialSize = {400, 420, 450, 500, 510, 550, 600},
         isAvailable = function(_, weather)
 
             if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then
@@ -63,35 +62,14 @@ this.fogTypes = {
             end
 
             return false
-        end,
-        colours = {
-            ["dawn"] = {
-                r = 0.02,
-                g = 0.01,
-                b = 0.01
-            },
-            ["day"] = {
-                r = 0.01,
-                g = 0.01,
-                b = 0.011,
-            },
-            ["dusk"] = {
-                r = 0.02,
-                g = 0.01,
-                b = 0.012
-            },
-            ["night"] = {
-                r = 0.035,
-                g = 0.035,
-                b = 0.042
-            },
-        }
+        end
     },
     ["mist"] = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
         height = 550,
-        initialSize = {200, 250, 260, 300, 325, 350, 400, 450, 500},
+        initialSize = {300, 325, 350, 400, 420, 450, 500},
+        wetWeathers = {["Rain"] = true, ["Thunderstorm"] = true},
         isAvailable = function(gameHour, weather)
 
             if config.blockedMist[weather.name] and config.blockedMist[weather.name] ~= nil then
@@ -121,30 +99,7 @@ this.fogTypes = {
             end
 
             return false
-        end,
-        wetWeathers = {["Rain"] = true, ["Thunderstorm"] = true},
-        colours = {
-            ["dawn"] = {
-                r = 0.07,
-                g = 0.05,
-                b = 0.05
-            },
-            ["day"] = {
-                r = 0.02,
-                g = 0.02,
-                b = 0.02
-            },
-            ["dusk"] = {
-                r = 0.07,
-                g = 0.05,
-                b = 0.05
-            },
-            ["night"] = {
-                r = 0.02,
-                g = 0.02,
-                b = 0.024
-            },
-        }
+        end
     },
 }
 
@@ -176,12 +131,7 @@ this.interiorFog = {
         if count == 0 then return false end
 
     return false
-    end,
-    colours = {
-        r = -0.3,
-        g = -0.3,
-        b = -0.3
-    },
+    end
 }
 
 
