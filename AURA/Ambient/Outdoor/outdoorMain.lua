@@ -298,19 +298,23 @@ local function hackyCheck()
 	cellCheck()
 end
 
-local function onCOC()
-	-- sounds.removeImmediate{module = moduleName}
-	cellCheck()
+-- Potential fix for sky texture pop-in - believe it or not :|
+local function onWeatherTransistionStarted()
+	timer.start(
+		{
+			duration=0.1, callback=cellCheck, iterations=1, type=timer.game
+		}
+	)
 end
 
 WtC = tes3.worldController.weatherController
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("load", runResetter, {priority=-160})
 event.register("cellChanged", cellCheck, {priority=-160})
-event.register("weatherTransitionStarted", cellCheck, {priority=-160})
+event.register("weatherTransitionStarted", onWeatherTransistionStarted, {priority=-160})
 event.register("weatherTransitionFinished", cellCheck, {priority=-160})
-event.register("weatherTransitionImmediate", onCOC, {priority=-160})
-event.register("weatherChangedImmediate", onCOC, {priority=-160})
+event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
+event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
 event.register("AURA:conditionChanged", hackyCheck)
 debugLog("Outdoor Ambient Sounds module initialised.")
