@@ -100,6 +100,6 @@ end
 
 print("[AURA "..version.."] Rain sounds initialised.")
 WtC=tes3.worldController.weatherController
-event.register("weatherChangedImmediate", changeRainSounds, {priority=-180})
-event.register("weatherTransitionImmediate", changeRainSounds, {priority=-180})
-event.register("weatherTransitionStarted", rainStartCheck, {priority=-180})
+event.register("weatherChangedImmediate", changeRainSounds, {priority=-233})
+event.register("weatherTransitionImmediate", changeRainSounds, {priority=-233})
+event.register("weatherTransitionStarted", rainStartCheck, {priority=-233})
