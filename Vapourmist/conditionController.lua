@@ -14,8 +14,6 @@ local WtC
 -- Check for interior cells
 local function interiorCheck(cell)
 
-	fogService.purgeInactive()
-
 	debugLog("Starting interior check.")
 
 	if data.interiorFog.isAvailable(cell) and not fogService.isCellFogged(cell, data.interiorFog.name) then
@@ -35,8 +33,6 @@ end
 
 -- Controls conditions and fog spawning/removing
 local function conditionCheck(e)
-
-	fogService.purgeInactive()
 
 	timer.start {
 		duration = 0.05,
@@ -169,7 +165,6 @@ end
 
 
 local function onWeatherChanged(e)
-	fogService.purgeInactive()
 	if data.fogTypes["mist"].wetWeathers[e.from.name] then
 
 		debugLog("Adding post-rain mist.")
