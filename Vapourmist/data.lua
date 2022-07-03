@@ -46,6 +46,10 @@ this.fogTypes = {
         initialSize = {420, 450, 500, 510, 550, 600, 640},
         isAvailable = function(_, weather)
 
+            if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then
+                return false
+            end
+
             if math.random(1, 100) <= config.randomCloudChance then
                 return false
             end
@@ -90,12 +94,16 @@ this.fogTypes = {
         initialSize = {200, 250, 260, 300, 325, 350, 400, 450, 500},
         isAvailable = function(gameHour, weather)
 
+            if config.blockedMist[weather.name] and config.blockedMist[weather.name] ~= nil then
+                return false
+            end
+
             local WtC = tes3.worldController.weatherController
             if (
                 (
                 (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 1.5)
                 or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
-                and not (this.fogTypes["mist"].wetWeathers[weather.name] or weather.name == "Ash" or weather.name == "Blight" or weather.name == "Snow" or weather.name == "Blizzard")
+                and not (this.fogTypes["mist"].wetWeathers[weather.name])
                 ) then
                 return true
             end

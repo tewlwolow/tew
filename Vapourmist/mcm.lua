@@ -49,9 +49,9 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("randomMistChance")
     }
 
-    local weathersPage = template:createPage{label="Weather Settings", noScroll=true}
+    local weathersPage = template:createPage{label="Allowed weathers", noScroll=true}
     weathersPage:createCategory{
-        label = "Controls weather types when cloud and mist types can spawn.\n",
+        label = "Controls weather types when cloud and mist types can spawn.\nThese can be overridden by a random chance.\n",
     }
 
     weathersPage:createExclusionsPage{
@@ -90,7 +90,7 @@ local template = mwse.mcm.createTemplate{
 
     weathersPage:createExclusionsPage{
         label = "Misty weathers",
-        description = "Weathers to spawn mist in:",
+        description = "Weathers to spawn mist in (in addition to dawn/dusk and post-rain mist):",
         toggleText = "Toggle",
         leftListLabel = "Misty weathers",
         rightListLabel = "All weathers",
@@ -121,6 +121,81 @@ local template = mwse.mcm.createTemplate{
 
         }
     }
+
+    local blockedPage = template:createPage{label="Disallowed weathers", noScroll=true}
+    blockedPage:createCategory{
+        label = "Controls weather types when fog will never spawn, regardless of other settings.\n",
+    }
+
+    blockedPage:createExclusionsPage{
+        label = "Cloudy weathers",
+        description = "Weathers to block cloud spawns in:",
+        toggleText = "Toggle",
+        leftListLabel = "Cloudy weathers",
+        rightListLabel = "All weathers",
+        showAllBlocked = false,
+        variable = mwse.mcm.createTableVariable{
+            id = "blockedCloud",
+            table = config,
+        },
+
+        filters = {
+
+            {
+                label = "Weathers",
+                callback = (
+                    function()
+                        local weatherNames = {}
+                        for weather, _ in pairs(tes3.weather) do
+                            if weather == "thunder" then
+                                table.insert(weatherNames, "Thunderstorm")
+                            else
+                                table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            end
+                        end
+                        return weatherNames
+                    end
+                )
+            },
+
+        }
+    }
+
+    blockedPage:createExclusionsPage{
+        label = "Misty weathers",
+        description = "Weathers to block mist spawns in:",
+        toggleText = "Toggle",
+        leftListLabel = "Misty weathers",
+        rightListLabel = "All weathers",
+        showAllBlocked = false,
+        variable = mwse.mcm.createTableVariable{
+            id = "blockedMist",
+            table = config,
+        },
+
+        filters = {
+
+            {
+                label = "Weathers",
+                callback = (
+                    function()
+                        local weatherNames = {}
+                        for weather, _ in pairs(tes3.weather) do
+                            if weather == "thunder" then
+                                table.insert(weatherNames, "Thunderstorm")
+                            else
+                                table.insert(weatherNames, weather:sub(1,1):upper()..weather:sub(2))
+                            end
+                        end
+                        return weatherNames
+                    end
+                )
+            },
+
+        }
+    }
+
+
 
 
 template:saveOnClose(configPath, config)
