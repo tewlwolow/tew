@@ -233,32 +233,35 @@ end
 -- Main function controlling cloud texture swap on weather transitions--
 local function skyChoice(e)
 	-- Buzz off if the event doesn't have any weather data --
-	local weatherNow
-	if e.from then
-		weatherNow = e.from.name
-	else
-		weatherNow = WtC.currentWeather
-	end
+	local weatherNow = WtC.currentWeather
 
 	-- Check against config chances, do nothing if dice roll determines we should use vanilla instead --
 	debugLog("Starting cloud texture randomisation.")
-	local vanChance=config.vanChance/100
-	local texPath
-	if vanChance<math.random() then
-		local sArray=weathers.customWeathers[weatherNow.index]
-		for weather, index in pairs(tes3.weather) do
-			if weatherNow.index==index then
-				texPath=weather
+	local texPath, sArray
+	for _, weather in pairs(WtC.weathers) do
+		if (weatherNow.index == weather.index) or (WtC.nextWeather and WtC.nextWeather.index == weather.index) then goto continue end
+		if config.vanChance<math.random() then
+			for index, _ in pairs(weathers.customWeathers) do
+				if weather.index==index then
+					for w, i in pairs(tes3.weather) do
+						if index==i then
+							sArray=weathers.customWeathers[weather.index]
+							texPath=w
+							break
+						end
+					end
+				end
 			end
+			if texPath~=nil and sArray[1]~=nil then
+				weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+				debugLog("Cloud texture path set to: "..weather.cloudTexture)
+			end
+		else
+			texPath = weathers.vanillaWeathers[weather.index]
+			weather.cloudTexture = "Data Files\\Textures\\"..texPath
+			debugLog("Using vanilla texture: "..weather.cloudTexture)
 		end
-		if texPath~=nil and sArray[1]~=nil then
-			weatherNow.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-			debugLog("Cloud texture path set to: "..weatherNow.cloudTexture)
-		end
-	else
-		texPath = weathers.vanillaWeathers[weatherNow.index]
-		weatherNow.cloudTexture = "Data Files\\Textures\\"..texPath
-		debugLog("Using vanilla texture: "..weatherNow.cloudTexture)
+		::continue::
 	end
 
 	-- Change hours between weather changes --
@@ -576,6 +579,10 @@ local function daytimeTimer()
 	timer.start({duration=6, callback=changeDaytime, iterations=-1, type=timer.game})
 end
 
+local function skyChoiceTimer()
+	timer.start({duration=2, callback=skyChoice, iterations=-1, type=timer.game})
+end
+
 
 local function rainMeshChecker(e)
 	local weatherNow
@@ -620,33 +627,33 @@ local function init()
 				end
 			end
 		end
-	end
+		-- Initially shuffle the cloud textures --
+		local vanChance=config.vanChance/100
+		local texPath, sArray
 
-	-- Initially shuffle the cloud textures --
-	local vanChance=config.vanChance/100
-	local texPath, sArray
-
-	for _, weather in pairs(WtC.weathers) do
-		if vanChance<math.random() then
-			for index, _ in pairs(weathers.customWeathers) do
-				if weather.index==index then
-					for w, i in pairs(tes3.weather) do
-						if index==i then
-							sArray=weathers.customWeathers[weather.index]
-							texPath=w
-							break
+		debugLog("Initially shuffling textures.")
+		for _, weather in pairs(WtC.weathers) do
+			if vanChance<math.random() then
+				for index, _ in pairs(weathers.customWeathers) do
+					if weather.index==index then
+						for w, i in pairs(tes3.weather) do
+							if index==i then
+								sArray=weathers.customWeathers[weather.index]
+								texPath=w
+								break
+							end
 						end
 					end
 				end
+				if texPath~=nil and sArray[1]~=nil then
+					weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
+					debugLog("Cloud texture path set to: "..weather.cloudTexture)
+				end
+			else
+				texPath = weathers.vanillaWeathers[weather.index]
+				weather.cloudTexture = "Data Files\\Textures\\"..texPath
+				debugLog("Using vanilla texture: "..weather.cloudTexture)
 			end
-			if texPath~=nil and sArray[1]~=nil then
-				weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-				debugLog("Cloud texture path set to: "..weather.cloudTexture)
-			end
-		else
-			texPath = weathers.vanillaWeathers[weather.index]
-			weather.cloudTexture = "Data Files\\Textures\\"..texPath
-			debugLog("Using vanilla texture: "..weather.cloudTexture)
 		end
 	end
 
@@ -675,9 +682,7 @@ local function init()
 	end
 
 	if config.alterClouds then
-		event.register("weatherChangedImmediate", skyChoice, {priority=-150})
-		event.register("weatherTransitionImmediate", skyChoice, {priority=-150})
-		event.register("weatherTransitionFinished", skyChoice, {priority=-150})
+		event.register("loaded", skyChoiceTimer)
 	end
 
 	if config.interiorTransitions then
