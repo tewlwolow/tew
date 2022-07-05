@@ -37,7 +37,6 @@ function this.purgeCurrentFogs(fogType)
 	currentFogs[fogType] = {}
 end
 
-
 function this.updateCurrentFogs(fog, fogType)
 	table.insert(currentFogs[fogType], fog)
 end
@@ -59,6 +58,66 @@ function this.isCellFogged(activeCell, fogType)
 		end
 	end
 	return false
+end
+
+local function removeSelected(parent, fog)
+	for _, f in pairs(fog.children) do
+		if f.name == "Mist Emitter" then
+			f.appCulled = true
+			f:update()
+		end
+	end
+	local currentCell = tes3.getPlayerCell()
+	timer.start{
+		type = timer.simulate,
+		duration = data.postAppCullTime,
+		callback = function()
+
+			parent:detachChild(fog)
+
+			for _, fogType in pairs(currentFogs) do
+				for k, v in pairs(fogType) do
+					if v == fog then
+						table.remove(fogType, k)
+					end
+				end
+			end
+			
+			local toRemove = {}
+			for _, fogType in pairs(foggedCells) do
+				for _, v in pairs(fogType) do
+					if v == currentCell then
+						table.insert(toRemove, v)
+					end
+				end
+			end
+
+			for _, fogType in pairs(foggedCells) do
+				for k, v in pairs(fogType) do
+					if v == currentCell then
+						table.remove(fogType, k)
+					end
+				end
+			end
+		end
+	}
+end
+
+function this.cleanInactiveFog()
+	local mp = tes3.mobilePlayer
+	if not mp then return end
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+	for _, fogType in pairs(currentFogs) do
+		if not fogType then return end
+		for _, fog in pairs(fogType) do
+			if not fog then return end
+			local fogPosition = fog.translation:copy()
+			local playerPosition = mp.position:copy()
+			if playerPosition:distance(fogPosition) > data.fogDistance then
+				removeSelected(vfxRoot, fog)
+			end
+		end
+	end
 end
 
 -- Check whether fog is appculled
@@ -144,7 +203,7 @@ function this.getOutputValues()
 			g = math.clamp(weatherColour.g + 0.03, 0.1, 0.85),
 			b = math.clamp(weatherColour.b + 0.03, 0.1, 0.85)
 		},
-		angle = WtC.windVelocityCurrWeather:normalized():copy().y * math.pi * 1,
+		angle = WtC.windVelocityCurrWeather:normalized():copy().x * math.pi * 2,
 		speed = math.max(WtC.currentWeather.cloudsSpeed * data.speedCoefficient, data.minimumSpeed)
 	}
 
@@ -226,20 +285,30 @@ function this.addFog(options)
 			fogMesh:updateProperties()
 			fogMesh:updateNodeEffects()
 			this.updateFoggedCells(activeCell, type)
-		else
-			this.debugLog("Cell is already fogged. Showing fog.")
-			this.cullFog(false, type)
-
 		end
 	end
 
 end
 
 -- Removes fog from view by appculling - with fade out
-function this.removeFog(type)
-    this.debugLog("Removing fog of type: "..type)
-	this.cullFog(true, type)
-	this.purgeCurrentFogs(type)
+function this.removeFog(fogType)
+    this.debugLog("Removing fog of type: "..fogType)
+	this.cullFog(true, fogType)
+
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+	timer.start{
+		type = timer.simulate,
+		duration = data.postAppCullTime,
+		callback = function()
+			for _, node in pairs(vfxRoot.children) do
+				if node and node.name == "tew_"..fogType then
+					vfxRoot:detachChild(node)
+				end
+			end
+			this.purgeCurrentFogs(fogType)
+			this.purgeFoggedCells(fogType)
+		end
+	}
 end
 
 -- Removes fog from view by detaching - without fade out
@@ -250,7 +319,7 @@ function this.removeFogImmediate(fogType)
 	if this.isFogAppculled(fogType) then return end
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-
+	local currentCell = tes3.getPlayerCell()
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..fogType then
 			vfxRoot:detachChild(node)
@@ -258,15 +327,22 @@ function this.removeFogImmediate(fogType)
 	end
 
 	this.purgeCurrentFogs(fogType)
-	table.remove(foggedCells, tes3.getPlayerCell)
+	
 	local toRemove = {}
-	for k, v in pairs(foggedCells) do
-		if v == tes3.getPlayerCell() then
-			table.insert(toRemove, k)
+	for _, fType in pairs(foggedCells) do
+		for _, v in pairs(fType) do
+			if v == currentCell then
+				table.insert(toRemove, v)
+			end
 		end
 	end
-	for _, v in pairs(toRemove) do
-		table.remove(foggedCells, v)
+
+	for _, fType in pairs(foggedCells) do
+		for k, v in pairs(fType) do
+			if v == currentCell then
+				table.remove(fType, k)
+			end
+		end
 	end
 end
 
@@ -310,9 +386,6 @@ function this.addInteriorFog(options)
 		fogMesh:updateProperties()
 		fogMesh:updateNodeEffects()
 		this.updateFoggedCells(cell, fogType)
-	else
-		this.debugLog("Cell is already fogged. Showing fog.")
-		this.cullFog(false, fogType)
 	end
 
 end

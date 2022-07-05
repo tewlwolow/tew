@@ -32,8 +32,8 @@ local function interiorCheck(cell)
 end
 
 -- Controls conditions and fog spawning/removing
-local function conditionCheck(e)
-
+local function conditionCheck()
+	fogService.cleanInactiveFog()
 	timer.start {
 		duration = 0.05,
 		type = timer.game,
@@ -103,14 +103,6 @@ local function conditionCheck(e)
 
 				-- Log fog type
 				debugLog("Fog type: "..fogType.name)
-
-				if fromWeather.name == toWeather.name
-				and fromFogColour == toFogColour
-				and fromRegion.id == toRegion.id
-				and (fogService.isCellFogged(cell, fogType.name)) then
-					debugLog("Conditions are the same. Returning.")
-					return
-				end
 				
 				local options = {
 					mesh = fogType.mesh,
@@ -208,5 +200,4 @@ local function init()
 	event.register("weatherTransitionFinished", function() debugLog("================== weatherTransitionFinished ==================") conditionCheck() end, {priority = 500})
 end
 
--- Cuz SOLID, encapsulation blah blah blah
 init()

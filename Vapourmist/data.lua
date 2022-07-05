@@ -2,10 +2,12 @@ local this = {}
 
 local config = require("tew.Vapourmist.config")
 
-this.baseTimerDuration = 0.5
+this.baseTimerDuration = 0.2
 this.speedCoefficient = 1.5
 this.minimumSpeed = 20
 this.minStaticCount = 5
+this.fogDistance = 12300
+this.postAppCullTime = 33
 
 local interiorStatics = {
     "in_moldcave",
@@ -42,7 +44,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 4500,
-        initialSize = {400, 420, 450, 500, 510, 550, 600},
+        initialSize = {420, 450, 500, 510, 550, 600},
         isAvailable = function(_, weather)
 
             if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then
@@ -68,7 +70,7 @@ this.fogTypes = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
         height = 550,
-        initialSize = {300, 325, 350, 400, 420, 450, 500},
+        initialSize = {400, 420, 450, 500, 520, 550},
         wetWeathers = {["Rain"] = true, ["Thunderstorm"] = true},
         isAvailable = function(gameHour, weather)
 
