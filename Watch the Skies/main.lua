@@ -215,16 +215,16 @@ local function changeCloudsSpeed()
 	debugLog("Clouds speed randomised.")
 end
 
--- Main function controlling cloud texture swap on weather transitions--
+-- Main function controlling cloud texture swap --
 local function skyChoice(e)
-	-- Buzz off if the event doesn't have any weather data --
 	local weatherNow = WtC.currentWeather
+	if WtC.nextWeather then return end
 
 	-- Check against config chances, do nothing if dice roll determines we should use vanilla instead --
 	debugLog("Starting cloud texture randomisation.")
 	local texPath, sArray
 	for _, weather in pairs(WtC.weathers) do
-		if (weatherNow.index == weather.index) or (WtC.nextWeather and WtC.nextWeather.index == weather.index) then goto continue end
+		if (weatherNow.index == weather.index) then goto continue end
 		if config.vanChance<math.random() then
 			for index, _ in pairs(weathers.customWeathers) do
 				if weather.index==index then
