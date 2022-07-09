@@ -254,7 +254,6 @@ end
 -- Adds fog to the cell
 function this.addFog(options)
 
-	local mesh = options.mesh
 	local type = options.type
 	local height = options.height
 
@@ -359,7 +358,6 @@ function this.addInteriorFog(options)
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
-	local mesh = options.mesh
 	local fogType = options.type
 	local height = options.height
 	local cell = options.cell

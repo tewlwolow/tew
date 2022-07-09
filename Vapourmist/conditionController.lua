@@ -19,7 +19,6 @@ local function interiorCheck(cell)
 	if data.interiorFog.isAvailable(cell) and not fogService.isCellFogged(cell, data.interiorFog.name) then
 
 		local options = {
-			mesh = data.interiorFog.mesh,
 			type = data.interiorFog.name,
 			height = data.interiorFog.height,
 			cell = cell,
@@ -105,7 +104,6 @@ local function conditionCheck()
 				debugLog("Fog type: "..fogType.name)
 				
 				local options = {
-					mesh = fogType.mesh,
 					type = fogType.name,
 					height = fogType.height,
 				}
@@ -162,7 +160,6 @@ local function onWeatherChanged(e)
 		debugLog("Adding post-rain mist.")
 
 		local options = {
-			mesh = data.fogTypes["mist"].mesh,
 			type = data.fogTypes["mist"].name,
 			height = data.fogTypes["mist"].height,
 		}
