@@ -216,7 +216,7 @@ local function changeCloudsSpeed()
 end
 
 -- Main function controlling cloud texture swap --
-local function skyChoice(e)
+local function skyChoice()
 	local weatherNow = WtC.currentWeather
 	if WtC.nextWeather then return end
 
@@ -565,7 +565,7 @@ local function daytimeTimer()
 end
 
 local function skyChoiceTimer()
-	timer.start({duration=2, callback=skyChoice, iterations=-1, type=timer.game})
+	timer.start({duration=4, callback=skyChoice, iterations=-1, type=timer.game})
 end
 
 
