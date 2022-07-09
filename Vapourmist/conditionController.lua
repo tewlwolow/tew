@@ -190,6 +190,10 @@ end
 
 -- Register events
 local function init()
+	for _, fogType in pairs(data.fogTypes) do
+		fogService.meshes[fogType.name] = tes3.loadMesh(fogType.mesh)
+	end
+	fogService.meshes[data.interiorFog] = tes3.loadMesh(data.interiorFog.mesh)
 	WtC = tes3.worldController.weatherController
 	event.register("loaded", function() debugLog("================== loaded ==================") onLoaded() end)
 	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority = 500})

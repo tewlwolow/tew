@@ -19,6 +19,12 @@ local foggedCells = {
 	["mist"] = {}
 }
 
+this.meshes = {
+	["cloud"] = nil,
+	["mist"] = nil,
+	["interior"] = nil
+}
+
 -- Print debug messages
 function this.debugLog(message)
     if config.debugLogOn then
@@ -51,6 +57,7 @@ end
 
 -- Returns true if the cell is fogged
 function this.isCellFogged(activeCell, fogType)
+	if not foggedCells or not foggedCells[fogType] then return false end
 	for _, cell in pairs(foggedCells[fogType]) do
 		if cell == activeCell then
 			this.debugLog("Cell: "..cell.editorName.." is fogged.")
@@ -259,7 +266,7 @@ function this.addFog(options)
 		if (not (this.isCellFogged(activeCell, type)) and not (activeCell.isInterior)) then
 			this.debugLog("Cell is not fogged. Adding "..type..".")
 
-			local fogMesh = tes3.loadMesh(mesh):clone()
+			local fogMesh = this.meshes[options.type]:clone()
 
 			fogMesh:clearTransforms()
 			fogMesh.translation = tes3vector3.new(
@@ -360,7 +367,7 @@ function this.addInteriorFog(options)
 	if not (this.isCellFogged(cell, fogType)) then
 		this.debugLog("Interior cell is not fogged. Adding "..fogType..".")
 
-		local fogMesh = tes3.loadMesh(mesh):clone()
+		local fogMesh = this.meshes["interior"]:clone()
 		local pos = getInteriorCellPosition(cell)
 
 		fogMesh:clearTransforms()
