@@ -13,9 +13,9 @@ local raindropsPath = "Data Files\\Meshes\\tew\\Watch the Skies\\raindrops"
 local raindrops = {}
 local newRainMesh
 
-local function debugLog(string)
+local function debugLog(message)
 	if debugLogOn then
-	   mwse.log("[Watch the Skies "..version.."] "..string.format("%s", string))
+	   mwse.log("[Watch the Skies "..version.."] "..string.format("%s", message))
 	end
 end
 
@@ -202,11 +202,11 @@ end
 
 -- Change cloud speed --
 local function changeCloudsSpeed()
-	WtC.weathers[1].cloudsSpeed=math.random(100,200)/100
-	WtC.weathers[2].cloudsSpeed=math.random(100,300)/100
+	WtC.weathers[1].cloudsSpeed=math.random(60,300)/100
+	WtC.weathers[2].cloudsSpeed=math.random(100,500)/100
 	WtC.weathers[3].cloudsSpeed=math.random(50,150)/100
-	WtC.weathers[4].cloudsSpeed=math.random(100,300)/100
-	WtC.weathers[5].cloudsSpeed=math.random(150,350)/100
+	WtC.weathers[4].cloudsSpeed=math.random(100,500)/100
+	WtC.weathers[5].cloudsSpeed=math.random(250,750)/100
 	WtC.weathers[6].cloudsSpeed=math.random(200,450)/100
 	WtC.weathers[7].cloudsSpeed=math.random(600,1000)/100
 	WtC.weathers[8].cloudsSpeed=math.random(800,1500)/100
