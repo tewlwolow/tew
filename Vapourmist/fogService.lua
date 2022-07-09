@@ -14,11 +14,6 @@ local currentFogs = {
 	["mist"] = {}
 }
 
-local foggedCells = {
-	["cloud"] = {},
-	["mist"] = {}
-}
-
 this.meshes = {
 	["cloud"] = nil,
 	["mist"] = nil,
@@ -43,22 +38,14 @@ function this.purgeCurrentFogs(fogType)
 	currentFogs[fogType] = {}
 end
 
-function this.updateCurrentFogs(fog, fogType)
-	table.insert(currentFogs[fogType], fog)
-end
-
-function this.purgeFoggedCells(fogType)
-	foggedCells[fogType] = {}
-end
-
-function this.updateFoggedCells(cell, fogType)
-	table.insert(foggedCells[fogType], cell)
+function this.updateCurrentFogs(fogType, fog, cell)
+	currentFogs[fogType][fog] = cell
 end
 
 -- Returns true if the cell is fogged
 function this.isCellFogged(activeCell, fogType)
-	if not foggedCells or not foggedCells[fogType] then return false end
-	for _, cell in pairs(foggedCells[fogType]) do
+	if not currentFogs or not currentFogs[fogType] then return false end
+	for _, cell in pairs(currentFogs[fogType]) do
 		if cell == activeCell then
 			this.debugLog("Cell: "..cell.editorName.." is fogged.")
 			return true
@@ -72,9 +59,10 @@ local function removeSelected(parent, fog)
 		if f.name == "Mist Emitter" then
 			f.appCulled = true
 			f:update()
+			this.debugLog("Appculling fog: "..fog.name)
 		end
 	end
-	local currentCell = tes3.getPlayerCell()
+
 	timer.start{
 		type = timer.simulate,
 		duration = data.postAppCullTime,
@@ -83,29 +71,13 @@ local function removeSelected(parent, fog)
 			parent:detachChild(fog)
 
 			for _, fogType in pairs(currentFogs) do
-				for k, v in pairs(fogType) do
-					if v == fog then
-						table.remove(fogType, k)
+				for f, _ in pairs(fogType) do
+					if fog == f then
+						fogType[fog] = nil
 					end
 				end
 			end
-			
-			local toRemove = {}
-			for _, fogType in pairs(foggedCells) do
-				for _, v in pairs(fogType) do
-					if v == currentCell then
-						table.insert(toRemove, v)
-					end
-				end
-			end
-
-			for _, fogType in pairs(foggedCells) do
-				for k, v in pairs(fogType) do
-					if v == currentCell then
-						table.remove(fogType, k)
-					end
-				end
-			end
+		
 		end
 	}
 end
@@ -116,7 +88,7 @@ function this.cleanInactiveFog()
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, fogType in pairs(currentFogs) do
 		if not fogType then return end
-		for _, fog in pairs(fogType) do
+		for fog, _ in pairs(fogType) do
 			if not fog then return end
 			local fogPosition = fog.translation:copy()
 			local playerPosition = mp.position:copy()
@@ -191,7 +163,7 @@ function this.cullFog(bool, type)
 					if fog.appCulled ~= bool then
 						fog.appCulled = bool
 						fog:update()
-						this.debugLog("Appculling switched to "..tostring(bool).." for "..type.." fog.")
+						this.debugLog("Appculling switched to "..tostring(bool).." for "..type.." fogs.")
 					end
 				end
 			end
@@ -223,7 +195,7 @@ function this.reColour()
 	local angle = output.angle
 	for _, fogType in pairs(currentFogs) do
 		if not fogType then return end
-		for _, fog in pairs(fogType) do
+		for fog, _ in pairs(fogType) do
 			if not fog then goto continue end
 			local particleSystem = fog:getObjectByName("MistEffect")
 			local controller = particleSystem.controller
@@ -282,7 +254,7 @@ function this.addFog(options)
 						local particleSystem = vfx:getObjectByName("MistEffect")
 						local controller = particleSystem.controller
 						controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
-						this.updateCurrentFogs(vfx, options.type)
+						this.updateCurrentFogs(options.type, vfx, activeCell)
 					end
 				end
 			end
@@ -290,7 +262,6 @@ function this.addFog(options)
 			fogMesh:update()
 			fogMesh:updateProperties()
 			fogMesh:updateNodeEffects()
-			this.updateFoggedCells(activeCell, type)
 		end
 	end
 
@@ -312,7 +283,6 @@ function this.removeFog(fogType)
 				end
 			end
 			this.purgeCurrentFogs(fogType)
-			this.purgeFoggedCells(fogType)
 		end
 	}
 end
@@ -325,7 +295,6 @@ function this.removeFogImmediate(fogType)
 	if this.isFogAppculled(fogType) then return end
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-	local currentCell = tes3.getPlayerCell()
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..fogType then
 			vfxRoot:detachChild(node)
@@ -333,23 +302,6 @@ function this.removeFogImmediate(fogType)
 	end
 
 	this.purgeCurrentFogs(fogType)
-	
-	local toRemove = {}
-	for _, fType in pairs(foggedCells) do
-		for _, v in pairs(fType) do
-			if v == currentCell then
-				table.insert(toRemove, v)
-			end
-		end
-	end
-
-	for _, fType in pairs(foggedCells) do
-		for k, v in pairs(fType) do
-			if v == currentCell then
-				table.remove(fType, k)
-			end
-		end
-	end
 end
 
 function this.addInteriorFog(options)
@@ -382,7 +334,7 @@ function this.addInteriorFog(options)
 					local particleSystem = vfx:getObjectByName("MistEffect")
 					local controller = particleSystem.controller
 					controller.initialSize = table.choice(data.interiorFog.initialSize)
-					this.updateCurrentFogs(vfx, fogType)
+					this.updateCurrentFogs(fogType, vfx, cell)
 				end
 			end
 		end
@@ -390,7 +342,6 @@ function this.addInteriorFog(options)
 		fogMesh:update()
 		fogMesh:updateProperties()
 		fogMesh:updateNodeEffects()
-		this.updateFoggedCells(cell, fogType)
 	end
 
 end
@@ -405,10 +356,6 @@ function this.removeAll()
 	end
 
 	currentFogs = {
-		["cloud"] = {},
-		["mist"] = {}
-	}
-	foggedCells = {
 		["cloud"] = {},
 		["mist"] = {}
 	}
