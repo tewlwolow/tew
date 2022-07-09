@@ -5,13 +5,13 @@ local debugLogOn = config.debugLogOn
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 
-function this.debugLog(string)
+function this.debugLog(message)
     if debugLogOn then
         local info = debug.getinfo(2, "Sl")
         local module = info.short_src:match("^.+\\(.+).lua$")
         local prepend = ("[AURA.%s.%s:%s]:"):format(version, module, info.currentline)
         local aligned = ("%-36s"):format(prepend)
-        mwse.log(aligned.." -- "..string.format("%s", string))
+        mwse.log(aligned.." -- "..string.format("%s", message))
     end
 end
 
