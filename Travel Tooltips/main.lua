@@ -7,8 +7,7 @@ local config=require("tew\\Travel Tooltips\\config")
 local descriptionTable=data.descriptionTable
 local gondoliersTable=data.gondoliersTable
 local useFallback=config.useFallback
-local headers
-local vehkTable = {}
+local headers, vehkHeaders
 
 local modversion = require("tew\\Travel Tooltips\\version")
 local version = modversion.version
@@ -46,11 +45,11 @@ end
 
 local function getVehkHeaders()
     debugLog("Creating arrays for vehk type headers.")
-    vehkTable = {}
+    vehkHeaders = {}
     for city, maps in pairs(data.headers_vehk) do
         if maps[1] then
-            local map = maps[math.random(1, #maps)]
-            vehkTable[city] = map
+            local map = table.choice(maps)
+            vehkHeaders[city] = map
         end
     end
 end
@@ -93,12 +92,12 @@ local function createTooltip(e)
                 elseif headers == "headers_Stuporstar" then
                     headers=data.headers_Stuporstar
                 elseif headers == "headers_vehk" then
-                    headers=data.headers_vehk
+                    headers=vehkHeaders
                 end
 
-                if headers == data.headers_vehk then
+                if headers == vehkHeaders then
                     debugLog("Getting vehk header.")
-                    for city, map in pairs(vehkTable) do
+                    for city, map in pairs(vehkHeaders) do
                         if string.startswith(trDestination.text, city) then
                             headerPath = vehkDir..city.."\\"..map
                         end
@@ -161,7 +160,7 @@ local function createTooltip(e)
                     destLabel.borderBottom=3*scale
 
                     local destHeader=destBlock:createImage{path=headerPath}
-                    if not headers==data.headers_vehk then
+                    if not headers==vehkHeaders then
                         getColour()
                         destHeader.color=mapColour
                     end
@@ -170,7 +169,7 @@ local function createTooltip(e)
                     destHeader.borderBottom = 2*scale
                     destHeader.borderTop = 2*scale
                     destHeader.justifyText="center"
-                    --TO DO: update path
+
                     if headerPath=="\\Textures\\Travel Tooltips\\Sheogorad_regionmap.tga" then
                         destHeader.imageScaleX=1*scale
                         destHeader.imageScaleY=1*scale
@@ -272,17 +271,19 @@ end
 
 local function init()
 
-    for city, maps in pairs(data.headers_vehk) do
-        for folder in lfs.dir(vehkDir) do
-            if city==folder then
-                for map in lfs.dir(vehkDir..folder) do
-                    if string.endswith(map, ".dds") or string.endswith(map, ".tga") then
-                        table.insert(maps, map)
-                        debugLog("Vehk's Ink: Adding file: '"..map.."' to array: '"..city.."'.")
-                    end
-                end
+    for folder in lfs.dir(vehkDir) do
+        if folder == ".." or folder == "." then goto continue end
+
+        data.headers_vehk[folder] = {}
+        debugLog("Found folder: "..folder)
+
+        for map in lfs.dir(vehkDir.."\\"..folder) do
+            if map ~= ".." and map ~= "."  and string.endswith(map, ".dds") or string.endswith(map, ".tga") then
+                table.insert(data.headers_vehk[folder], map)
+                debugLog("Vehk's Ink: Adding file: '"..map.."' to array: '"..folder.."'.")
             end
         end
+        :: continue ::
     end
 
     if config.headers == "headers_vehk" then
