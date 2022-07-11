@@ -44,7 +44,7 @@ local function conditionCheck()
 			-- Sanity check
 			if not cell then debugLog("No cell. Returning.") return end
 		
-			if (cell.isInterior) and not (cell.behavesAsExterior) then
+			if not (cell.isOrBehavesAsExterior) then
 				fogService.removeAll()
 				if config.interiorFog then
 					interiorCheck(cell)

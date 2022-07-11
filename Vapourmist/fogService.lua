@@ -55,12 +55,11 @@ function this.isCellFogged(activeCell, fogType)
 end
 
 local function removeSelected(parent, fog)
-	for _, f in pairs(fog.children) do
-		if f.name == "Mist Emitter" then
-			f.appCulled = true
-			f:update()
-			this.debugLog("Appculling fog: "..fog.name)
-		end
+	local emitter = fog:getObjectByName("Mist Emitter")
+	if not emitter.appCulled then
+		emitter.appCulled = true
+		emitter:update()
+		this.debugLog("Appculling fog: "..fog.name)
 	end
 
 	timer.start{
