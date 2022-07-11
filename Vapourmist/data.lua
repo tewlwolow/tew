@@ -3,7 +3,7 @@ local this = {}
 local config = require("tew.Vapourmist.config")
 
 this.baseTimerDuration = 0.05
-this.speedCoefficient = 1.5
+this.speedCoefficient = 2.5
 this.minimumSpeed = 20
 this.minStaticCount = 5
 this.fogDistance = 12300
@@ -51,15 +51,8 @@ this.fogTypes = {
                 return false
             end
 
-            if math.random(1, 100) <= config.randomCloudChance then
-                return false
-            end
 
             if config.cloudyWeathers[weather.name] and config.cloudyWeathers[weather.name] ~= nil then
-                return true
-            end
-
-            if math.random(1, 100) <= config.randomCloudChance then
                 return true
             end
 
@@ -88,15 +81,7 @@ this.fogTypes = {
                 return true
             end
 
-            if math.random(1, 100) <= config.randomCloudChance then
-                return false
-            end
-
             if config.mistyWeathers[weather.name] and config.mistyWeathers[weather.name] ~= nil then
-                return true
-            end
-
-            if math.random(1, 100) <= config.randomMistChance then
                 return true
             end
 

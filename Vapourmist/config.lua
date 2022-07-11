@@ -24,8 +24,6 @@ return mwse.loadConfig(
             ["Blizzard"] = true,
             ["Rain"] = true,
             ["Thunderstorm"] = true
-        },
-        randomCloudChance = 15,
-        randomMistChance = 10
+        }
     }
 )
