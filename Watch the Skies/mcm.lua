@@ -60,8 +60,8 @@ local template = mwse.mcm.createTemplate{
         restartRequired=true
     }
     page:createYesNoButton{
-        label = "Randomise rain mesh?",
-        variable = registerVariable("randomiseRainMesh"),
+        label = "Randomise rain and snow particle meshes?",
+        variable = registerVariable("randomiseParticleMeshes"),
         restartRequired=true
     }
     page:createSlider{

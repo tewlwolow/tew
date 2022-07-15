@@ -9,9 +9,12 @@ local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
-local raindropsPath = "Data Files\\Meshes\\tew\\Watch the Skies\\raindrops"
-local raindrops = {}
-local newRainMesh
+local particlesPath = "Data Files\\Meshes\\tew\\Watch the Skies\\particles"
+local particles = {
+	["rain"] = {},
+	["snow"] = {}
+}
+local newParticleMesh
 
 local function debugLog(message)
 	if debugLogOn then
@@ -130,10 +133,10 @@ local function getMQState()
 	return questStage
 end
 
-local function reColourRain()
-	if not (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm")
-	or ((WtC.nextWeather) and not (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm"))
-	or not newRainMesh then
+local function reColourParticleMesh()
+	if not (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm" or WtC.currentWeather.name == "Snow")
+	or ((WtC.nextWeather) and not (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm" or WtC.nextWeather.name == "Snow"))
+	or not newParticleMesh then
 		return
 	end
 
@@ -145,7 +148,7 @@ local function reColourRain()
 		b = math.clamp(weatherColour.b + 0.13, 0.1, 0.9)
 	}
 
-	local materialProperty = newRainMesh:getObjectByName("Tri Raindrop").materialProperty
+	local materialProperty = newParticleMesh:getObjectByName("tew_particle").materialProperty
 	materialProperty.emissive = colours
 	materialProperty.specular = colours
 	materialProperty.diffuse = colours
@@ -154,21 +157,21 @@ end
 
 
 -- Randomise rain mesh --
-local function changeRainMesh()
+local function changeParticleMesh(particleType)
 
 	timer.start{
 		type = timer.real,
 		duration = 0.3,
 		callback = function()
 
-			local randomRaindrop = table.choice(raindrops)
-			newRainMesh = tes3.loadMesh("tew\\Watch the Skies\\raindrops\\"..randomRaindrop):clone()
+			local randomParticleMesh = table.choice(particles[particleType])
+			newParticleMesh = tes3.loadMesh("tew\\Watch the Skies\\particles\\"..particleType.."\\"..randomParticleMesh):clone()
 
 			local function swapNode(particle)
 				local old = particle.object
 				particle.rainRoot:detachChild(old)
 
-				local new = newRainMesh:clone()
+				local new = newParticleMesh:clone()
 				particle.rainRoot:attachChild(new)
 				new.appCulled = old.appCulled
 
@@ -184,7 +187,7 @@ local function changeRainMesh()
 			end
 
 			WtC.sceneRainRoot:updateEffects()
-			debugLog("Rain mesh changed to "..randomRaindrop)
+			debugLog("Rain mesh changed to "..randomParticleMesh)
 		end
 	}
 end
@@ -569,7 +572,7 @@ local function skyChoiceTimer()
 end
 
 
-local function rainMeshChecker(e)
+local function particleMeshChecker(e)
 	local weatherNow
 	if e and e.to then
 		weatherNow = e.to
@@ -577,7 +580,9 @@ local function rainMeshChecker(e)
 		weatherNow = WtC.currentWeather
 	end
 	if (weatherNow.name == "Rain" or weatherNow.name == "Thunderstorm") then
-		changeRainMesh()
+		changeParticleMesh("rain")
+	elseif (weatherNow.name == "Snow") then
+		changeParticleMesh("snow")
 	end
 end
 
@@ -587,16 +592,20 @@ local function init()
 	WtC=tes3.worldController.weatherController
 
 	-- Get available raindrops --
-	if config.randomiseRainMesh then
-		for raindrop in lfs.dir(raindropsPath) do
-			if raindrop and raindrop ~= ".." and raindrop ~= "." and string.endswith(raindrop, ".nif") then
-				table.insert(raindrops, raindrop)
+	if config.randomiseParticleMeshes then
+		for particleType in lfs.dir(particlesPath) do
+			if particleType and particleType ~= ".." and particleType ~= "." then
+				for particle in lfs.dir(particlesPath.."\\"..particleType) do
+					if particle and particle ~= ".." and particle ~= "." and string.endswith(particle:lower(), ".nif") then
+						table.insert(particles[particleType], particle)
+					end
+				end
 			end
 		end
-		event.register("weatherTransitionStarted", rainMeshChecker, {priority = -250})
-		event.register("weatherTransitionImmediate", rainMeshChecker, {priority = -250})
-		event.register("weatherChangedImmediate", rainMeshChecker, {priority = -250})
-		event.register("enterFrame", reColourRain)
+		event.register("weatherTransitionStarted", particleMeshChecker, {priority = -250})
+		event.register("weatherTransitionImmediate", particleMeshChecker, {priority = -250})
+		event.register("weatherChangedImmediate", particleMeshChecker, {priority = -250})
+		event.register("enterFrame", reColourParticleMesh)
 	end
 
 	-- Populate data tables --
