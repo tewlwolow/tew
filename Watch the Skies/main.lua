@@ -74,12 +74,11 @@ local particleAmount = {
 	},
 	["snow"] = {
 		300,
+		320,
+		400,
 		460,
 		500,
 		600,
-		1000,
-		1200,
-		1500,
 	}
 }
 
@@ -142,11 +141,21 @@ local function reColourParticleMesh()
 
 	local weatherColour	 = WtC.currentFogColor
 
-	local colours = {
-		r = math.clamp(weatherColour.r + 0.11, 0.1, 0.9),
-		g = math.clamp(weatherColour.g + 0.12, 0.1, 0.9),
-		b = math.clamp(weatherColour.b + 0.13, 0.1, 0.9)
-	}
+	local colours
+	if (WtC.currentWeather.name) == "Snow" or (WtC.nextWeather and WtC.nextWeather.name == "Snow") then
+		colours = {
+			r = math.clamp(weatherColour.r + 0.2, 0.1, 0.9),
+			g = math.clamp(weatherColour.g + 0.2, 0.1, 0.9),
+			b = math.clamp(weatherColour.b + 0.2, 0.1, 0.9)
+		}
+	else
+		colours = {
+			r = math.clamp(weatherColour.r + 0.11, 0.1, 0.9),
+			g = math.clamp(weatherColour.g + 0.12, 0.1, 0.9),
+			b = math.clamp(weatherColour.b + 0.13, 0.1, 0.9)
+		}
+	end
+
 
 	local materialProperty = newParticleMesh:getObjectByName("tew_particle").materialProperty
 	materialProperty.emissive = colours
@@ -605,6 +614,7 @@ local function init()
 		event.register("weatherTransitionStarted", particleMeshChecker, {priority = -250})
 		event.register("weatherTransitionImmediate", particleMeshChecker, {priority = -250})
 		event.register("weatherChangedImmediate", particleMeshChecker, {priority = -250})
+		event.register("loaded", particleMeshChecker, {priority = -250})
 		event.register("enterFrame", reColourParticleMesh)
 	end
 
