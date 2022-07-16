@@ -14,6 +14,11 @@ local particles = {
 	["rain"] = {},
 	["snow"] = {}
 }
+local weatherChecklist = {
+	["rain"] = "rain",
+	["thunderstorm"] = "rain",
+	["snow"] = "snow"
+}
 local newParticleMesh
 
 local function debugLog(message)
@@ -170,7 +175,7 @@ local function changeParticleMesh(particleType)
 
 	timer.start{
 		type = timer.real,
-		duration = 0.3,
+		duration = 0.1,
 		callback = function()
 
 			local randomParticleMesh = table.choice(particles[particleType])
@@ -581,17 +586,26 @@ local function skyChoiceTimer()
 end
 
 
-local function particleMeshChecker(e)
+local function particleMeshChecker()
 	local weatherNow
-	if e and e.to then
-		weatherNow = e.to
+	if WtC.nextWeather then
+		weatherNow = WtC.nextWeather
+		local checked = weatherChecklist[weatherNow]
+		if checked ~= nil then
+			timer.start{
+				duration=0.5,
+				callback=function()
+					changeParticleMesh(checked)
+				end,
+				type=timer.game,
+			}
+		end
 	else
 		weatherNow = WtC.currentWeather
-	end
-	if (weatherNow.name == "Rain" or weatherNow.name == "Thunderstorm") then
-		changeParticleMesh("rain")
-	elseif (weatherNow.name == "Snow") then
-		changeParticleMesh("snow")
+		local checked = weatherChecklist[weatherNow]
+		if checked ~= nil then
+			changeParticleMesh(checked)
+		end
 	end
 end
 
@@ -612,6 +626,7 @@ local function init()
 			end
 		end
 		event.register("weatherTransitionStarted", particleMeshChecker, {priority = -250})
+		event.register("weatherTransitionFinished", particleMeshChecker, {priority = -250})
 		event.register("weatherTransitionImmediate", particleMeshChecker, {priority = -250})
 		event.register("weatherChangedImmediate", particleMeshChecker, {priority = -250})
 		event.register("loaded", particleMeshChecker, {priority = -250})
