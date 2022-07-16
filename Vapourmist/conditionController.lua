@@ -34,7 +34,7 @@ end
 local function conditionCheck()
 	fogService.cleanInactiveFog()
 	timer.start {
-		duration = 0.05,
+		duration = 0.02,
 		type = timer.game,
 		callback = function()
 			debugLog("Running check.")
