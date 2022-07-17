@@ -100,7 +100,7 @@ local function updateInteriorBig()
 	debugLog("Updating interior doors and windows.")
 	local playerPos=tes3.player.position
 	for _, windoor in ipairs(windoors) do
-		if common.getDistance(playerPos, windoor.position) > 2048
+		if common.getDistance(playerPos, windoor.position) > 1800
 		and windoor~=nil then
 			playInteriorBig(windoor, true)
 		end
