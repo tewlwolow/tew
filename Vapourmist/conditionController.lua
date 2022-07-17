@@ -7,7 +7,7 @@ local debugLog = fogService.debugLog
 local config = require("tew\\Vapourmist\\config")
 local data = require("tew\\Vapourmist\\data")
 
-local toFogColour, toWeather, toRegion, fromFogColour, fromWeather, fromRegion, blockTimer
+local toFogColour, toWeather, toRegion, fromFogColour, fromWeather, fromRegion, recolourRegistered
 
 local WtC
 
@@ -69,33 +69,6 @@ local function conditionCheck()
 			debugLog("Game hour: "..gameHour)
 			debugLog("Fog colour: "..tostring(fromFogColour).." -> "..tostring(toFogColour))
 			debugLog("Region: "..fromRegion.id.." -> "..toRegion.id)
-
-			-- Gets messy otherwise
-			local mp = tes3.mobilePlayer
-			if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-				debugLog("Player waiting or travelling.")
-				if not (
-						fromWeather.name == toWeather.name
-						and fromFogColour == toFogColour
-						and fromRegion.id == toRegion.id) then
-							debugLog("Conditions changed.")
-							for _, fogType in pairs(data.fogTypes) do
-								if not (fogType.isAvailable(gameHour, toWeather)) then
-									fogService.removeFogImmediate(fogType.name)
-								end
-							end
-				end
-				if not (blockTimer) or (blockTimer.state == timer.expired) then
-					blockTimer = timer.start
-					{
-						callback = conditionCheck,
-						type = timer.game,
-						duration = 0.001
-					}
-				return
-				end
-			end
-
 				
 			-- Iterate through fog types
 			for _, fogType in pairs(data.fogTypes) do
@@ -140,20 +113,6 @@ local function conditionCheck()
 
 end
 
--- On travelling, waiting etc.
-local function onImmediateChange()
-	fogService.removeAll()
-	timer.start {
-		duration = 0.02,
-		type = timer.game,
-		callback = function()
-			debugLog("Weather changed immediate. Removing fog.")
-			conditionCheck()
-		end
-	}
-end
-
-
 local function onWeatherChanged(e)
 	if data.fogTypes["mist"].wetWeathers[e.from.name] then
 
@@ -167,7 +126,7 @@ local function onWeatherChanged(e)
 		timer.start {
 			type = timer.game,
 			iterations = 1,
-			duration = 0.2,
+			duration = 0.001,
 			callback = function() fogService.addFog(options) end
 		}
 		
@@ -176,7 +135,10 @@ end
 
 -- A timer needed to check for time changes
 local function onLoaded()
-	event.register("enterFrame", fogService.reColour)
+	if not recolourRegistered then
+		event.register("enterFrame", fogService.reColour)
+		recolourRegistered = true
+	end
 	timer.start({duration = data.baseTimerDuration, callback = function() debugLog("================== timer ==================") conditionCheck() end, iterations = -1, type = timer.game})
 	debugLog("Timer started. Duration: "..data.baseTimerDuration)
 	fromWeather = nil
@@ -194,8 +156,8 @@ local function init()
 	WtC = tes3.worldController.weatherController
 	event.register("loaded", function() debugLog("================== loaded ==================") onLoaded() end)
 	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority = 500})
-	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") onImmediateChange() end, {priority = 500})
-	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") onImmediateChange() end, {priority = 500})
+	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") conditionCheck() end, {priority = 500})
+	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") conditionCheck() end, {priority = 500})
 	event.register("weatherTransitionStarted", function() debugLog("================== weatherTransitionStarted ==================") conditionCheck() end, {priority = 500})
 	event.register("weatherTransitionStarted", function(e) debugLog("================== weatherTransitionStarted ==================") onWeatherChanged(e) end, {priority = 500})
 	event.register("weatherTransitionFinished", function() debugLog("================== weatherTransitionFinished ==================") conditionCheck() end, {priority = 500})
