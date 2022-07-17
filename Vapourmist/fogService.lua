@@ -181,7 +181,7 @@ function this.getOutputValues()
 			g = math.clamp(weatherColour.g + 0.03, 0.1, 0.85),
 			b = math.clamp(weatherColour.b + 0.03, 0.1, 0.85)
 		},
-		angle = WtC.windVelocityCurrWeather:normalized():copy().x * math.pi * 2,
+		angle = WtC.windVelocityCurrWeather:normalized():copy().y * math.pi * 0.5,
 		speed = math.max(WtC.currentWeather.cloudsSpeed * data.speedCoefficient, data.minimumSpeed)
 	}
 
