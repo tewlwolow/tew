@@ -110,9 +110,11 @@ end
 
 local function updateInteriorBig()
 	debugLog("Updating interior doors and windows.")
-	local playerPos=tes3.player.position
+	local playerPos=tes3.player.position:copy()
 	for _, windoor in ipairs(windoors) do
-		if common.getDistance(playerPos, windoor.position) > 2048 then
+		if common.getDistance(playerPos, windoor.position) < 1800
+		and windoor~=nil then
+			debug.log(windoor.id)
 			playInteriorBig(windoor, true)
 		end
 	end
@@ -126,7 +128,7 @@ local function cellCheck()
 	thunderTime = math.random(1,15)
 
 	if not interiorTimer then
-		interiorTimer = timer.start({duration=3, iterations=-1, callback=updateInteriorBig, type=timer.real})
+		interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig, type=timer.real})
 		interiorTimer:pause()
 	else
 		interiorTimer:pause()
@@ -178,7 +180,7 @@ local function cellCheck()
 			scalarTimer:cancel()
 			scalarTimer = nil
 		end
-		weather = WtC.currentWeather.index
+		weather = tes3.getRegion({useDoors=true}).weather.index
 		immediate = true
 	end
 	debugLog("Weather: "..weather)
@@ -261,6 +263,23 @@ local function cellCheck()
 	immediate = true
 end
 
+local function runResetter()
+	cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, thunderTime, interiorType, weather, weatherLast, scalarTimer
+	= nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
+	immediate = false
+end
+
+local function waitCheck(e)
+	local element=e.element
+	element:register("destroy", function()
+        timer.start{
+            type=timer.game,
+            duration = 0.02,
+            callback = cellCheck
+        }
+    end)
+end
+
 WtC = tes3.worldController.weatherController
 debugLog("Interior Weather module initialised.")
 
@@ -269,3 +288,5 @@ event.register("weatherTransitionFinished", cellCheck, { priority = -165 })
 event.register("weatherTransitionStarted", cellCheck, { priority = -165 })
 event.register("weatherChangedImmediate", cellCheck, { priority = -165 })
 event.register("weatherTransitionImmediate", cellCheck, { priority = -165 })
+event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
+event.register("load", runResetter)

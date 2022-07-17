@@ -126,20 +126,15 @@ end
 
 local function cellCheck()
 
+    -- Gets messy otherwise
+	local mp = tes3.mobilePlayer
+	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+		return
+	end
+
     if interiorMusic then
         onMusicSelection()
     end
-
-	-- Gets messy otherwise
-	local mp = tes3.mobilePlayer
-	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-		debugLog("Player waiting or travelling. Returning.")
-		timer.start{
-			duration = 1,
-			callback = cellCheck,
-		}
-		return
-	end
 
     local cell = tes3.getPlayerCell()
 
@@ -236,11 +231,22 @@ local function onCOC()
     cellCheck()
 end
 
+local function waitCheck(e)
+	local element=e.element
+	element:register("destroy", function()
+        timer.start{
+            type=timer.game,
+            duration = 0.02,
+            callback = cellCheck
+        }
+    end)
+end
 
 event.register("cellChanged", cellCheck, { priority = -200 })
 event.register("weatherTransitionImmediate", onCOC, {priority=-160})
 event.register("weatherChangedImmediate", onCOC, {priority=-160})
 event.register("death", deathCheck)
+event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
 if interiorMusic then
     event.register("musicSelectTrack", onMusicSelection)
 end

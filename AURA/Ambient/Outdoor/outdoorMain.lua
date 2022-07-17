@@ -122,11 +122,6 @@ local function cellCheck()
 	-- Gets messy otherwise
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-		debugLog("Player waiting or travelling. Returning.")
-		timer.start{
-			duration = 1,
-			callback = cellCheck,
-		}
 		return
 	end
 
@@ -146,12 +141,22 @@ local function cellCheck()
 
 	local cell = tes3.getPlayerCell()
 	if (not cell) then debugLog("No cell detected. Returning.") return end
+	debugLog("Cell: "..cell.editorName)
 
 	if cell.isInterior then
-		region = tes3.getRegion({useDoors=true}).name
+		local regionObject = tes3.getRegion({useDoors=true})
+		region = regionObject.name
+		weatherNow = regionObject.weather.index
 	else
 		region = tes3.getRegion().name
+		if WtC.nextWeather then
+			weatherNow = WtC.nextWeather.index
+		else
+			weatherNow = WtC.currentWeather.index
+		end
 	end
+
+	debugLog("Weather: "..weatherNow)
 
 	if region == nil then debugLog("No region detected. Returning.") return end
 
@@ -178,13 +183,6 @@ local function cellCheck()
 	end
 	debugLog("Time: "..timeNow)
 
-	-- Checking current weather --
-	if WtC.nextWeather then
-		weatherNow = WtC.nextWeather.index
-	else
-		weatherNow = WtC.currentWeather.index
-	end
-	debugLog("Weather: "..weatherNow)
 
 	-- Transition filter chunk --
 	if
@@ -283,19 +281,30 @@ local function positionCheck(e)
 	end)
 end
 
+local function waitCheck(e)
+	local element=e.element
+	element:register("destroy", function()
+        timer.start{
+            type=timer.game,
+            duration = 0.02,
+            callback = cellCheck
+        }
+    end)
+end
+
 local function runResetter()
 	climateLast, weatherLast, timeLast = nil, nil, nil
 	climateNow, weatherNow, timeNow = nil, nil, nil
 	windoors = {}
+	timer.start{
+		type = timer.game,
+		duration = 0.01,
+		callback = cellCheck
+	}
 end
 
 local function runHourTimer()
 	timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
-end
-
-local function hackyCheck()
-	runResetter()
-	cellCheck()
 end
 
 -- Potential fix for sky texture pop-in - believe it or not :|
@@ -316,5 +325,5 @@ event.register("weatherTransitionFinished", cellCheck, {priority=-160})
 event.register("weatherTransitionImmediate", cellCheck, {priority=-160})
 event.register("weatherChangedImmediate", cellCheck, {priority=-160})
 event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar", priority = -5})
-event.register("AURA:conditionChanged", hackyCheck)
+event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
 debugLog("Outdoor Ambient Sounds module initialised.")

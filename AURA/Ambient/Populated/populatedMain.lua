@@ -52,14 +52,9 @@ end
 
 local function cellCheck()
 
-	-- Gets messy otherwise
+    -- Gets messy otherwise
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-		debugLog("Player waiting or travelling. Returning.")
-		timer.start{
-			duration = 1,
-			callback = cellCheck,
-		}
 		return
 	end
 
@@ -149,11 +144,32 @@ local function onCOC()
     cellCheck()
 end
 
+local function runResetter()
+	time, timeLast, typeCellLast, weatherNow, weatherLast = nil, nil, nil, nil, nil
+	timer.start{
+		type = timer.game,
+		duration = 0.01,
+		callback = cellCheck
+	}
+end
+
+local function waitCheck(e)
+	local element=e.element
+	element:register("destroy", function()
+        timer.start{
+            type=timer.game,
+            duration = 0.02,
+            callback = cellCheck
+        }
+    end)
+end
 
 WtC = tes3.worldController.weatherController
 event.register("cellChanged", cellCheck, { priority = -190 })
 event.register("weatherTransitionImmediate", onCOC, {priority=-190})
 event.register("weatherChangedImmediate", onCOC, {priority=-190})
 event.register("loaded", populatedTimer)
+event.register("load", runResetter)
+event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
 debugLog("Populated Sounds module initialised.")
 

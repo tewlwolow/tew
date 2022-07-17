@@ -345,8 +345,7 @@ local function getTrack(options)
 	end
 
 	if not table then
-		debugLog("No table found. Triggering condition change.")
-		event.trigger("AURA:conditionChanged")
+		debugLog("No table found. Returning.")
 		return
 	end
 
