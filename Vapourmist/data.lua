@@ -94,7 +94,7 @@ this.interiorFog = {
     name = "interior",
     mesh = "tew\\Vapourmist\\vapourint.nif",
     height = -1300,
-    initialSize = {100, 150, 200, 300, 360},
+    initialSize = {300, 400, 450, 500, 510, 550},
     isAvailable = function(cell)
 
         for _, namePattern in ipairs(interiorNames) do
