@@ -11,7 +11,8 @@ local WtC = tes3.worldController.weatherController
 
 local currentFogs = {
 	["cloud"] = {},
-	["mist"] = {}
+	["mist"] = {},
+	["interior"] = {}
 }
 
 this.meshes = {
@@ -54,37 +55,38 @@ function this.isCellFogged(activeCell, fogType)
 	return false
 end
 
-local function removeSelected(parent, fog)
+local function removeSelected(fog)
 	local emitter = fog:getObjectByName("Mist Emitter")
 	if not emitter.appCulled then
 		emitter.appCulled = true
 		emitter:update()
 		this.debugLog("Appculling fog: "..fog.name)
 	end
-
-	timer.start{
-		type = timer.simulate,
-		duration = data.postAppCullTime,
-		callback = function()
-
-			parent:detachChild(fog)
-
-			for _, fogType in pairs(currentFogs) do
-				for f, _ in pairs(fogType) do
-					if fog == f then
-						fogType[fog] = nil
-					end
-				end
-			end
-		
-		end
-	}
 end
 
 function this.cleanInactiveFog()
 	local mp = tes3.mobilePlayer
 	if not mp then return end
+
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+
+	for _, node in pairs(vfxRoot.children) do
+		if node and string.startswith(node.name, "tew_") then
+			if node.appCulled then
+				vfxRoot:detachChild(node)
+				this.debugLog("Found appculled fog. Detaching.")
+				for _, fogType in pairs(currentFogs) do
+					for f, _ in pairs(fogType) do
+						if node == f then
+							fogType[f] = nil
+							this.debugLog("Removed fog: "..f.name)
+						end
+					end
+				end
+			end
+		end
+	end
+
 	for _, fogType in pairs(currentFogs) do
 		if not fogType then return end
 		for fog, _ in pairs(fogType) do
@@ -92,7 +94,7 @@ function this.cleanInactiveFog()
 			local fogPosition = fog.translation:copy()
 			local playerPosition = mp.position:copy()
 			if playerPosition:distance(fogPosition) > data.fogDistance then
-				removeSelected(vfxRoot, fog)
+				removeSelected(fog)
 			end
 		end
 	end
@@ -193,15 +195,17 @@ function this.reColour()
 	local speed = output.speed
 	local angle = output.angle
 	for _, fogType in pairs(currentFogs) do
-		if not fogType then return end
+		if not fogType or not currentFogs then return end
 		for fog, _ in pairs(fogType) do
-			if not fog then goto continue end
+			if not fog or fogType == "interior" then goto continue end
 			local particleSystem = fog:getObjectByName("MistEffect")
 			local controller = particleSystem.controller
 			local colorModifier = controller.particleModifiers
 
-			controller.speed = speed
-			controller.planarAngle = angle
+			if fogType == currentFogs["cloud"] then
+				controller.speed = speed
+				controller.planarAngle = angle
+			end
 
 			for _, key in pairs(colorModifier.colorData.keys) do
 				key.color.r = fogColour.r
@@ -270,36 +274,17 @@ end
 function this.removeFog(fogType)
     this.debugLog("Removing fog of type: "..fogType)
 	this.cullFog(true, fogType)
-
-	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
-	timer.start{
-		type = timer.simulate,
-		duration = data.postAppCullTime,
-		callback = function()
-			for _, node in pairs(vfxRoot.children) do
-				if node and node.name == "tew_"..fogType then
-					vfxRoot:detachChild(node)
-				end
-			end
-			this.purgeCurrentFogs(fogType)
-		end
-	}
 end
 
 -- Removes fog from view by detaching - without fade out
 function this.removeFogImmediate(fogType)
-
     this.debugLog("Immediately removing fog of type: "..fogType)
-
-	if this.isFogAppculled(fogType) then return end
-
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
 		if node and node.name == "tew_"..fogType then
 			vfxRoot:detachChild(node)
 		end
 	end
-
 	this.purgeCurrentFogs(fogType)
 end
 
@@ -309,7 +294,7 @@ function this.addInteriorFog(options)
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
-	local fogType = options.type
+	local fogType = data.interiorFog.name
 	local height = options.height
 	local cell = options.cell
 
@@ -326,10 +311,34 @@ function this.addInteriorFog(options)
 			pos.z + height
 		)
 
+		local particleSystem = fogMesh:getObjectByName("MistEffect")
+		local controller = particleSystem.controller
+		local colorModifier = controller.particleModifiers
+		local originalInteriorFogColor = cell.fogColor
+		local interiorFogColor = {
+			r = math.lerp(originalInteriorFogColor.r, 0.0, 0.7),
+			g = math.lerp(originalInteriorFogColor.g, 0.0, 0.7),
+			b = math.lerp(originalInteriorFogColor.b, 0.0, 0.7)
+		}
+
+		for _, key in pairs(colorModifier.colorData.keys) do
+			key.color.r = interiorFogColor.r
+			key.color.g = interiorFogColor.g
+			key.color.b = interiorFogColor.b
+		end
+
+		local materialProperty = particleSystem.materialProperty
+		materialProperty.emissive = interiorFogColor
+		materialProperty.specular = interiorFogColor
+		materialProperty.diffuse = interiorFogColor
+		materialProperty.ambient = interiorFogColor
+
+		particleSystem:updateNodeEffects()
+
 		vfxRoot:attachChild(fogMesh, true)
 		for _, vfx in pairs(vfxRoot.children) do
 			if vfx then
-				if vfx.name == "tew_"..type then
+				if vfx.name == "tew_"..fogType then
 					local particleSystem = vfx:getObjectByName("MistEffect")
 					local controller = particleSystem.controller
 					controller.initialSize = table.choice(data.interiorFog.initialSize)
@@ -356,9 +365,26 @@ function this.removeAll()
 
 	currentFogs = {
 		["cloud"] = {},
-		["mist"] = {}
+		["mist"] = {},
+		["interior"] = {},
 	}
 
+	this.debugLog("All fog removed.")
+end
+
+function this.removeAllExterior()
+
+	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
+	for _, node in pairs(vfxRoot.children) do
+		if node and string.startswith(node.name, "tew_") and not node.name == "tew_interior" then
+			vfxRoot:detachChild(node)
+		end
+	end
+
+	currentFogs["cloud"] = {}
+	currentFogs["mist"] = {}
+
+	this.debugLog("All exterior fog removed.")
 end
 
 return this
