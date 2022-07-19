@@ -169,7 +169,7 @@ local function reColourParticleMesh()
 	materialProperty.ambient = colours
 end
 
-
+-- TODO: Try our rain meshes for snow --
 -- Randomise rain mesh --
 local function changeParticleMesh(particleType)
 
@@ -206,6 +206,16 @@ local function changeParticleMesh(particleType)
 	}
 end
 
+
+-- [Weather Rain] change these:
+-- Rain Diameter=1200
+-- Max Raindrops=1500
+-- [Weather Thunderstorm] change these:
+-- Rain Diameter=1200
+-- Max Raindrops=3000
+-- [Weather Snow] change these:
+-- Snow Diameter=1600
+-- Max Snowflakes=1500
 -- Randomise particle amount --
 local function changeMaxParticles()
 	WtC.weathers[5].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
@@ -219,8 +229,8 @@ end
 
 -- Change cloud speed --
 local function changeCloudsSpeed()
-	WtC.weathers[1].cloudsSpeed=math.random(60,300)/100
-	WtC.weathers[2].cloudsSpeed=math.random(100,500)/100
+	WtC.weathers[1].cloudsSpeed=math.random(60,220)/100
+	WtC.weathers[2].cloudsSpeed=math.random(100,400)/100
 	WtC.weathers[3].cloudsSpeed=math.random(50,150)/100
 	WtC.weathers[4].cloudsSpeed=math.random(100,500)/100
 	WtC.weathers[5].cloudsSpeed=math.random(250,750)/100
