@@ -196,8 +196,9 @@ function this.reColour()
 	local angle = output.angle
 	for _, fogType in pairs(currentFogs) do
 		if not fogType or not currentFogs then return end
+		if fogType == currentFogs["interior"] then goto continue_1 end
 		for fog, _ in pairs(fogType) do
-			if not fog or fogType == "interior" then goto continue end
+			if not fog or fogType == "interior" then goto continue_2 end
 			local particleSystem = fog:getObjectByName("MistEffect")
 			local controller = particleSystem.controller
 			local colorModifier = controller.particleModifiers
@@ -220,9 +221,9 @@ function this.reColour()
 			materialProperty.ambient = fogColour
 
 			particleSystem:updateNodeEffects()
-
-			:: continue ::
+			:: continue_2 ::
 		end
+		:: continue_1 ::
 	end
 end
 
@@ -311,22 +312,24 @@ function this.addInteriorFog(options)
 			pos.z + height
 		)
 
-		local particleSystem = fogMesh:getObjectByName("MistEffect")
-		local controller = particleSystem.controller
-		local colorModifier = controller.particleModifiers
 		local originalInteriorFogColor = cell.fogColor
 		local interiorFogColor = {
-			r = math.lerp(originalInteriorFogColor.r, 0.0, 0.7),
-			g = math.lerp(originalInteriorFogColor.g, 0.0, 0.7),
-			b = math.lerp(originalInteriorFogColor.b, 0.0, 0.7)
+			r = math.clamp(math.lerp(originalInteriorFogColor.r, 1.0, 0.5), 0.3, 0.85),
+			g = math.clamp(math.lerp(originalInteriorFogColor.r, 1.0, 0.46), 0.3, 0.85),
+			b = math.clamp(math.lerp(originalInteriorFogColor.r, 1.0, 0.42), 0.3, 0.85)
 		}
 
+		local particleSystem = fogMesh:getObjectByName("MistEffect")
+		local controller = particleSystem.controller
+		controller.initialSize = table.choice(data.interiorFog.initialSize)
+		local colorModifier = controller.particleModifiers
 		for _, key in pairs(colorModifier.colorData.keys) do
+			debug.log(key.color.r)
 			key.color.r = interiorFogColor.r
 			key.color.g = interiorFogColor.g
 			key.color.b = interiorFogColor.b
+			debug.log(key.color.r)
 		end
-
 		local materialProperty = particleSystem.materialProperty
 		materialProperty.emissive = interiorFogColor
 		materialProperty.specular = interiorFogColor
@@ -334,22 +337,14 @@ function this.addInteriorFog(options)
 		materialProperty.ambient = interiorFogColor
 
 		particleSystem:updateNodeEffects()
+		this.updateCurrentFogs(fogType, fogMesh, cell)
 
 		vfxRoot:attachChild(fogMesh, true)
-		for _, vfx in pairs(vfxRoot.children) do
-			if vfx then
-				if vfx.name == "tew_"..fogType then
-					local particleSystem = vfx:getObjectByName("MistEffect")
-					local controller = particleSystem.controller
-					controller.initialSize = table.choice(data.interiorFog.initialSize)
-					this.updateCurrentFogs(fogType, vfx, cell)
-				end
-			end
-		end
 
 		fogMesh:update()
 		fogMesh:updateProperties()
 		fogMesh:updateNodeEffects()
+
 	end
 
 end
