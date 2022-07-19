@@ -76,7 +76,7 @@ local function changeRainSounds(e)
         if WtC.currentWeather.name == "Rain" then
             rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
         elseif WtC.currentWeather.name == "Thunderstorm" then
-            rainy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][rainyType])
+            stormy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][stormyType])
         end
 
         if weather.maxParticles then
