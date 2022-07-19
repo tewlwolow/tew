@@ -31,6 +31,14 @@ local function conditionCheck()
 	-- Gets messy otherwise
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+		local gameHour = tes3.worldController.hour.value
+		toWeather = WtC.nextWeather or WtC.currentWeather
+		for _, fogType in pairs(data.fogTypes) do
+			if not (fogType.isAvailable(gameHour, toWeather)) then
+				debugLog("Player waiting or travelling and fog: "..fogType.name.." not available.")
+				fogService.removeFogImmediate(fogType.name)
+			end
+		end
 		return
 	end
 
@@ -145,14 +153,6 @@ end
 
 local function waitCheck(e)
 	local element=e.element
-	local gameHour = tes3.worldController.hour.value
-	toWeather = WtC.nextWeather or WtC.currentWeather
-	for _, fogType in pairs(data.fogTypes) do
-		if not (fogType.isAvailable(gameHour, toWeather)) then
-			debugLog("Player waiting or travelling and fog: "..fogType.name.." not available.")
-			fogService.removeFogImmediate(fogType.name)
-		end
-	end
 	element:register("destroy", function()
         timer.start{
             type=timer.game,
