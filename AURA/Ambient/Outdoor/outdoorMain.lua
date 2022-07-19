@@ -1,3 +1,5 @@
+-- TODO: WIND MODULE PER CLOUD/WIND SPEED FROM WTS?
+
 local climates = require("tew.AURA.Ambient.Outdoor.outdoorClimates")
 local config = require("tew.AURA.config")
 local common=require("tew.AURA.common")
@@ -227,6 +229,11 @@ local function cellCheck()
 			weatherParser{volume=OAvol}
 		end
 	elseif cell.isInterior then
+		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
+			debugLog("Found interior cell. Removing sounds.")
+			sounds.removeImmediate{module = moduleName}
+			return
+		end
 		debugLog("Found interior cell.")
 		sounds.removeImmediate{module = moduleName}
 		if common.getCellType(cell, common.cellTypesSmall)==true
