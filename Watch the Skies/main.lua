@@ -209,19 +209,20 @@ end
 -- Randomise particle amount --
 local function changeMaxParticles()
 	local currentWeather = WtC.currentWeather.index
-	if not currentWeather == 4 then
-		WtC.weathers[4].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
+	if currentWeather ~= 4 then
+		WtC.weathers[5].maxParticles=table.choice(particleAmount["rain"])
 	end
-	if not currentWeather == 5 then
-		WtC.weathers[5].maxParticles=particleAmount["thunder"][math.random(1, #particleAmount["thunder"])]
+	if currentWeather ~= 5 then
+		WtC.weathers[6].maxParticles=table.choice(particleAmount["thunder"])
 	end
-	if not currentWeather == 9 then
-		WtC.weathers[9].maxParticles=particleAmount["snow"][math.random(1, #particleAmount["snow"])]
+	if currentWeather ~= 8 then
+		WtC.weathers[9].maxParticles=table.choice(particleAmount["snow"])
 	end
 	debugLog("Particles amount randomised.")
 	debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
 	debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
 	debugLog("Snow particles: "..WtC.weathers[9].maxParticles)
+	event.trigger("WtS:maxParticlesChanged")
 end
 
 -- Change cloud speed --
@@ -585,7 +586,7 @@ local function daytimeTimer()
 end
 
 local function skyChoiceTimer()
-	timer.start({duration=4, callback=skyChoice, iterations=-1, type=timer.game})
+	timer.start({duration=2, callback=skyChoice, iterations=-1, type=timer.game})
 end
 
 
