@@ -127,11 +127,4 @@ function this.getWindoors(cell)
 	end
 end
 
-function this.getDistance(v0, v1)
-	local dx=v1.x-v0.x
-	local dy=v1.y-v0.y
-	local dz=v1.z-v0.z
-	return math.sqrt(dx*dx+dy*dy+dz*dz)
-end
-
 return this
