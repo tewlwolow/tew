@@ -15,9 +15,9 @@ local particles = {
 	["snow"] = {}
 }
 local weatherChecklist = {
-	["rain"] = "rain",
-	["thunderstorm"] = "rain",
-	["snow"] = "snow"
+	["Rain"] = "rain",
+	["Thunderstorm"] = "rain",
+	["Snow"] = "snow"
 }
 local newParticleMesh
 
@@ -42,49 +42,23 @@ end
 -- Define particle amounts for randomisation --
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
-	["rain"] = {
-		300,
-		360,
-		400,
-		450,
-		500,
-		550,
-		600,
-		650,
-		700,
-		740,
-		800,
-		900,
-		950,
-		1000,
-		1100,
-		1200,
-		1300
-	},
-	["thunder"] = {
-		350,
-		400,
-		450,
-		500,
-		600,
-		700,
-		800,
-		900,
-		1000,
-		1200,
-		1300,
-		1400,
-		1550,
-		1700,
-	},
-	["snow"] = {
-		300,
-		320,
-		400,
-		460,
-		500,
-		600,
-	}
+	["rain"] = {300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300},
+	["thunder"] = {350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700},
+	["snow"] = {300, 320, 400, 460, 500, 600}
+}
+
+local cloudSpeed = {
+	[1] = {50, 55, 60, 80, 98, 100, 110, 120, 150, 190, 200, 220},
+	[2] = {60, 72, 85, 90, 100, 120, 140, 150, 170, 182, 200},
+	[3] = {50, 60, 70, 100, 120, 150, 190},
+	[4] = {100, 120, 150, 160, 200, 250, 350},
+	[5] = {100, 120, 150, 190, 200, 250, 300, 375, 430},
+	[6] = {180, 200, 260, 340, 380, 450, 500},
+	[7] = {600, 700, 800, 900, 1000, 1200, 1500},
+	[8] = {750, 800, 900, 1000, 1250, 2360, 1470, 1600, 1800},
+	[9] = {80, 100, 110, 125, 145, 185, 196, 200, 270},
+	[10] = {600, 760, 850, 920, 1100, 1250}
+
 }
 
 -- Determine current MQ state --
@@ -174,8 +148,8 @@ end
 local function changeParticleMesh(particleType)
 
 	timer.start{
-		type = timer.real,
-		duration = 0.1,
+		type = timer.game,
+		duration = 0.01,
 		callback = function()
 
 			local randomParticleMesh = table.choice(particles[particleType])
@@ -207,20 +181,18 @@ local function changeParticleMesh(particleType)
 end
 
 
--- [Weather Rain] change these:
--- Rain Diameter=1200
--- Max Raindrops=1500
--- [Weather Thunderstorm] change these:
--- Rain Diameter=1200
--- Max Raindrops=3000
--- [Weather Snow] change these:
--- Snow Diameter=1600
--- Max Snowflakes=1500
 -- Randomise particle amount --
 local function changeMaxParticles()
-	WtC.weathers[5].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
-	WtC.weathers[6].maxParticles=particleAmount["thunder"][math.random(1, #particleAmount["thunder"])]
-	WtC.weathers[9].maxParticles=particleAmount["snow"][math.random(1, #particleAmount["snow"])]
+	local currentWeather = WtC.currentWeather.index
+	if not currentWeather == 4 then
+		WtC.weathers[4].maxParticles=particleAmount["rain"][math.random(1, #particleAmount["rain"])]
+	end
+	if not currentWeather == 5 then
+		WtC.weathers[5].maxParticles=particleAmount["thunder"][math.random(1, #particleAmount["thunder"])]
+	end
+	if not currentWeather == 9 then
+		WtC.weathers[9].maxParticles=particleAmount["snow"][math.random(1, #particleAmount["snow"])]
+	end
 	debugLog("Particles amount randomised.")
 	debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
 	debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
@@ -229,16 +201,12 @@ end
 
 -- Change cloud speed --
 local function changeCloudsSpeed()
-	WtC.weathers[1].cloudsSpeed=math.random(60,220)/100
-	WtC.weathers[2].cloudsSpeed=math.random(100,400)/100
-	WtC.weathers[3].cloudsSpeed=math.random(50,150)/100
-	WtC.weathers[4].cloudsSpeed=math.random(100,500)/100
-	WtC.weathers[5].cloudsSpeed=math.random(250,750)/100
-	WtC.weathers[6].cloudsSpeed=math.random(200,450)/100
-	WtC.weathers[7].cloudsSpeed=math.random(600,1000)/100
-	WtC.weathers[8].cloudsSpeed=math.random(800,1500)/100
-	WtC.weathers[9].cloudsSpeed=math.random(100,200)/100
-	WtC.weathers[10].cloudsSpeed=math.random(600,1200)/100
+	local currentWeather = WtC.currentWeather.index
+	for i, w in pairs(WtC.weathers) do
+		if i == currentWeather then goto continue end
+		w.cloudsSpeed = table.choice(cloudSpeed[i])/100
+		:: continue ::
+	end
 	debugLog("Clouds speed randomised.")
 end
 
@@ -600,7 +568,7 @@ local function particleMeshChecker()
 	local weatherNow
 	if WtC.nextWeather then
 		weatherNow = WtC.nextWeather
-		local checked = weatherChecklist[weatherNow]
+		local checked = weatherChecklist[weatherNow.name]
 		if checked ~= nil then
 			timer.start{
 				duration=0.5,
@@ -612,7 +580,7 @@ local function particleMeshChecker()
 		end
 	else
 		weatherNow = WtC.currentWeather
-		local checked = weatherChecklist[weatherNow]
+		local checked = weatherChecklist[weatherNow.name]
 		if checked ~= nil then
 			changeParticleMesh(checked)
 		end
