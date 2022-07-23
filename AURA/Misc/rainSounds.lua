@@ -54,53 +54,34 @@ local function getRainType(particleAmount)
     end
 end
 
-local function changeRainSounds(e)
-    if (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm") or (WtC.nextWeather and (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm")) then
-        local weather
-        if e and e.to then
-            weather = e.to
-        else
-            weather = WtC.currentWeather
-        end
+local function changeRainSounds()
 
-        debugLog("Current particle amount: "..tostring(weather.maxParticles))
+    local rainy = WtC.weathers[5]
+    local rainyType = getRainType(rainy.maxParticles)
+    local stormy = WtC.weathers[6]
+    local stormyType = getRainType(stormy.maxParticles)
 
-        local rainy = WtC.weathers[5]
-        local rainyType = getRainType(rainy.maxParticles)
-        local stormy = WtC.weathers[6]
-        local stormyType = getRainType(stormy.maxParticles)
+    debugLog("Rain type: "..rainyType)
+    debugLog("Storm type: "..stormyType)
 
-        debugLog("Rain type: "..rainyType)
-        debugLog("Storm type: "..stormyType)
+    rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
+    stormy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][stormyType])
 
-        if WtC.currentWeather.name == "Rain" then
-            rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
-        elseif WtC.currentWeather.name == "Thunderstorm" then
-            stormy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][stormyType])
-        end
-
+    if config.moduleInteriorWeather then
+        local weather = WtC.currentWeather
         if weather.maxParticles then
             local interiorRainType = getRainType(weather.maxParticles)
-            if config.moduleInteriorWeather then
-                if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
-                for interiorType, array in pairs(sounds.interiorWeather) do
-                    array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
-                    array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
-                end
+            if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
+            for interiorType, array in pairs(sounds.interiorWeather) do
+                array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
+                array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
             end
         end
-	end
-end
-
-local function rainStartCheck(e)
-    if (e and e.to and e.to.name) and (e.to.name == "Rain" or e.to.name == "Thunderstorm") then
-        changeRainSounds(e)
     end
+
 end
 
 print("[AURA "..version.."] Rain sounds initialised.")
 WtC=tes3.worldController.weatherController
-event.register("loaded", rainStartCheck, {priority=-233})
-event.register("weatherChangedImmediate", changeRainSounds, {priority=-233})
-event.register("weatherTransitionImmediate", changeRainSounds, {priority=-233})
-event.register("weatherTransitionStarted", rainStartCheck, {priority=-233})
+event.register("loaded", changeRainSounds, {priority=-233})
+event.register("WtS:maxParticlesChanged", changeRainSounds, {priority=-233})
