@@ -3,8 +3,8 @@ local this = {}
 local config = require("tew.Vapourmist.config")
 
 this.baseTimerDuration = 0.1
-this.speedCoefficient = 26
-this.minimumSpeed = 20
+this.speedCoefficient = 28
+this.minimumSpeed = 15
 this.minStaticCount = 5
 this.fogDistance = 17000
 this.postAppCullTime = 16
@@ -43,7 +43,7 @@ this.fogTypes = {
     ["cloud"] = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
-        height = 4500,
+        height = 5100,
         initialSize = {420, 450, 500, 510, 550, 600},
         isAvailable = function(_, weather)
 
