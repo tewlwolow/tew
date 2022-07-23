@@ -324,11 +324,9 @@ function this.addInteriorFog(options)
 		controller.initialSize = table.choice(data.interiorFog.initialSize)
 		local colorModifier = controller.particleModifiers
 		for _, key in pairs(colorModifier.colorData.keys) do
-			debug.log(key.color.r)
 			key.color.r = interiorFogColor.r
 			key.color.g = interiorFogColor.g
 			key.color.b = interiorFogColor.b
-			debug.log(key.color.r)
 		end
 		local materialProperty = particleSystem.materialProperty
 		materialProperty.emissive = interiorFogColor
