@@ -341,7 +341,10 @@ local function getTrack(options)
 		debugLog("Got interior type: "..options.type)
 		return this.interiorWeather[options.type][options.weather]
 	elseif options.module == "wind" then
-		if options.type == "warm" then
+		if options.type == "quiet" then
+			debugLog("Got wind quiet type.")
+			table = this.quiet
+		elseif options.type == "warm" then
 			debugLog("Got warm type.")
 			table = this.warm
 		elseif options.type == "cold" then

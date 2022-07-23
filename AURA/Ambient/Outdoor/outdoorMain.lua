@@ -11,7 +11,6 @@ local isOpenPlaza=tewLib.isOpenPlaza
 local moduleAmbientOutdoor=config.moduleAmbientOutdoor
 local moduleInteriorWeather=config.moduleInteriorWeather
 local playSplash=config.playSplash
-local quietChance=config.quietChance/100
 local OAvol = config.OAvol/200
 local splashVol = config.splashVol/200
 local playInteriorAmbient=config.playInteriorAmbient
@@ -42,20 +41,11 @@ local function weatherParser(options)
 	end
 
 	if weatherNow >= 0 and weatherNow <4 then
-		if quietChance<math.random() then
-			debugLog("Playing regular weather track.")
-			if immediate then
-				sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
-			else
-				sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
-			end
+		debugLog("Playing regular weather track.")
+		if immediate then
+			sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
 		else
-			debugLog("Playing quiet weather track.")
-			if immediate then
-				sounds.playImmediate{module = moduleName, volume = volume, type = "quiet", pitch = pitch, reference = ref}
-			else
-				sounds.play{module = moduleName, volume = volume, type = "quiet", pitch = pitch, reference = ref}
-			end
+			sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
 		end
 	elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
 		debugLog("Extreme weather detected.")

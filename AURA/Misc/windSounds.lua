@@ -5,7 +5,7 @@ local common=require("tew.AURA.common")
 local moduleName = "wind"
 local windPlaying = false
 local config = require("tew.AURA.config")
-local windVol = (config.windVol/200) * 0.7
+local windVol = (config.windVol/200)
 local windTypeLast
 
 local debugLog = common.debugLog
@@ -22,7 +22,7 @@ local blockedWeathers = {
 local function getWindType(cSpeed)
     local cloudSpeed = cSpeed * 100
     if cloudSpeed < 150 then
-        return nil
+        return "quiet"
     elseif cloudSpeed < 360 then
         return "warm"
     elseif cloudSpeed <= 1800 then

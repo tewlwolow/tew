@@ -91,14 +91,6 @@ local template = mwse.mcm.createTemplate{
 		jump = 10,
 		variable=registerVariable("OAvol")
 	}
-	pageOA:createSlider{
-		label = string.format("Changes %% chance for a quiet track to play instead of the regular one. Default = %s%%.\nRequires restart. Chance %%", defaults.quietChance),
-		min = 0,
-		max = 100,
-		step = 1,
-		jump = 10,
-		variable=registerVariable("quietChance")
-	}
 	pageOA:createYesNoButton{
 		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each interior door leading to an exterior. The sound will stop if you're far enough from such door.",
 		variable = registerVariable("playInteriorAmbient"),
@@ -118,7 +110,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("intVol")
 	}
 	pageIA:createYesNoButton{
-		label = "Enable natural, native music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod. Requires restart.",
+		label = "Enable culture-specific music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod. Requires restart.",
 		variable = registerVariable("interiorMusic"),
 		restartRequired=true
 	}

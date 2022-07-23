@@ -24,7 +24,6 @@ return {
     playInteriorWeather=true,
     playYurtFlap=true,
     debugLogOn=false,
-    quietChance=15,
     tauntChance=30,
     serviceTravel=true,
     serviceRepair=true,
