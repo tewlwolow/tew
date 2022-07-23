@@ -93,7 +93,7 @@ local function changeRainSounds(e)
 end
 
 local function rainStartCheck(e)
-    if e.to.name == "Rain" or e.to.name == "Thunderstorm" then
+    if (e and e.to and e.to.name) and (e.to.name == "Rain" or e.to.name == "Thunderstorm") then
         changeRainSounds(e)
     end
 end
