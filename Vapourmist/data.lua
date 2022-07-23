@@ -6,7 +6,7 @@ this.baseTimerDuration = 0.1
 this.speedCoefficient = 37
 this.minimumSpeed = 15
 this.minStaticCount = 5
-this.fogDistance = 17000
+this.fogDistance = 15000
 this.postAppCullTime = 16
 
 local interiorStatics = {
