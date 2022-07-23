@@ -43,7 +43,7 @@ local function playWind(e)
     local cell = tes3.getPlayerCell()
     if not cell or not cell.isOrBehavesAsExterior then
         debugLog("Not in an exterior cell. Returning.")
-        sounds.remove{module = moduleName, volume = windVol}
+        sounds.removeImmediate{module = moduleName, volume = windVol}
         windPlaying = false
         return
     end
