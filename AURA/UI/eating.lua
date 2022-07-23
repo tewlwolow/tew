@@ -7,7 +7,7 @@ local function eating(e)
     tes3.getSound("Swallow").volume = 0
 
     if e.item.objectType == tes3.objectType.ingredient then
-        tes3.playSound{reference=e.reference, soundPath="Fx\\eating.wav", volume=1.0*UIvol}
+        tes3.playSound{reference=e.reference, soundPath="Fx\\eating.wav", volume=0.7*UIvol}
     end
 end
 
