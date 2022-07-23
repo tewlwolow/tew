@@ -231,22 +231,10 @@ local function onCOC()
     cellCheck()
 end
 
-local function waitCheck(e)
-	local element=e.element
-	element:register("destroy", function()
-        timer.start{
-            type=timer.game,
-            duration = 0.02,
-            callback = cellCheck
-        }
-    end)
-end
-
 event.register("cellChanged", cellCheck, { priority = -200 })
 event.register("weatherTransitionImmediate", onCOC, {priority=-160})
 event.register("weatherChangedImmediate", onCOC, {priority=-160})
 event.register("death", deathCheck)
-event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
 if interiorMusic then
     event.register("musicSelectTrack", onMusicSelection)
 end

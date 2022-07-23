@@ -155,10 +155,10 @@ end
 
 local function waitCheck(e)
 	local element=e.element
-	element:register("destroy", function()
+	element:registerAfter("destroy", function()
         timer.start{
             type=timer.game,
-            duration = 0.02,
+            duration = 0.01,
             callback = cellCheck
         }
     end)

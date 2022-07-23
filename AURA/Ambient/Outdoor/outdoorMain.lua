@@ -252,7 +252,7 @@ local function positionCheck(e)
 	if playSplash and moduleAmbientOutdoor then
 		tes3.playSound{sound="splash_lrg", volume=0.5*splashVol, pitch=0.6}
 	end
-	element:register("destroy", function()
+	element:registerAfter("destroy", function()
 		debugLog("Player above water level. Resetting AURA sounds.")
 		if (not cell.isInterior) or (cell.behavesAsExterior) then
 			sounds.removeImmediate{module = moduleName}
@@ -267,10 +267,10 @@ end
 
 local function waitCheck(e)
 	local element=e.element
-	element:register("destroy", function()
+	element:registerAfter("destroy", function()
         timer.start{
             type=timer.game,
-            duration = 0.02,
+            duration = 0.01,
             callback = cellCheck
         }
     end)
