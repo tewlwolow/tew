@@ -104,11 +104,6 @@ local template = mwse.mcm.createTemplate{
 		variable = registerVariable("playInteriorAmbient"),
 		restartRequired=true
 	}
-	pageOA:createYesNoButton{
-		label = "Enable additional wind tracks in bad weather (overcast, rain, thunder, snow)?",
-		variable = registerVariable("playWindy"),
-		restartRequired=true
-	}
 
 	local pageIA = template:createPage{label="Interior Ambient"}
 	pageIA:createCategory{
@@ -353,8 +348,20 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays various miscellaneous sounds.\n\nSettings:"
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable variable rain sounds?",
+		label = "Enable variable rain sounds per max particles?\nNote: requires Watch the Skies for full effect.",
 		variable = registerVariable("rainSounds"),
+	}
+	pageMisc:createYesNoButton{
+		label = "Enable variable wind sounds per clouds speed?\nNote: requires Watch the Skies for full effect.",
+		variable = registerVariable("windSounds"),
+	}
+	pageMisc:createSlider{
+		label = string.format("Changes %% volume for wind sounds. Default = %s%%.\nRequires restart. Volume %%", defaults.windVol),
+		min = 0,
+		max = 200,
+		step = 1,
+		jump = 10,
+		variable=registerVariable("windVol")
 	}
 	pageMisc:createYesNoButton{
 		label = "Enable splash sounds when going underwater and back to surface?",

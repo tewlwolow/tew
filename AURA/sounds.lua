@@ -97,6 +97,10 @@ local modules = {
 	["interiorWeather"] = {
 		old = nil,
 		new = nil
+	},
+	["wind"] = {
+		old = nil,
+		new = nil
 	}
 }
 
@@ -304,12 +308,6 @@ local function getTrack(options)
 			if options.type == "quiet" then
 				debugLog("Got quiet type.")
 				table = this.quiet
-			elseif options.type == "warm" then
-				debugLog("Got warm type.")
-				table = this.warm
-			elseif options.type == "cold" then
-				debugLog("Got cold type.")
-				table = this.cold
 			end
 		else
 			local climate = options.climate
@@ -342,6 +340,14 @@ local function getTrack(options)
 		debugLog("Got interior weather module.")
 		debugLog("Got interior type: "..options.type)
 		return this.interiorWeather[options.type][options.weather]
+	elseif options.module == "wind" then
+		if options.type == "warm" then
+			debugLog("Got warm type.")
+			table = this.warm
+		elseif options.type == "cold" then
+			debugLog("Got cold type.")
+			table = this.cold
+		end
 	end
 
 	if not table then
@@ -398,11 +404,12 @@ end
 -- Supporting kwargs here
 function this.play(options)
 
-
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
 
 	local newTrack = getTrack(options)
+	if not newTrack then debugLog("No track selected. Returning.") return end
+
 	modules[options.module].old = modules[options.module].new
 	modules[options.module].new = newTrack
 

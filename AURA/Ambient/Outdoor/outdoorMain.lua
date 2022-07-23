@@ -14,7 +14,6 @@ local playSplash=config.playSplash
 local quietChance=config.quietChance/100
 local OAvol = config.OAvol/200
 local splashVol = config.splashVol/200
-local playWindy=config.playWindy
 local playInteriorAmbient=config.playInteriorAmbient
 
 local moduleName = "outdoor"
@@ -57,28 +56,6 @@ local function weatherParser(options)
 			else
 				sounds.play{module = moduleName, volume = volume, type = "quiet", pitch = pitch, reference = ref}
 			end
-		end
-	elseif (weatherNow >= 4 and weatherNow < 6) or (weatherNow == 8) then
-		if playWindy then
-			debugLog("Bad weather detected and windy option on.")
-			if weatherNow == 3 or weatherNow == 4 then
-				debugLog("Found warm weather, using warm wind loops.")
-				if immediate then
-					sounds.playImmediate{module = moduleName, volume = volume, type = "warm", pitch = pitch, reference = ref}
-				else
-					sounds.play{module = "outdoor", volume = volume, type = "warm", pitch = pitch, reference = ref}
-				end
-			elseif weatherNow == 8 or weatherNow == 5 then
-				debugLog("Found cold weather, using cold wind loops.")
-				if immediate then
-					sounds.playImmediate{module = moduleName, volume = volume, type = "cold", pitch = pitch, reference = ref}
-				else
-					sounds.play{module = "outdoor", volume = volume, type = "cold", pitch = pitch, reference = ref}
-				end
-			end
-		else
-			debugLog("Bad weather detected and no windy option on. Returning.")
-			return
 		end
 	elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
 		debugLog("Extreme weather detected.")

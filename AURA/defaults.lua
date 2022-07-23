@@ -20,12 +20,11 @@ return {
     moduleMisc=true,
     modulePC=true,
     playSplash=true,
-    playWindy=true,
     playInteriorAmbient=true,
     playInteriorWeather=true,
     playYurtFlap=true,
     debugLogOn=false,
-    quietChance=30,
+    quietChance=15,
     tauntChance=30,
     serviceTravel=true,
     serviceRepair=true,
@@ -47,6 +46,8 @@ return {
     PCBlight=true,
     PCtaunts=false,
     interiorMusic=false,
+    windSounds = true,
     rainSounds = true,
-    disabledTaverns={}
+    disabledTaverns={},
+    windVol = 100,
 }
