@@ -7,7 +7,7 @@ return {
     SVvol=200,
     Cvol=120,
     vsVol=130,
-    intVol=150,
+    intVol=120,
     popVol=100,
     tVol=150,
     moduleAmbientOutdoor=true,
