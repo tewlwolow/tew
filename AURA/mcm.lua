@@ -340,11 +340,11 @@ local template = mwse.mcm.createTemplate{
 		label = "Plays various miscellaneous sounds.\n\nSettings:"
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable variable rain sounds per max particles?\nNote: requires Watch the Skies for full effect.",
+		label = "Enable variable rain sounds per max particles?\nNote: requires Watch the Skies.",
 		variable = registerVariable("rainSounds"),
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable variable wind sounds per clouds speed?\nNote: requires Watch the Skies for full effect.",
+		label = "Enable variable wind sounds per clouds speed?\nNote: requires Watch the Skies.",
 		variable = registerVariable("windSounds"),
 	}
 	pageMisc:createSlider{
