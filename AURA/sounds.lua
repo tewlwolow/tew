@@ -8,7 +8,7 @@ local common=require("tew.AURA.common")
 local debugLog = common.debugLog
 
 -- Constants
-local STEP = 0.015
+local STEP = 0.012
 local TICK = 0.1
 local MAX = 1
 local MIN = 0
