@@ -156,7 +156,7 @@ local template = mwse.mcm.createTemplate{
 							end
 							previous = v
 						end
-						for k, v in pairs(duplicates) do
+						for k, _ in pairs(duplicates) do
 							table.remove(enabledTaverns, k-1)
 						end
 
