@@ -31,6 +31,15 @@ local template = mwse.mcm.createTemplate{
         variable = registerVariable("interiorFog"),
     }
 
+    mainPage:createSlider{
+        label = "Controls how fast clouds move across the sky.\nDefault - 55.\nSpeed coefficient",
+        min = 0,
+        max = 100,
+        step = 1,
+        jump = 10,
+        variable=registerVariable("speedCoefficient")
+    }
+
     local weathersPage = template:createPage{label="Allowed weathers", noScroll=true}
     weathersPage:createCategory{
         label = "Controls weather types when cloud and mist types can spawn.\n",
