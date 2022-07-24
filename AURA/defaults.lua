@@ -1,5 +1,5 @@
 return {
-    OAvol=150,
+    OAvol=130,
     IWvol=150,
     yurtVol=200,
     splashVol=200,
