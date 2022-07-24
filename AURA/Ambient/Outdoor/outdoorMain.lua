@@ -26,7 +26,7 @@ local debugLog = common.debugLog
 
 -- Parse passed options to prepare dispatch to sounds module --
 local function weatherParser(options)
-	local volume, pitch, ref, immediate
+	local volume, pitch, ref, immediate, playLast
 
 	-- Fallback values --
 	if not options then
@@ -34,18 +34,20 @@ local function weatherParser(options)
 		pitch = 1
 		immediate = false
 		ref = tes3.mobilePlayer.reference
+		playLast = false
 	else
 		volume = options.volume or OAvol
 		pitch = options.pitch or 1
 		immediate = options.immediate or false
 		ref = options.reference or tes3.mobilePlayer.reference
+		playLast = options.playLast or false
 	end
 
 	-- Determine if we should play the sound or not, depending on the weather --
 	if weatherNow >= 0 and weatherNow <4 then
 		debugLog("Playing regular weather track.")
 		if immediate then
-			sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
+			sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref, last = playLast}
 		else
 			sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
 		end
@@ -59,12 +61,13 @@ end
 -- Play outdoor ambient on doors and windows --
 local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
+	local bigVolume = (0.55*OAvol)-(0.005 * #windoors)
 	if playOld then
 		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, reference = windoor, volume = (0.55*OAvol)-(0.005 * #windoors), pitch=0.8}
+		weatherParser{reference = windoor, volume = bigVolume, pitch = 0.8, immediate = true, playLast = true}
 	else
 		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = (0.55*OAvol)-(0.005 * #windoors), pitch = 0.8, immediate = true}
+		weatherParser{reference = windoor, volume = bigVolume, pitch = 0.8, immediate = true}
 	end
 end
 
@@ -82,7 +85,7 @@ end
 
 -- Play on the whole thing for shacks etc. --
 local function playInteriorSmall()
-	if cellLast and not cellLast.isInterior then
+	if (cellLast) and (cellLast.isOrBehavesAsExterior) then
 		debugLog("Playing interior ambient sounds for small interiors using old track.")
 		sounds.playImmediate{module = moduleName, last = true, volume = 0.3*OAvol, pitch=0.9}
 	else
@@ -195,17 +198,16 @@ local function cellCheck()
 		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 		and weatherNow==weatherLast and climateNow==climateLast
 		and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
-		-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
+			-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 			debugLog("Found same cell. Using last sound.")
 			useLast = true
 			sounds.removeImmediate{module = moduleName}
-			sounds.playImmediate{module = moduleName, last = true, volume = OAvol}
+			sounds.playImmediate{module = moduleName, last = useLast, volume = OAvol}
 		else
 			debugLog("Found exterior cell.")
 			sounds.remove{module = moduleName, volume=OAvol}
 			weatherParser{volume=OAvol}
 		end
-
 	-- Interior cells --
 	-- Remove main outdoor sound and play the same sound for interiors, either big or small --
 	elseif cell.isInterior then
@@ -228,8 +230,8 @@ local function cellCheck()
 			if windoors ~= nil then
 				for _, windoor in ipairs(windoors) do
 					tes3.removeSound{reference=windoor}
-					playInteriorBig(windoor, useLast)
 					useLast = true
+					playInteriorBig(windoor, useLast)
 				end
 				interiorTimer:resume()
 			end
