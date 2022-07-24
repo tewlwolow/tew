@@ -92,7 +92,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("OAvol")
 	}
 	pageOA:createYesNoButton{
-		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each interior door leading to an exterior. The sound will stop if you're far enough from such door.",
+		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each door leading to an exterior.",
 		variable = registerVariable("playInteriorAmbient"),
 		restartRequired=true
 	}
