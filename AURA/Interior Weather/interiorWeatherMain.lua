@@ -14,6 +14,7 @@ local moduleName = "interiorWeather"
 
 local immediate = false
 
+-- Check script scope variable or function param to determine whether we should play immediately of fade in --
 local function immediateParser(options)
 	immediate = immediate or options.immediate
 	if immediate then
@@ -23,10 +24,10 @@ local function immediateParser(options)
 	end
 end
 
+-- Play thunder sounds on a timer --
 local function playThunder()
 	local thunVol, thunPitch
 	if thunRef==nil then return end
-	
 	thunVol = (math.random(3,8))/10
 	thunPitch = (math.random(5,15))/10
 
@@ -64,6 +65,7 @@ local function playThunder()
 	end
 end
 
+-- For shacks, small huts etc. --
 local function playInteriorSmall(cell)
 	local volBoost=0
 
@@ -93,6 +95,7 @@ local function playInteriorSmall(cell)
 	end
 end
 
+-- For bigger interiors, proper buildings and that --
 local function playInteriorBig(windoor, updateImmediate)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 
@@ -108,6 +111,7 @@ local function playInteriorBig(windoor, updateImmediate)
 	end
 end
 
+-- Will be yeeeeeeeeeeeeeeeeet otherwise ``
 local function updateInteriorBig()
 	debugLog("Updating interior doors and windows.")
 	local playerPos=tes3.player.position:copy()
@@ -126,6 +130,7 @@ local function cellCheck()
 	IWvol = config.IWvol/200
 	thunderTime = math.random(1,15)
 
+	-- Start the interior timer for windoor updates if not started already --
 	if not interiorTimer then
 		interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig, type=timer.real})
 		interiorTimer:pause()
@@ -136,6 +141,7 @@ local function cellCheck()
 	local cell = tes3.getPlayerCell()
 	if not cell then debugLog("No cell detected. Returning.") return end
 
+	-- If exterior - bugger off and stop timers --
 	if (cell.isOrBehavesAsExterior)
 	and (isOpenPlaza(cell)==false) then
 		debugLog("Found exterior cell. Removing sounds and returning.")
@@ -155,6 +161,7 @@ local function cellCheck()
 		return
 	end
 
+	-- Resolve if we're transitioning, play the interior sound only after the particles appear (roughly) --
 	if (WtC.nextWeather) then
 		if WtC.transitionScalar <= 0.7 then
 			scalarTimer = timer.start {
@@ -185,14 +192,18 @@ local function cellCheck()
 	debugLog("Weather: "..weather)
 	debugLog("Immediate flag: "..tostring(immediate))
 
+	-- Remove sounds from small type of interior if the weather has changed --
 	if weather ~= weatherLast then
 		sounds.removeImmediate{module = moduleName, type = "small"}
 	end
+
+	-- Get out if the weather is the same as last time --
 	if weather == weatherLast and cellLast == cell then
 		debugLog("Same weather detected. Returning.")
 		return
 	end
 
+	-- If the weather is clear or snowy, let's bugger off --
 	if weather < 4 or weather == 8 then
 		debugLog("Uneligible weather detected. Returning.")
 		sounds.removeImmediate{module = moduleName, type = "small"}
@@ -204,12 +215,15 @@ local function cellCheck()
 		return
 	end
 
+	-- Important for Glass Domes --
+	-- We don't want it here, GD will use regular weather sounds since it's an int-as-ext --
 	if (isOpenPlaza(cell) == true)
 	and (weather == 6
 	or weather == 7) then
 		return
 	end
 
+	-- Determine cell type --
 	if common.getCellType(cell, common.cellTypesSmall)==true then
 		interiorType = "sma"
 	elseif common.getCellType(cell, common.cellTypesTent)==true then
@@ -218,9 +232,11 @@ local function cellCheck()
 		interiorType = "big"
 	end
 
+	-- Get doors and windows --
 	windoors={}
 	windoors=common.getWindoors(cell)
 
+	-- Play according to cell type --
 	debugLog("Found interior cell.")
 	if interiorType == "sma" then
 		debugLog("Playing small interior sounds.")
@@ -262,6 +278,7 @@ local function cellCheck()
 	immediate = true
 end
 
+-- Suck it Java --
 local function runResetter()
 	cellLast, thunRef, windoors, thunder, interiorTimer, thunderTimerBig, thunderTimerSmall, thunderTime, interiorType, weather, weatherLast, scalarTimer
 	= nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil

@@ -88,13 +88,13 @@ local function playerCheck()
 end
 
 local function combatCheck(e)
-    if tes3.worldController.charGenState.value ~= -1 then return end
+    if tes3.worldController.charGenState.value ~= -1 then return end -- We don't know the race or gender yet, so f- off --
     if playedTaunt == 1 then debugLog("Flag on. Returning.") return end
 
     local player = tes3.mobilePlayer
     if tes3.mobilePlayer.werewolf then
         local taunt = werewolfSounds[math.random(1, #werewolfSounds)]
-        tes3.play{
+        tes3.playSound{
             sound=taunt,
             volume=0.9*tVol,
             reference=player.reference

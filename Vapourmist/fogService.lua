@@ -1,5 +1,3 @@
--- TODO: distance check, appcull and remove if too far away
-
 local this = {}
 
 local config = require("tew\\Vapourmist\\config")
@@ -9,6 +7,7 @@ local data = require("tew\\Vapourmist\\data")
 
 local WtC = tes3.worldController.weatherController
 
+-- The array holding cells and their fog data --
 local currentFogs = {
 	["cloud"] = {},
 	["mist"] = {},
@@ -21,7 +20,7 @@ this.meshes = {
 	["interior"] = nil
 }
 
--- Print debug messages
+-- Print debug messages --
 function this.debugLog(message)
     if config.debugLogOn then
 		if not message then message = "n/a" end
@@ -34,16 +33,17 @@ function this.debugLog(message)
     end
 end
 
-
+-- Remove all cached fog data for particular fog type --
 function this.purgeCurrentFogs(fogType)
 	currentFogs[fogType] = {}
 end
 
+-- Update cache --
 function this.updateCurrentFogs(fogType, fog, cell)
 	currentFogs[fogType][fog] = cell
 end
 
--- Returns true if the cell is fogged
+-- Returns true if the cell is fogged --
 function this.isCellFogged(activeCell, fogType)
 	if not currentFogs or not currentFogs[fogType] then return false end
 	for _, cell in pairs(currentFogs[fogType]) do
@@ -55,6 +55,7 @@ function this.isCellFogged(activeCell, fogType)
 	return false
 end
 
+-- Remove fog meshes one by one --
 local function removeSelected(fog)
 	local emitter = fog:getObjectByName("Mist Emitter")
 	if not emitter.appCulled then
@@ -64,6 +65,7 @@ local function removeSelected(fog)
 	end
 end
 
+-- Clean distant fog and remove appculled fog --
 function this.cleanInactiveFog()
 	local mp = tes3.mobilePlayer
 	if not mp then return end
@@ -94,13 +96,14 @@ function this.cleanInactiveFog()
 			local fogPosition = fog.translation:copy()
 			local playerPosition = mp.position:copy()
 			if playerPosition:distance(fogPosition) > data.fogDistance then
+				this.debugLog("Found distant fog. Appculling.")
 				removeSelected(fog)
 			end
 		end
 	end
 end
 
--- Check whether fog is appculled
+-- Check whether fog is appculled --
 function this.isFogAppculled(fogType)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
@@ -117,7 +120,7 @@ function this.isFogAppculled(fogType)
 	end
 end
 
--- Determine fog position for exteriors
+-- Determine fog position for exteriors --
 local function getFogPosition(activeCell, height)
 	local average = 0
 	local denom = 0
@@ -139,7 +142,7 @@ local function getFogPosition(activeCell, height)
 	return (average/denom) + height
 end
 
--- Determine fog position for interiors
+-- Determine fog position for interiors --
 local function getInteriorCellPosition(cell)
 	local pos = {x = 0, y = 0, z = 0}
 	local denom = 0
@@ -154,7 +157,7 @@ local function getInteriorCellPosition(cell)
 	return {x = pos.x/denom, y = pos.y/denom, z = pos.z/denom}
 end
 
--- Appculling switch
+-- Appculling switch --
 function this.cullFog(bool, type)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
@@ -172,11 +175,9 @@ function this.cullFog(bool, type)
 	end
 end
 
--- Calculate output colours from current fog colour
+-- Calculate output colours from current fog colour --
 function this.getOutputValues()
-
 	local weatherColour = WtC.currentFogColor:copy()
-
 	return {
 		colours = {
 			r = math.clamp(weatherColour.r + 0.03, 0.1, 0.85),
@@ -186,9 +187,9 @@ function this.getOutputValues()
 		angle = WtC.windVelocityCurrWeather:normalized():copy().y * math.pi * 0.5,
 		speed = math.max(WtC.currentWeather.cloudsSpeed * data.speedCoefficient, data.minimumSpeed)
 	}
-
 end
 
+-- These continues are giving me headaches, such an ugly job, tewl --
 function this.reColour()
 	local output = this.getOutputValues()
 	local fogColour = output.colours
@@ -203,6 +204,7 @@ function this.reColour()
 			local controller = particleSystem.controller
 			local colorModifier = controller.particleModifiers
 
+			-- Only alter speed and angle for clouds, per current weather settings --
 			if fogType == currentFogs["cloud"] then
 				controller.speed = speed
 				controller.planarAngle = angle
@@ -227,7 +229,7 @@ function this.reColour()
 	end
 end
 
--- Adds fog to the cell
+-- Add fogs to the active cells
 function this.addFog(options)
 
 	local type = options.type
@@ -244,6 +246,7 @@ function this.addFog(options)
 			local fogMesh = this.meshes[options.type]:clone()
 
 			fogMesh:clearTransforms()
+			-- Position just at the centre of the cell --
 			fogMesh.translation = tes3vector3.new(
 				8192 * activeCell.gridX + 4096,
 				8192 * activeCell.gridY + 4096,
@@ -289,6 +292,7 @@ function this.removeFogImmediate(fogType)
 	this.purgeCurrentFogs(fogType)
 end
 
+-- Add fog to interior, a wee bit different func here --
 function this.addInteriorFog(options)
 
 	this.debugLog("Adding interior fog.")
@@ -301,7 +305,6 @@ function this.addInteriorFog(options)
 
 	if not (this.isCellFogged(cell, fogType)) then
 		this.debugLog("Interior cell is not fogged. Adding "..fogType..".")
-
 		local fogMesh = this.meshes["interior"]:clone()
 		local pos = getInteriorCellPosition(cell)
 
@@ -312,6 +315,8 @@ function this.addInteriorFog(options)
 			pos.z + height
 		)
 
+		-- Interior light/colour values don't change, so we're good to just set it once --
+		-- Let's give it a natural orangeish hue --
 		local originalInteriorFogColor = cell.fogColor
 		local interiorFogColor = {
 			r = math.clamp(math.lerp(originalInteriorFogColor.r, 1.0, 0.5), 0.3, 0.85),
@@ -342,13 +347,11 @@ function this.addInteriorFog(options)
 		fogMesh:update()
 		fogMesh:updateProperties()
 		fogMesh:updateNodeEffects()
-
 	end
-
 end
 
+-- Just remove them all --
 function this.removeAll()
-
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
 		if node and string.startswith(node.name, "tew_") then
@@ -365,8 +368,8 @@ function this.removeAll()
 	this.debugLog("All fog removed.")
 end
 
+-- Just remove exterior fogs. Useful for interiors --
 function this.removeAllExterior()
-
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
 		if node and string.startswith(node.name, "tew_") and not node.name == "tew_interior" then

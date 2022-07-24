@@ -6,6 +6,7 @@ local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
 
+-- Because MW sound engine is the worst --
 local function warning(e)
     if not e.newlyCreated then
         return

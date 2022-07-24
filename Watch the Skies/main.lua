@@ -9,6 +9,15 @@ local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
 local isOpenPlaza=tewLib.isOpenPlaza
 
+local function debugLog(message)
+	if debugLogOn then
+	   mwse.log("[Watch the Skies "..version.."] "..string.format("%s", message))
+	end
+end
+
+-- Mod scope variable so we can change rain colours without scenegraph iteration --
+local newParticleMesh
+
 local particlesPath = "Data Files\\Meshes\\tew\\Watch the Skies\\particles"
 local particles = {
 	["rain"] = {},
@@ -19,13 +28,6 @@ local weatherChecklist = {
 	["Thunderstorm"] = "rain",
 	["Snow"] = "snow"
 }
-local newParticleMesh
-
-local function debugLog(message)
-	if debugLogOn then
-	   mwse.log("[Watch the Skies "..version.."] "..string.format("%s", message))
-	end
-end
 
 -- Define regions affected by the Blight --
 local vvRegions = {"Bitter Coast Region", "Azura's Coast Region", "Molag Mar Region", "Ashlands Region", "West Gash Region", "Ascadian Isles Region", "Grazelands Region", "Sheogorad"}
@@ -39,7 +41,7 @@ local function checkVv(region)
 	end
 end
 
--- Define particle amounts for randomisation --
+-- Define particle and clouds values for randomisation --
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
 	["rain"] = {300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300},
@@ -136,15 +138,20 @@ local function getMQState()
 	return questStage
 end
 
+-- Change particle mesh colours in real-time --
 local function reColourParticleMesh()
+
+	-- Bugger off if we don't have all the data needed --
 	if not (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm" or WtC.currentWeather.name == "Snow")
 	or ((WtC.nextWeather) and not (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm" or WtC.nextWeather.name == "Snow"))
 	or not newParticleMesh then
 		return
 	end
 
+	-- Get fog colour to make the particles match the scene look --
 	local weatherColour	 = WtC.currentFogColor
 
+	-- Preprocess colours a bit, snow should be lighter, rain should look a bit colder --
 	local colours
 	if (WtC.currentWeather.name) == "Snow" or (WtC.nextWeather and WtC.nextWeather.name == "Snow") then
 		colours = {
@@ -160,7 +167,7 @@ local function reColourParticleMesh()
 		}
 	end
 
-
+	-- Set the particle mesh colour via mesh material property --
 	local materialProperty = newParticleMesh:getObjectByName("tew_particle").materialProperty
 	materialProperty.emissive = colours
 	materialProperty.specular = colours
@@ -168,18 +175,20 @@ local function reColourParticleMesh()
 	materialProperty.ambient = colours
 end
 
--- TODO: Try our rain meshes for snow --
--- Randomise rain mesh --
+-- Randomise particle mesh --
 local function changeParticleMesh(particleType)
 
+	-- Timer here to actually allow background data to be available --
 	timer.start{
 		type = timer.game,
 		duration = 0.01,
 		callback = function()
 
+			-- Get particle mesh from pre-filled array and load it --
 			local randomParticleMesh = table.choice(particles[particleType])
 			newParticleMesh = tes3.loadMesh("tew\\Watch the Skies\\particles\\"..particleType.."\\"..randomParticleMesh):clone()
 
+			-- Simple inline function to swap the nodes, preserving visibility --
 			local function swapNode(particle)
 				local old = particle.object
 				particle.rainRoot:detachChild(old)
@@ -191,14 +200,15 @@ local function changeParticleMesh(particleType)
 				particle.object = new
 			end
 
+			-- Swap both active and inactive particles to ward off sudden changes --
 			for _, particle in pairs(WtC.particlesActive) do
 				swapNode(particle)
 			end
-
 			for _, particle in pairs(WtC.particlesInactive) do
 				swapNode(particle)
 			end
 
+			-- Update the root node to reflect the changes made --
 			WtC.sceneRainRoot:updateEffects()
 			debugLog("Rain mesh changed to "..randomParticleMesh)
 		end
@@ -209,6 +219,8 @@ end
 -- Randomise particle amount --
 local function changeMaxParticles()
 	local currentWeather = WtC.currentWeather.index
+
+	-- Match the weather index with lua array index --
 	if currentWeather ~= 4 then
 		WtC.weathers[5].maxParticles=table.choice(particleAmount["rain"])
 	end
@@ -369,6 +381,7 @@ local function changeSeasonal()
 				region.weatherChanceBlight = seasonalChances[region.id][month][8]
 				region.weatherChanceSnow = seasonalChances[region.id][month][9]
 				region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
+				
 				-- Disable the blight cloud object from Dagoth Ur volcano --
 				mwscript.disable{reference="blight cloud"}
 			end
@@ -446,7 +459,6 @@ end
 
 -- The following function uses slightly amended sveng's calculations from their old ESP mod: nexusmods.com/morrowind/mods/44375 --
 -- The function changes sunrise/sunset hours based on world latitude --
-
 local function changeDaytime()
 
 	local month = tes3.worldController.month.value
@@ -531,6 +543,7 @@ local function onCellChanged(e)
 	local cell=e.cell or tes3.getPlayerCell()
 	if not cell then return end
 
+	-- To ensure Glass Domes don't get rain particles inside --
 	if isOpenPlaza(cell)==true then
 		WtC.weathers[5].maxParticles=1500
 		WtC.weathers[6].maxParticles=3000
@@ -585,19 +598,22 @@ local function daytimeTimer()
 	timer.start({duration=6, callback=changeDaytime, iterations=-1, type=timer.game})
 end
 
+-- Shuffle texture every two hours --
 local function skyChoiceTimer()
 	timer.start({duration=2, callback=skyChoice, iterations=-1, type=timer.game})
 end
 
-
+-- Check if we have the weather that warrants particle change --
 local function particleMeshChecker()
 	local weatherNow
+	-- Also check if we're transitioning to next weather --
 	if WtC.nextWeather then
 		weatherNow = WtC.nextWeather
+		-- Match rain and thunderstorm with rain particles, and snow with snow particles --
 		local checked = weatherChecklist[weatherNow.name]
 		if checked ~= nil then
 			timer.start{
-				duration=0.5,
+				duration=0.65,
 				callback=function()
 					changeParticleMesh(checked)
 				end,
@@ -629,6 +645,8 @@ local function init()
 				end
 			end
 		end
+
+		-- Register events to change particle meshes in --
 		event.register("weatherTransitionStarted", particleMeshChecker, {priority = -250})
 		event.register("weatherTransitionFinished", particleMeshChecker, {priority = -250})
 		event.register("weatherTransitionImmediate", particleMeshChecker, {priority = -250})
@@ -637,9 +655,8 @@ local function init()
 		event.register("enterFrame", reColourParticleMesh)
 	end
 
-	-- Populate data tables --
+	-- Populate data tables with cloud textures --
 	if config.alterClouds then
-		print("Watch the Skies version "..version.." initialised.")
 		for weather, index in pairs(tes3.weather) do
 			debugLog("Weather: "..weather)
 			for sky in lfs.dir(WtSdir..weather) do
@@ -651,10 +668,10 @@ local function init()
 				end
 			end
 		end
+
 		-- Initially shuffle the cloud textures --
 		local vanChance=config.vanChance/100
 		local texPath, sArray
-
 		debugLog("Initially shuffling textures.")
 		for _, weather in pairs(WtC.weathers) do
 			if vanChance<math.random() then
@@ -679,6 +696,9 @@ local function init()
 				debugLog("Using vanilla texture: "..weather.cloudTexture)
 			end
 		end
+
+		-- Start texture change timer --
+		event.register("loaded", skyChoiceTimer)
 	end
 
 	-- Initially shuffle hours between weather changes --
@@ -696,23 +716,18 @@ local function init()
 		changeCloudsSpeed()
 	end
 
-	-- Register the events --
+	-- Register other events per MCM config --
 	if config.seasonalWeather then
 		event.register("loaded", seasonalTimer)
 	end
-
 	if config.daytime then
 		event.register("loaded", daytimeTimer)
 	end
-
-	if config.alterClouds then
-		event.register("loaded", skyChoiceTimer)
-	end
-
 	if config.interiorTransitions then
 		event.register("cellChanged", onCellChanged, {priority=-150})
 	end
 
+	mwse.log("[Watch the Skies] Version "..version.." initialised.")
 end
 
 event.register("initialized", init, {priority=-150})

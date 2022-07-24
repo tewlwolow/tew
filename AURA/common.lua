@@ -5,6 +5,7 @@ local debugLogOn = config.debugLogOn
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 
+-- Centralised debug message printer --
 function this.debugLog(message)
     if debugLogOn then
         local info = debug.getinfo(2, "Sl")
@@ -15,6 +16,7 @@ function this.debugLog(message)
     end
 end
 
+-- Thunder sound IDs (as seen in the CS) --
 this.thunArray={
 	"Thunder0",
 	"Thunder1",
@@ -23,6 +25,7 @@ this.thunArray={
 	"ThunderClap"
 }
 
+-- Small types of interiors --
 this.cellTypesSmall={
 	"in_de_shack_",
 	"s12_v_plaza",
@@ -32,17 +35,13 @@ this.cellTypesSmall={
 	"t_rea_set_i_house_"
 }
 
+-- Tent interiors --
 this.cellTypesTent={
 	"in_ashl_tent_0",
 	"drs_tnt",
 }
 
---[[this.cellTypesCaves={
-"cave",
-"sewer",
-"grotto",
-}]]
-
+-- String bit to match against window object ids --
 this.windows={
 	"_win_",
 	"window",
@@ -54,19 +53,10 @@ this.windows={
 	"_windowin_"
 }
 
--- Getting region on loaded save in interior. Taken from Provincial Music --
-function this.getInteriorRegion(cell)
-	for ref in cell:iterateReferences(tes3.objectType.door) do
-		if (ref.destination) then
-			if (ref.destination.cell.region) then
-				return ref.destination.cell.region.name
-			end
-		end
-	end
-end
-
+-- Check if transitioning int/ext or the other way around --
 function this.checkCellDiff(cell, cellLast)
 	if (cellLast==nil) then return true end
+
 	if (cell.isInterior) and (not cellLast.isInterior)
 	or (cell.isInterior) and (cellLast.isInterior)
 	or (not cell.isInterior) and (cellLast.isInterior)
@@ -74,16 +64,10 @@ function this.checkCellDiff(cell, cellLast)
 	or (cell.behavesAsExterior) and (not cellLast.behavesAsExterior) then
 		return true
 	end
-	--[[if cell.name ~= nil then
-	for _, name in pairs(this.cellTypesCaves) do
-		if string.find(cell.name:lower(), name) then
-			return true
-		end
-	end
-end]]
-return false
+	return false
 end
 
+-- Pass me the cell and cell type array and I'll tell you if it matches --
 function this.getCellType(cell, celltype)
 	if not cell.isInterior then
 		return false
@@ -97,6 +81,7 @@ function this.getCellType(cell, celltype)
 	end
 end
 
+-- Return doors and windows objects --
 function this.getWindoors(cell)
 	local windoors = {}
 	for door in cell:iterateReferences(tes3.objectType.door) do

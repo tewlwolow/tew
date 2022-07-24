@@ -3,6 +3,7 @@ local version = modversion.version
 local config=require("tew.AURA.config")
 local vol = config.splashVol/200
 
+-- Wonder if anyone uses this lol --
 local function splashPlay(e)
     local element=e.element
     tes3.playSound{soundPath="Fx\\envrn\\splash_lrg.wav", volume=0.5*vol, pitch=0.6}

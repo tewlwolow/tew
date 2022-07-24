@@ -21,6 +21,7 @@ local function isEnabled(cellName)
     end
 end
 
+-- Ugly behemoth to resolve cell type we got --
 local function getTypeCell(maxCount, cell)
     local count = 0
     local typeCell
@@ -38,6 +39,7 @@ local function getTypeCell(maxCount, cell)
     if count == 0 then debugLog("Too few statics. Count: "..count) return nil end
 end
 
+-- See if the cell warrants populated sounds - or whether you killed them all, you bastard --
 local function getPopulatedCell(maxCount, cell)
     local count = 0
     for npc in cell:iterateReferences(tes3.objectType.NPC) do
@@ -49,12 +51,12 @@ local function getPopulatedCell(maxCount, cell)
     if count < maxCount then --[[debugLog("Too few people in a cell. Count: "..count)]] return false end
 end
 
+-- Music bit per culture --
 local musicArrays = {
     ["imp"] = {},
     ["dar"] = {},
     ["nor"] = {},
 }
-
 local function playMusic()
     if not interiorMusic then return end
     lastMusicPath = musicPath
@@ -65,7 +67,7 @@ local function playMusic()
     }
     played = true
 end
-
+-- Get music tracks from folders --
 for folder in lfs.dir("Data Files\\Music\\tew\\AURA") do
     if folder ~= "Special" then
         for soundfile in lfs.dir("Data Files\\Music\\tew\\AURA\\"..folder) do
@@ -77,6 +79,7 @@ for folder in lfs.dir("Data Files\\Music\\tew\\AURA") do
     end
 end
 
+-- Determine if we can play tavern music --
 local function onMusicSelection()
     local cell = tes3.getPlayerCell()
 
@@ -138,6 +141,7 @@ local function cellCheck()
 
     local cell = tes3.getPlayerCell()
 
+    -- Bugger off if we're not inside --
     if not (cell) or (cell.isOrBehavesAsExterior) then
         debugLog("Exterior cell. Removing sound.")
         sounds.removeImmediate{module = moduleName}
@@ -151,9 +155,10 @@ local function cellCheck()
         return
     end
 
+    -- If we got this far let's recycle whatever might have been playing before for that module (useful for guild service travel etc.) --
     sounds.removeImmediate{module = moduleName}
 
-    -- First check if the cell type can be determined by architecture
+    -- First check if the cell type can be determined by architecture --
     local typeCell = getTypeCell(5, cell)
     if typeCell ~= nil then
         debugLog("Found appropriate cell. Playing interior ambient sound.")
@@ -161,7 +166,7 @@ local function cellCheck()
         return
     end
 
-    -- A little override to ensure that taverns with non-native publicans get covered too
+    -- A little override to ensure that taverns with non-native publicans get covered too --
     if getPopulatedCell(2, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
     for race, taverns in pairs(data.tavernNames) do
         for _, pattern in ipairs(taverns) do
@@ -173,10 +178,10 @@ local function cellCheck()
         end
     end
 
-    -- If at this point there's no-one inside, let's bail out
+    -- If at this point there's no-one inside, let's bail out --
     if getPopulatedCell(1, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
 
-    -- Now performing pattern match for cell names
+    -- Now performing pattern match for cell names --
     for cellType, nameTable in pairs(data.names) do
         for _, pattern in pairs(nameTable) do
             if findWholeWords(cell.name, pattern) then
@@ -187,7 +192,7 @@ local function cellCheck()
         end
     end
 
-    -- Determine tavern type per race
+    -- Determine tavern type per race --
     for npc in cell:iterateReferences(tes3.objectType.npc) do
         if (npc.object.class.id == "Publican"
         or npc.object.class.id == "T_Sky_Publican"
@@ -212,8 +217,8 @@ local function cellCheck()
     sounds.removeImmediate{module = moduleName}
 end
 
--- Make sure any law-breakers, murderes and maniacs are covered
--- Meaning the death of a publican means we recheck conditions
+-- Make sure any law-breakers, murderes and maniacs are covered --
+-- Meaning the death of a publican means we recheck conditions --
 local function deathCheck(e)
     if e.reference and e.reference.baseObject == tes3.objectType.npc
     and (e.reference.object.class.id == "Publican"
@@ -227,7 +232,6 @@ local function deathCheck(e)
 end
 
 local function onCOC()
-	-- sounds.removeImmediate{module = moduleName}
     cellCheck()
 end
 

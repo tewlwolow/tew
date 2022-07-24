@@ -1,3 +1,6 @@
+-- If you need more information about the script, you can find it in the outdoorMain.lua --
+-----------------------------------------------------------------------------------------------
+
 local data = require("tew.AURA.Ambient.Populated.populatedData")
 local config = require("tew.AURA.config")
 local sounds = require("tew.AURA.sounds")
@@ -6,17 +9,15 @@ local tewLib = require("tew.tewLib.tewLib")
 local popVol = config.popVol/200
 local isOpenPlaza=tewLib.isOpenPlaza
 
-
 local time, timeLast, typeCellLast, weatherNow, weatherLast
-
 local WtC
-
 local moduleName = "populated"
-
 local debugLog = common.debugLog
 
+-- Doesn't make any sense to play populated sound there --
 local blacklistedCells = {"Holamayan"}
 
+-- Let's see if there are enough people for us to consider the cell eligible --
 local function getPopulatedCell(maxCount, cell)
     for _, v in ipairs(blacklistedCells) do
         if string.find(cell.name, v) then
@@ -33,6 +34,7 @@ local function getPopulatedCell(maxCount, cell)
     if count < maxCount then debugLog("Too few people in a cell. Count: "..count) return false end
 end
 
+-- Get cell type with the aid of statics name matching --
 local function getTypeCell(maxCount, cell)
     local count = 0
     local typeCell
@@ -52,7 +54,7 @@ end
 
 local function cellCheck()
 
-    -- Gets messy otherwise
+    -- Gets messy otherwise --
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
 		return
@@ -60,13 +62,15 @@ local function cellCheck()
 
     local cell = tes3.getPlayerCell()
 
+    -- Wilderness shouldn't be considered populated --
+    -- If cell name is nil (different from editorName!) then it's wilderness --
     if (not cell) or (not cell.name) then
         debugLog("Player in the wilderness. Returning.")
         sounds.remove{module = moduleName, volume = popVol}
         timeLast = nil
         typeCellLast = nil
         return
-    elseif not (cell.isOrBehavesAsExterior and not isOpenPlaza(cell)) then
+    elseif not (cell.isOrBehavesAsExterior and not isOpenPlaza(cell)) then -- Bugger off if we're inside --
         debugLog("Player in interior cell. Removing sounds immediately.")
         sounds.removeImmediate{module = moduleName, volume = popVol}
         timeLast = nil
@@ -82,6 +86,7 @@ local function cellCheck()
 	end
 	debugLog("Weather: "..weatherNow)
 
+    -- No outside activity in ashstorms and that --
     if (weatherNow >= 4 and weatherNow <= 7) or (weatherNow == 8) and weatherNow ~= weatherLast then
         debugLog("Bad weather detected. Removing sounds.")
         sounds.remove{module = moduleName, volume = popVol}
@@ -95,6 +100,7 @@ local function cellCheck()
 
     local typeCell = getTypeCell(5, cell)
 
+    -- Do not reset sounds if conditions are the same at this point --
     if typeCell == typeCellLast
     and time == timeLast
     and weatherNow == weatherLast then
@@ -102,10 +108,12 @@ local function cellCheck()
         return
     end
 
+    -- Otherwise reset and resolve --
     debugLog("Different conditions. Removing sounds.")
     sounds.remove{module = moduleName, volume = popVol}
     timeLast = nil
 
+    -- Check if the cell is populated and whether it's night or day --
     if typeCell ~= nil and getPopulatedCell(5, cell) == true then
         if typeCell~="dae" and
         typeCell~="dwe" and
@@ -140,7 +148,6 @@ local function populatedTimer()
 end
 
 local function onCOC()
-	-- sounds.removeImmediate{module = moduleName}
     cellCheck()
 end
 

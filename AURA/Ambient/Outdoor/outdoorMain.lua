@@ -24,10 +24,11 @@ local windoors, interiorTimer
 
 local debugLog = common.debugLog
 
+-- Parse passed options to prepare dispatch to sounds module --
 local function weatherParser(options)
-
 	local volume, pitch, ref, immediate
 
+	-- Fallback values --
 	if not options then
 		volume = OAvol
 		pitch = 1
@@ -40,6 +41,7 @@ local function weatherParser(options)
 		ref = options.reference or tes3.mobilePlayer.reference
 	end
 
+	-- Determine if we should play the sound or not, depending on the weather --
 	if weatherNow >= 0 and weatherNow <4 then
 		debugLog("Playing regular weather track.")
 		if immediate then
@@ -54,6 +56,7 @@ local function weatherParser(options)
 	end
 end
 
+-- Play outdoor ambient on doors and windows --
 local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
 	if playOld then
@@ -65,17 +68,19 @@ local function playInteriorBig(windoor, playOld)
 	end
 end
 
+-- Because MW engine will otherwise scrap the sound and not put it up again. Dumb thing --
 local function updateInteriorBig()
 	debugLog("Updating interior doors and windows.")
 	local playerPos=tes3.player.position
 	for _, windoor in ipairs(windoors) do
-		if playerPos:distance(windoor.position:copy()) > 1800
+		if playerPos:distance(windoor.position:copy()) > 1800 -- Less then cutoff, just to be sure. Shouldn't be too jarring --
 		and windoor~=nil then
 			playInteriorBig(windoor, true)
 		end
 	end
 end
 
+-- Play on the whole thing for shacks etc. --
 local function playInteriorSmall()
 	if cellLast and not cellLast.isInterior then
 		debugLog("Playing interior ambient sounds for small interiors using old track.")
@@ -88,7 +93,9 @@ end
 
 local function cellCheck()
 
-	-- Gets messy otherwise
+	-- Gets messy otherwise --
+	-- We don't want to reset sounds when the player is waiting for a longer time --
+	-- We'll resolve conditions after UI waiting element is destroyed --
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
 		return
@@ -112,12 +119,14 @@ local function cellCheck()
 	if (not cell) then debugLog("No cell detected. Returning.") return end
 	debugLog("Cell: "..cell.editorName)
 
+	-- Proper region resolution depending on whether we've just loaded the game or not --
+	-- Initially the game will not properly use region stuff unless you step outside --
 	if cell.isInterior then
-		local regionObject = tes3.getRegion({useDoors=true})
+		local regionObject = tes3.getRegion({useDoors=true}) -- If we're inside we need to scan doors to get the proper region --
 		region = regionObject.name
 		weatherNow = regionObject.weather.index
 	else
-		region = tes3.getRegion().name
+		region = tes3.getRegion().name -- Otherwise we can just get the region from the cell --
 		if WtC.nextWeather then
 			weatherNow = WtC.nextWeather.index
 		else
@@ -126,7 +135,6 @@ local function cellCheck()
 	end
 
 	debugLog("Weather: "..weatherNow)
-
 	if region == nil then debugLog("No region detected. Returning.") return end
 
 	-- Checking climate --
@@ -173,6 +181,7 @@ local function cellCheck()
 
 	debugLog("Different conditions. Resetting sounds.")
 
+	-- In case someone dislikes my interior weather module --
 	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
 		for _, windoor in ipairs(windoors) do
 			sounds.removeImmediate{module=moduleName, reference=windoor}
@@ -181,6 +190,7 @@ local function cellCheck()
 	end
 
 	local useLast = false
+	-- Exterior cells --
 	if (cell.isOrBehavesAsExterior and not isOpenPlaza(cell)) then
 		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
 		and weatherNow==weatherLast and climateNow==climateLast
@@ -195,6 +205,9 @@ local function cellCheck()
 			sounds.remove{module = moduleName, volume=OAvol}
 			weatherParser{volume=OAvol}
 		end
+
+	-- Interior cells --
+	-- Remove main outdoor sound and play the same sound for interiors, either big or small --
 	elseif cell.isInterior then
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
 			debugLog("Found interior cell. Removing sounds.")
@@ -231,6 +244,8 @@ local function cellCheck()
 	debugLog("Cell check complete.")
 end
 
+-- To check whether we're underwater --
+-- This doesn't work with water breathing (no UI element), so eventually will need to be migrated to a new method --
 local function positionCheck(e)
 	local cell=tes3.getPlayerCell()
 	local element=e.element
@@ -255,6 +270,7 @@ local function positionCheck(e)
 	end)
 end
 
+-- After waiting/travelling --
 local function waitCheck(e)
 	local element=e.element
 	element:registerAfter("destroy", function()
@@ -266,6 +282,7 @@ local function waitCheck(e)
     end)
 end
 
+-- Reset stuff on load to not pollute our logic --
 local function runResetter()
 	climateLast, weatherLast, timeLast = nil, nil, nil
 	climateNow, weatherNow, timeNow = nil, nil, nil
@@ -277,11 +294,12 @@ local function runResetter()
 	}
 end
 
+-- Check for time changes --
 local function runHourTimer()
 	timer.start({duration=0.5, callback=cellCheck, iterations=-1, type=timer.game})
 end
 
--- Potential fix for sky texture pop-in - believe it or not :|
+-- Fix for sky texture pop-in - believe it or not :| --
 local function onWeatherTransistionStarted()
 	timer.start(
 		{

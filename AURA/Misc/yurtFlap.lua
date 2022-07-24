@@ -24,6 +24,7 @@ local bearSkins={
 
 local debugLog = common.debugLog
 
+-- Fabric sorta sound on entering yurts and those weird BM dwellings --
 local function yurtFlap(e)
     if not (e.target.object.objectType == tes3.objectType.door) then return end
     for _, door in pairs(yurtDoors) do

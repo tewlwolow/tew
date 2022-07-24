@@ -104,7 +104,7 @@ local modules = {
 	}
 }
 
-
+-- Remove sound if it's already been faded in/out --
 local function removeBlocked(track)
 	for k, v in pairs(blocked) do
 		if v == track then
@@ -113,17 +113,20 @@ local function removeBlocked(track)
 	end
 end
 
+-- Check if the sound is not being faded in/out, block if yes --
 local function isBlocked(track)
 	for _, v in pairs(blocked) do
 		if v == track then debugLog("Track blocked: "..track.id) return true end
 	end
 end
 
--- Play/Stop handling --
+-- Controls fading in --
 local function fadeIn(ref, volume, track, module)
 
+	-- We can sometimes get calls where no sound is actually playing, get out if it is so --
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
 
+	-- If the track is already fading in, block it and check later --
 	if isBlocked(track) then
 		timer.start{
 			callback = function()
@@ -139,10 +142,12 @@ local function fadeIn(ref, volume, track, module)
 	debugLog("Running fade in for: "..track.id)
 	table.insert(blocked, track)
 
+	-- Magic maths --
 	local TIME = TICK*volume/STEP
 	local ITERS = math.ceil(volume/STEP)
 	local runs = 1
 
+	-- Inline function to ensure we can register different iterations of this on different sounds --
 	local function fader()
 		local incremented = STEP*runs
 
@@ -157,6 +162,7 @@ local function fadeIn(ref, volume, track, module)
 		debugLog("In runs for track: "..track.id.." : "..runs)
 	end
 
+	-- Remove from blocked once we're done --
 	local function queuer()
 		modules[module].old = track
 		removeBlocked(track)
@@ -166,19 +172,22 @@ local function fadeIn(ref, volume, track, module)
 	debugLog("Iterations: "..tostring(ITERS))
 	debugLog("Time: "..tostring(TIME))
 
+	-- Start fading --
 	timer.start{
 		iterations = ITERS,
 		duration = TICK,
 		callback = fader
 	}
 
+	-- Clean up afterwards --
 	timer.start{
 		iterations = 1,
-		duration = TIME + 0.1,
+		duration = TIME + 0.1, -- Ridiculous but required --
 		callback = queuer
 	}
 end
 
+-- Same as above, just backwards --
 local function fadeOut(ref, volume, track, module)
 
 	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
@@ -238,6 +247,7 @@ local function fadeOut(ref, volume, track, module)
 	}
 end
 
+-- Simple crossfade using available faders --
 local function crossFade(ref, volume, trackOld, trackNew, module)
 	if not trackOld or not trackNew then return end
 	debugLog("Running crossfade for: "..trackOld.id..", "..trackNew.id)
@@ -245,10 +255,13 @@ local function crossFade(ref, volume, trackOld, trackNew, module)
 	fadeIn(ref, volume, trackNew, module)
 end
 
+-- Sometimes we need to just remove the sounds without fading --
 function this.removeImmediate(options)
 	debugLog("Immediately removing sounds for module: "..options.module)
+
 	local ref = options.reference or tes3.mobilePlayer.reference
 
+	-- Remove old file if playing (for instance if fade out didn't quite finish yet) --
 	if
 		modules[options.module].old
 		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
@@ -259,6 +272,7 @@ function this.removeImmediate(options)
 		debugLog("Old track not playing.")
 	end
 
+	-- Remove the new file as well --
 	if
 		modules[options.module].new
 		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
@@ -271,6 +285,7 @@ function this.removeImmediate(options)
 	end
 end
 
+-- Remove the sound for a given module, but with fade out --
 function this.remove(options)
 	debugLog("Removing sounds for module: "..options.module)
 	local ref = options.reference or tes3.mobilePlayer.reference
@@ -295,6 +310,7 @@ function this.remove(options)
 	end
 end
 
+-- Resolve options and return the randomised track per conditions given --
 local function getTrack(options)
 	debugLog("Parsing passed options.")
 
@@ -353,6 +369,7 @@ local function getTrack(options)
 		end
 	end
 
+	-- Can happen on fresh load etc. --
 	if not table then
 		debugLog("No table found. Returning.")
 		return
@@ -370,10 +387,12 @@ local function getTrack(options)
 	return newTrack
 end
 
+-- Sometiems we need to play a sound immediately as well --
 function this.playImmediate(options)
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
 
+	-- Get the last track so that we're not randomising each time we change int/ext cells within same conditions --
 	if options.last and modules[options.module].new then
 		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
 		debugLog("Immediately restaring: "..modules[options.module].new.id)
@@ -405,19 +424,25 @@ function this.playImmediate(options)
 end
 
 -- Supporting kwargs here
+-- Main entry point, resolves all data received and decides what to do next --
 function this.play(options)
-
+	-- If no ref (windoor etc.) given, use player --
 	local ref = options.reference or tes3.mobilePlayer.reference
+
+	-- Need this for fader calcs --
 	local volume = options.volume or MAX
 
+	-- Get the new track, if nothing is returned then bugger off (shouldn't really happen at all, but oh well) --
 	local newTrack = getTrack(options)
 	if not newTrack then debugLog("No track selected. Returning.") return end
 
+	-- Move the queue forward --
 	modules[options.module].old = modules[options.module].new
 	modules[options.module].new = newTrack
 
 	debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
 
+	-- Play the sound with 0 volume, decide the fader method later --
 	tes3.playSound {
 		sound = newTrack,
 		loop = true,
@@ -426,12 +451,12 @@ function this.play(options)
 		pitch = options.pitch or MAX
 	}
 
+	-- Fade in if nothing is playing, otherwise crossfade --
 	if not modules[options.module].old or not tes3.getSoundPlaying{sound = newTrack} then
 		fadeIn(ref, volume, newTrack, options.module)
 	else
 		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
 	end
-
 end
 
 

@@ -12,13 +12,14 @@ local debugLog = common.debugLog
 
 local WtC
 
+-- These have their own wind sounds --
 local blockedWeathers = {
     [7] = true,
     [8] = true,
     [10] = true
 }
 
-
+-- Determine wind type per cloud speed values, set in Watch the Skies --
 local function getWindType(cSpeed)
     local cloudSpeed = cSpeed * 100
     if cloudSpeed < 150 then
@@ -32,21 +33,25 @@ local function getWindType(cSpeed)
     end
 end
 
+-- Resolve data and play or remove wind sounds --
 local function playWind(e)
 
-     -- Gets messy otherwise
+     -- Gets messy otherwise --
 	local mp = tes3.mobilePlayer
 	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
 		return
 	end
 
     local cell = tes3.getPlayerCell()
+    -- Remove immediately if in interior --
     if not cell or not cell.isOrBehavesAsExterior then
         debugLog("Not in an exterior cell. Returning.")
         sounds.removeImmediate{module = moduleName, volume = windVol}
         windPlaying = false
         return
     end
+
+    -- Determine if we're transitioning --
     local weather
     if e and e.to then
         weather = e.to
@@ -54,6 +59,7 @@ local function playWind(e)
         weather = WtC.currentWeather
     end
 
+    -- Bugger off if weather is blocked --
     if blockedWeathers[weather.index] then
         debugLog("Weather is blocked. Returning.")
         sounds.remove{module = moduleName, volume = windVol}
@@ -61,10 +67,12 @@ local function playWind(e)
         return
     end
 
+    -- Get wind type after resolving clouds speed --
     local cloudsSpeed = weather.cloudsSpeed
     debugLog("Current clouds speed: "..tostring(cloudsSpeed))
     local windType = getWindType(cloudsSpeed)
 
+    -- If it's super slow then bugger off, no sound for ya --
     if not windType then
         debugLog("Wind type is nil. Returning.")
         sounds.remove{module = moduleName, volume = windVol}
@@ -72,6 +80,7 @@ local function playWind(e)
         return
     end
 
+    -- Play and set flag so that we don't end up resetting the sound when not needed --
     if not windPlaying or (windTypeLast ~= windType)then
         debugLog("Wind type: "..windType)
         sounds.play{module = moduleName, type = windType, volume = windVol}
@@ -80,14 +89,17 @@ local function playWind(e)
     end
 end
 
+-- Reset on load --
 local function onLoad()
     windPlaying = false
 end
 
+-- Check every half an hour --
 local function runHourTimer()
 	timer.start({duration=0.5, callback=playWind, iterations=-1, type=timer.game})
 end
 
+-- Waiting/travelling check --
 local function waitCheck(e)
 	local element=e.element
 	element:registerAfter("destroy", function()
@@ -101,6 +113,7 @@ end
 
 print("[AURA "..version.."] Wind sounds initialised.")
 WtC=tes3.worldController.weatherController
+
 event.register("weatherChangedImmediate", playWind, {priority=-100})
 event.register("weatherTransitionImmediate", playWind, {priority=-100})
 event.register("weatherTransitionStarted", playWind, {priority=-100})

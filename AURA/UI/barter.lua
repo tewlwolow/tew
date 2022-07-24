@@ -3,10 +3,10 @@ local common = require("tew.AURA.common")
 local modversion = require("tew\\AURA\\version")
 local version = modversion.version
 local UIvol=config.UIvol/200
---local moduleContainers=config.moduleContainers
 
 local debugLog = common.debugLog
 
+-- Plays the chest opening/closing sounds on bartering --
 local function playBarterSounds(e)
 
     tes3.playSound{sound="chest open", volume=0.7*UIvol, pitch=0.6}

@@ -3,6 +3,7 @@ local version = modversion.version
 local config = require("tew\\AURA\\config")
 local UIvol=config.UIvol/200
 
+-- Makes use of Bethesda eating sound instead of old weird swallow sound --
 local function eating(e)
     tes3.getSound("Swallow").volume = 0
 

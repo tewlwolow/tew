@@ -12,6 +12,7 @@ local PCDisease = config.PCDisease
 local PCBlight = config.PCBlight
 local vsVol = config.vsVol/200
 
+-- People don't cough underwater I guess --
 local function isPlayerUnderWater()
     local cell = tes3.getPlayerCell()
     if cell.hasWater then
@@ -25,8 +26,9 @@ local function isPlayerUnderWater()
     return false
 end
 
+-- Determine player g-e-n-d-e-r on load --
+-- Awfully binary that one! >:-( --
 local function onLoaded()
-
     if tes3.player.object.female then
         genderFatigue = "fatigue_f.mp3"
         genderDisease = "disease_f.wav"
@@ -34,37 +36,35 @@ local function onLoaded()
         genderFatigue = "fatigue_m.mp3"
         genderDisease = "disease_m.wav"
     end
-
+    -- ... right? --
     player = tes3.mobilePlayer
-
 end
 
+-- Check for disease, which is actually a spell type --
 local function checkDisease(ref)
     local disease
-
     for spell in tes3.iterate(ref.object.spells.iterator) do
         if (spell.castType == tes3.spellType.disease) then
             disease = "Disease"
             break
         end
     end
-
     return disease
 end
 
+-- Same as above, just for Blight --
 local function checkBlight(ref)
     local blight
-
     for spell in tes3.iterate(ref.object.spells.iterator) do
         if (spell.castType == tes3.spellType.blight) then
             blight = "Blight"
             break
         end
     end
-
     return blight
 end
 
+-- Play cough stuff if the player is diseased --
 local function playDisease()
     if diseaseFlag == 1 then return end
     if not diseaseTimer then
@@ -77,6 +77,7 @@ local function playDisease()
     diseaseFlag = 1
 end
 
+-- Shudder before Ur! --
 local function playBlight()
     if blightFlag == 1 then return end
     if not blightTimer then
@@ -89,6 +90,8 @@ local function playBlight()
     blightFlag = 1
 end
 
+-- Thum thum, thum thum --
+-- Actually it plays nicely with "starving" effect from Ashfall as well --
 local function playHealth()
     if healthFlag == 1 then return end
     if not healthTimer then
@@ -101,6 +104,7 @@ local function playHealth()
     healthFlag = 1
 end
 
+-- Me when standing up for a minute: --
 local function playFatigue()
     if fatigueFlag == 1 then return end
     if not fatigueTimer then
@@ -116,6 +120,7 @@ local function playFatigue()
     fatigueFlag = 1
 end
 
+-- Weeeeeuuuuiii no casting for ya --
 local function playMagicka()
     if magickaFlag == 1 then return end
     if not magickaTimer then
@@ -128,6 +133,7 @@ local function playMagicka()
     magickaFlag = 1
 end
 
+-- Centralised vitals resolver --
 local function playVitals()
 
     if PChealth then
@@ -210,6 +216,7 @@ local function playVitals()
 
 end
 
+-- For underwater stuff --
 local function positionCheck()
     if PCfatigue then
         if fatigueTimer then

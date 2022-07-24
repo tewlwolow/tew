@@ -6,10 +6,9 @@ local common = require("tew.AURA.common")
 
 local debugLog = common.debugLog
 
+-- Play gold and magic sound on purchasing spells --
 local function onSpellClick(e)
-
     local element=e.element:findChild(-1155)
-
     for _, spellClick in pairs(element.children) do
         if string.find(spellClick.text, "gp") then
             spellClick:register("mouseDown", function()
@@ -21,6 +20,7 @@ local function onSpellClick(e)
 
 end
 
+-- Why was this hidden? o.O --
 --[[local function onSpellMenu(e)
     local function spellScroll()
         tes3.playSound{sound="scroll", volume=0.6}

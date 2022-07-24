@@ -6,12 +6,14 @@ local common = require("tew.AURA.common")
 
 local debugLog = common.debugLog
 
+-- Silt strider sound ids --
 local silts={
     "Silt_1",
     "Silt_2",
     "Silt_3"
 }
 
+-- Play gold and appropriate travel sound --
 local function travelFee(e)
     local npcId=tes3ui.getServiceActor(e)
     local class=npcId.reference.object.class.id

@@ -8,6 +8,7 @@ local debugLog = common.debugLog
 
 local WtC
 
+-- Map between weather types, rain types and sound id --
 local rainLoops = {
     ["Rain"] = {
         ["light"] = "tew_rain_light",
@@ -21,6 +22,7 @@ local rainLoops = {
     }
 }
 
+-- For interior weather module --
 local interiorRainLoops = {
     ["big"] = {
         ["light"] = "tew_b_rainlight",
@@ -42,6 +44,7 @@ local interiorRainLoops = {
     }
 }
 
+-- Resolve rain type per particle amount set in Watch the Skies --
 local function getRainType(particleAmount)
     if particleAmount < 500 then
         return "light"
@@ -54,8 +57,10 @@ local function getRainType(particleAmount)
     end
 end
 
+-- Set proper rain sounds --
 local function changeRainSounds()
 
+    -- Resolve max particles --
     local rainy = WtC.weathers[5]
     local rainyType = getRainType(rainy.maxParticles)
     local stormy = WtC.weathers[6]
@@ -64,9 +69,11 @@ local function changeRainSounds()
     debugLog("Rain type: "..rainyType)
     debugLog("Storm type: "..stormyType)
 
+    -- Load sounds --
     rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
     stormy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][stormyType])
 
+    -- Also change interior rain sounds --
     if config.moduleInteriorWeather then
         local weather = WtC.currentWeather
         if weather.maxParticles then
@@ -83,5 +90,8 @@ end
 
 print("[AURA "..version.."] Rain sounds initialised.")
 WtC=tes3.worldController.weatherController
+
+-- Also make sure we're setting these on loaded --
 event.register("loaded", changeRainSounds, {priority=-233})
+-- Use custom event from Watch the Skies - no much sense otherwise, who else changes these? :-) --
 event.register("WtS:maxParticlesChanged", changeRainSounds, {priority=-233})

@@ -2,7 +2,7 @@ local this = {}
 
 local config = require("tew.Vapourmist.config")
 
-this.baseTimerDuration = 0.1
+this.baseTimerDuration = 0.5
 this.speedCoefficient = 37
 this.minimumSpeed = 15
 this.minStaticCount = 5
@@ -44,7 +44,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 5100,
-        initialSize = {420, 450, 500, 510, 550, 600},
+        initialSize = {650, 700, 780, 800, 900, 980, 1000, 1100},
         isAvailable = function(_, weather)
 
             if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then

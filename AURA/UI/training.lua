@@ -7,6 +7,7 @@ local UIvol=config.UIvol/200
 
 local debugLog = common.debugLog
 
+-- Play skill sounds on training --
 local function onTrainingMenu(e)
 
     if not e.newlyCreated then
@@ -16,6 +17,7 @@ local function onTrainingMenu(e)
     local element=e.element
     element=element:findChild(-1155)
 
+    -- OOOOPH --
     for _, vF in pairs(element.children) do
         if vF.name=="null" then
             for _, skillClick in pairs(vF.children) do

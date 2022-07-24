@@ -21,6 +21,8 @@ end
 local vehkDir = "Data Files\\Textures\\tew\\Travel Tooltips\\Vehk's Ink\\"
 
 local mapColour=nil
+
+-- Colour overlay for decal-type maps --
 local mapColours={
     ["Indoril"] = {1.0, 1.0, 1.0},
     ["Velothi"] = {0.9, 0.8, 0.5},
@@ -35,6 +37,7 @@ local mapColours={
     ["Reman"] = {1.0, 0.4, 0.7}
 }
 
+-- I know, I know... --
 local function getColour()
     for k, v in pairs(mapColours) do
         if k==config.mapColour then
@@ -43,6 +46,7 @@ local function getColour()
     end
 end
 
+-- Generate proper AI headers --
 local function getVehkHeaders()
     debugLog("Creating arrays for vehk type headers.")
     vehkHeaders = {}
@@ -54,10 +58,13 @@ local function getVehkHeaders()
     end
 end
 
+-- Create the tooltip itself --
 local function createTooltip(e)
-
+    
+    -- Get service NPC --
     local npc=tes3ui.getServiceActor(e).object
 
+    -- Use gondoliers only if set in MCM --
     if npc.class.id == "Gondolier" and not config.showGondola then
         return
     end
@@ -67,6 +74,7 @@ local function createTooltip(e)
     local element=e.element
     local destinationList={}
 
+    -- The famous MW UI element matching --
     element=element:findChild(-1155)
     for _, vF in pairs(element.children) do
         if vF.name=="null" then
@@ -86,6 +94,7 @@ local function createTooltip(e)
             ------------------------------------
                 local headerPath = ""
 
+                -- Match MCM config with header data --
                 headers=config.headers
                 if headers == "headers_ComradeRaven" then
                     headers=data.headers_ComradeRaven
@@ -95,6 +104,7 @@ local function createTooltip(e)
                     headers=vehkHeaders
                 end
 
+                -- Bit more complicated for AI headers --
                 if headers == vehkHeaders then
                     debugLog("Getting vehk header.")
                     for city, map in pairs(vehkHeaders) do
@@ -110,6 +120,7 @@ local function createTooltip(e)
                     end
                 end
 
+                -- If none available and no fallback set in MCM, bugger off --
                 if headerPath == "" and not useFallback then
                     return
                 elseif headerPath == "" and useFallback then
@@ -141,7 +152,6 @@ local function createTooltip(e)
                 end
 
                 local tooltip = tes3ui.createTooltipMenu()
-
                 local destBlock = tooltip:createBlock{id=tes3ui.registerID("twl_Travel_Tooltip")}
 
                 if size=="Wide" then
@@ -185,7 +195,6 @@ local function createTooltip(e)
                     destDescr.justifyText="center"
                     destDescr.autoWidth = true
                     destDescr.autoHeight = true
-
                 elseif size =="Slim" then
                     destBlock.flowDirection = "top_to_bottom"
                     destBlock.width = 500*scale
@@ -232,12 +241,15 @@ local function createTooltip(e)
     updateTooltip()
 end
 
+-- Creating travel menu on hovering over "Travel" button --
 local function createTravelMap(e)
 
+    -- Lmao --
     if config.showMainMap==false then
         return
     end
 
+    -- No sane travel map for TR/PT, so get out early --
     local npc=tes3ui.getServiceActor().reference.object
     if string.startswith(npc.id, "TR_") or
     string.startswith(npc.id, "PC_") or
@@ -271,6 +283,7 @@ end
 
 local function init()
 
+    -- Prepare AI headers data from available images on disk --
     for folder in lfs.dir(vehkDir) do
         if folder == ".." or folder == "." then goto continue end
 
@@ -286,6 +299,7 @@ local function init()
         :: continue ::
     end
 
+    -- Get AI headers once per cell change, not on each hover --
     if config.headers == "headers_vehk" then
         getVehkHeaders()
         event.register("cellChanged", getVehkHeaders)
