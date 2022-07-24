@@ -108,7 +108,7 @@ local function conditionCheck()
 			timer.start {
 				type = timer.game,
 				iterations = 1,
-				duration = 0.3,
+				duration = 0.2,
 				callback = function() fogService.addFog(options) end
 			}
 		else
