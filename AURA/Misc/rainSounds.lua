@@ -69,6 +69,10 @@ local function changeRainSounds()
     debugLog("Rain type: "..rainyType)
     debugLog("Storm type: "..stormyType)
 
+    if WtC.currentWeather.rainLoopSound then
+        WtC.currentWeather.rainLoopSound:stop()
+    end
+
     -- Load sounds --
     rainy.rainLoopSound = tes3.getSound(rainLoops["Rain"][rainyType])
     stormy.rainLoopSound = tes3.getSound(rainLoops["Thunderstorm"][stormyType])
