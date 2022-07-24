@@ -24,7 +24,7 @@ local function getWindType(cSpeed)
     local cloudSpeed = cSpeed * 100
     if cloudSpeed < 150 then
         return "quiet"
-    elseif cloudSpeed < 360 then
+    elseif cloudSpeed <= 320 then
         return "warm"
     elseif cloudSpeed <= 1800 then
         return "cold"
@@ -35,12 +35,11 @@ end
 
 -- Resolve data and play or remove wind sounds --
 local function playWind(e)
-
-     -- Gets messy otherwise --
-	local mp = tes3.mobilePlayer
-	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-		return
-	end
+    -- Gets messy otherwise --
+    local mp = tes3.mobilePlayer
+    if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+        return
+    end
 
     local cell = tes3.getPlayerCell()
     -- Remove immediately if in interior --
@@ -111,12 +110,21 @@ local function waitCheck(e)
     end)
 end
 
+-- Timer here so that sky textures can work ok... something fishy with weatherTransitionStarted event for sure --
+local function transitionStartedWrapper()
+    timer.start{
+        duration = 0.1,
+        type = timer.game,
+        callback = playWind()
+    }
+end
+
 print("[AURA "..version.."] Wind sounds initialised.")
 WtC=tes3.worldController.weatherController
 
 event.register("weatherChangedImmediate", playWind, {priority=-100})
 event.register("weatherTransitionImmediate", playWind, {priority=-100})
-event.register("weatherTransitionStarted", playWind, {priority=-100})
+event.register("weatherTransitionStarted", transitionStartedWrapper, {priority=-100})
 event.register("weatherTransitionFinished", playWind, {priority=-100})
 event.register("load", onLoad)
 event.register("loaded", runHourTimer, {priority=-160})
