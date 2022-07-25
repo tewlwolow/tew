@@ -1,5 +1,5 @@
 return {
-    OAvol=130,
+    OAvol=110,
     IWvol=150,
     yurtVol=200,
     splashVol=200,
@@ -48,5 +48,5 @@ return {
     windSounds = true,
     rainSounds = true,
     disabledTaverns={},
-    windVol = 130,
+    windVol = 125,
 }
