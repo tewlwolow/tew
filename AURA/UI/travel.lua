@@ -40,7 +40,7 @@ local function travelFee(e)
             for _, vS in pairs(vF.children) do
                 if string.find(vS.text, "gp") then
                     local travelClick=vS
-                    travelClick:register("mouseDown", playFee)
+                    travelClick:registerBefore("mouseDown", playFee)
                 end
             end
         end
