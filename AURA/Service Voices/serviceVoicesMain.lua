@@ -251,7 +251,7 @@ local function spellGreet(e)
    debugLog("NPC says a spell vendor comment.")
 
    if UISpells and moduleUI then
-      tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.6*UIvol, pitch=1.3}
+      tes3.playSound{soundPath="FX\\MysticGate.wav", reference=tes3.player, volume=0.2*UIvol, pitch=1.8}
       debugLog("Opening spell menu sound played.")
    end
 end

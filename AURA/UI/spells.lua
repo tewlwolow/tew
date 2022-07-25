@@ -8,32 +8,31 @@ local debugLog = common.debugLog
 
 -- Play gold and magic sound on purchasing spells --
 local function onSpellClick(e)
-    local element=e.element:findChild(-1155)
+    local element=e.element:findChild("MenuServiceSpells_Spells")
     for _, spellClick in pairs(element.children) do
         if string.find(spellClick.text, "gp") then
-            spellClick:register("mouseDown", function()
-            tes3.playSound{sound="sprigganmagic", volume=0.7*UIvol, pitch=1.2}
-            debugLog("Purchase spell sound played.")
+            spellClick:registerAfter("mouseDown", function()
+                tes3.playSound{sound="sprigganmagic", volume=0.2*UIvol, pitch=1.7}
+                debugLog("Purchase spell sound played.")
             end)
         end
     end
-
 end
 
--- Why was this hidden? o.O --
---[[local function onSpellMenu(e)
+-- Play scroll on opening the menu --
+local function onSpellMenu(e)
     local function spellScroll()
-        tes3.playSound{sound="scroll", volume=0.6}
+        tes3.playSound{sound="scroll", volume=0.5}
         debugLog("Opening spell menu sound played.")
     end
 
     local element=e.element
     local spellsButton=element:findChild(tes3ui.registerID("MenuDialog_service_spells"))
 
-    spellsButton:register("mouseDown", spellScroll)
-end--]]
+    spellsButton:registerAfter("mouseDown", spellScroll)
+end
 
 
 print("[AURA "..version.."] UI: Spell purchase sounds initialised.")
 event.register("uiActivated", onSpellClick, {filter="MenuServiceSpells", priority=-15})
---event.register("uiActivated", onSpellMenu, {filter="MenuDialog", priority=-15})
+event.register("uiActivated", onSpellMenu, {filter="MenuDialog", priority=-15})
