@@ -68,7 +68,7 @@ end
 -- Clean distant fog and remove appculled fog --
 function this.cleanInactiveFog()
 	local mp = tes3.mobilePlayer
-	if not mp then return end
+	if not mp or not mp.position then return end
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
