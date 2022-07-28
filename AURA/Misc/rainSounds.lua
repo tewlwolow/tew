@@ -28,19 +28,16 @@ local interiorRainLoops = {
         ["light"] = "tew_b_rainlight",
         ["medium"] = "tew_b_rainmedium",
         ["heavy"] = "tew_b_rainheavy",
-        ["thunder"] = "tew_b_thunderheavy"
     },
     ["sma"] = {
         ["light"] = "tew_s_rainlight",
         ["medium"] = "tew_s_rainmedium",
         ["heavy"] = "tew_s_rainheavy",
-        ["thunder"] = "tew_s_thunderheavy"
     },
     ["ten"] = {
         ["light"] = "tew_t_rainlight",
         ["medium"] = "tew_t_rainmedium",
         ["heavy"] = "tew_t_rainheavy",
-        ["thunder"] = "tew_t_thunderheavy"
     }
 }
 
@@ -80,14 +77,9 @@ local function changeRainSounds()
 
     -- Also change interior rain sounds --
     if config.moduleInteriorWeather then
-        local weather = WtC.currentWeather
-        if weather.maxParticles then
-            local interiorRainType = getRainType(weather.maxParticles)
-            if weather.name == "Thunderstorm" then interiorRainType = "thunder" end
-            for interiorType, array in pairs(sounds.interiorWeather) do
-                array[4] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
-                array[5] = tes3.getSound(interiorRainLoops[interiorType][interiorRainType])
-            end
+        for interiorType, array in pairs(sounds.interiorWeather) do
+            array[4] = tes3.getSound(interiorRainLoops[interiorType][rainyType])
+            array[5] = tes3.getSound(interiorRainLoops[interiorType][stormyType])
         end
     end
 
