@@ -146,14 +146,13 @@ local function buildWeatherSounds()
     filename = soundDir..wDir.."\\big\\rm.wav"
     objectId = "tew_b_rainmedium"
     createSound(objectId, filename, sounds.interiorWeather["big"], 4)
+	filename = soundDir..wDir.."\\big\\rm.wav"
+    objectId = "tew_b_thundermedium"
+	createSound(objectId, filename, sounds.interiorWeather["big"], 5)
 
 	filename = soundDir..wDir.."\\big\\rh.wav"
     objectId = "tew_b_rainheavy"
 	createSound(objectId, filename)
-
-	filename = soundDir..wDir.."\\big\\th.wav"
-    objectId = "tew_b_thunderheavy"
-    createSound(objectId, filename, sounds.interiorWeather["big"], 5)
 
     filename = soundDir..wDir.."\\sma\\rl.wav"
     objectId = "tew_s_rainlight"
@@ -162,14 +161,13 @@ local function buildWeatherSounds()
 	filename = soundDir..wDir.."\\sma\\rm.wav"
     objectId = "tew_s_rainmedium"
     createSound(objectId, filename, sounds.interiorWeather["sma"], 4)
+	filename = soundDir..wDir.."\\sma\\rm.wav"
+    objectId = "tew_s_thundermedium"
+	createSound(objectId, filename, sounds.interiorWeather["sma"], 5)
 
     filename = soundDir..wDir.."\\sma\\rh.wav"
     objectId = "tew_s_rainheavy"
 	createSound(objectId, filename)
-
-	filename = soundDir..wDir.."\\sma\\th.wav"
-    objectId = "tew_s_thunderheavy"
-    createSound(objectId, filename, sounds.interiorWeather["sma"], 5)
 
     filename = soundDir..wDir.."\\ten\\rl.wav"
     objectId = "tew_t_rainlight"
@@ -178,14 +176,13 @@ local function buildWeatherSounds()
 	filename = soundDir..wDir.."\\ten\\rm.wav"
     objectId = "tew_t_rainmedium"
     createSound(objectId, filename, sounds.interiorWeather["ten"], 4)
+	filename = soundDir..wDir.."\\ten\\rm.wav"
+    objectId = "tew_t_thundermedium"
+	createSound(objectId, filename, sounds.interiorWeather["ten"], 5)
 
     filename = soundDir..wDir.."\\ten\\rh.wav"
     objectId = "tew_t_rainheavy"
     createSound(objectId, filename)
-
-	filename = soundDir..wDir.."\\ten\\th.wav"
-    objectId = "tew_t_thunderheavy"
-    createSound(objectId, filename, sounds.interiorWeather["ten"], 5)
 
     filename = soundDir..wDir.."\\com\\wg.wav"
     objectId = "tew_wind_gust"
