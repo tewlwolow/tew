@@ -57,13 +57,11 @@ this.windows={
 function this.checkCellDiff(cell, cellLast)
 	if (cellLast==nil) then return true end
 
-	if (cell.isInterior) and (not cellLast.isInterior)
-	or (cell.isInterior) and (cellLast.isInterior)
-	or (not cell.isInterior) and (cellLast.isInterior)
-	or (cell.isInterior) and (cellLast.behavesAsExterior)
-	or (cell.behavesAsExterior) and (not cellLast.behavesAsExterior) then
+	if (cell.isInterior) and (cellLast.isOrBehavesAsExterior)
+	or (cell.isOrBehavesAsExterior) and (cellLast.isInterior) then
 		return true
 	end
+
 	return false
 end
 
