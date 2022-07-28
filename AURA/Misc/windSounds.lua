@@ -5,8 +5,12 @@ local common=require("tew.AURA.common")
 local moduleName = "wind"
 local windPlaying = false
 local config = require("tew.AURA.config")
+local playInteriorWind = config.playInteriorWind
 local windVol = (config.windVol/200)
-local windTypeLast
+local windType
+local windTypeLast, cellLast
+local interiorTimer
+local windoors = {}
 
 local debugLog = common.debugLog
 
@@ -33,22 +37,42 @@ local function getWindType(cSpeed)
     end
 end
 
+local function playWind(ref, useLast, vol, pitch)
+    debugLog("Wind type: "..windType)
+    if not vol then vol = windVol end
+    sounds.play{module = moduleName, type = windType, volume = vol, pitch = pitch, reference = ref, last = useLast}
+    windPlaying = true
+    windTypeLast = windType
+    cellLast = cell
+end
+
+local function updateInteriorBig()
+	debugLog("Updating interior doors and windows.")
+	local playerPos=tes3.player.position
+	for _, windoor in ipairs(windoors) do
+		if playerPos:distance(windoor.position:copy()) > 2000 -- Less then cutoff, just to be sure. Shouldn't be too jarring --
+		and windoor~=nil then
+            local windoorVol = (0.4*windVol)-(0.005 * #windoors)
+			playWind(windoor, true, windoorVol, 0.8)
+		end
+	end
+end
+
 -- Resolve data and play or remove wind sounds --
-local function playWind(e)
+local function windCheck(e)
     -- Gets messy otherwise --
     local mp = tes3.mobilePlayer
     if (not mp) or (mp and (mp.waiting or mp.traveling)) then
         return
     end
 
-    local cell = tes3.getPlayerCell()
-    -- Remove immediately if in interior --
-    if not cell or not cell.isOrBehavesAsExterior then
-        debugLog("Not in an exterior cell. Returning.")
-        sounds.removeImmediate{module = moduleName, volume = windVol}
-        windPlaying = false
-        return
-    end
+    -- Getting rid of timers on cell check --
+	if not interiorTimer then
+		interiorTimer = timer.start({duration=1, iterations=-1, callback=updateInteriorBig, type=timer.real})
+		interiorTimer:pause()
+	else
+		interiorTimer:pause()
+	end
 
     -- Determine if we're transitioning --
     local weather
@@ -69,7 +93,7 @@ local function playWind(e)
     -- Get wind type after resolving clouds speed --
     local cloudsSpeed = weather.cloudsSpeed
     debugLog("Current clouds speed: "..tostring(cloudsSpeed))
-    local windType = getWindType(cloudsSpeed)
+    windType = getWindType(cloudsSpeed)
 
     -- If it's super slow then bugger off, no sound for ya --
     if not windType then
@@ -79,12 +103,55 @@ local function playWind(e)
         return
     end
 
-    -- Play and set flag so that we don't end up resetting the sound when not needed --
-    if not windPlaying or (windTypeLast ~= windType)then
-        debugLog("Wind type: "..windType)
-        sounds.play{module = moduleName, type = windType, volume = windVol}
-        windPlaying = true
-        windTypeLast = windType
+    local cell = tes3.getPlayerCell()
+    local useLast = (cellLast and common.checkCellDiff(cell, cellLast)==true and windType==windTypeLast)
+
+    if not (windPlaying) or (windTypeLast ~= windType) or (common.checkCellDiff(cell, cellLast)) then
+
+        if (cell.isOrBehavesAsExterior) then
+            if useLast then
+                -- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
+                debugLog("Found same cell. Using last sound.")
+                sounds.removeImmediate{module = moduleName}
+                playWind(nil, useLast, nil, nil)
+            else
+                debugLog("Found different exterior cell. Using new sound.")
+                sounds.remove{module = moduleName, volume=windVol}
+                playWind(nil, useLast, nil, nil)
+            end
+        else
+            debugLog("Not in an exterior cell. Returning.")
+            if not playInteriorWind then
+                debugLog("Removing wind sound.")
+                sounds.removeImmediate{module = moduleName}
+                windPlaying = false
+                return
+            else
+                debugLog("Playing interior wind sound.")
+                sounds.removeImmediate{module = moduleName, volume = windVol}
+                if common.getCellType(cell, common.cellTypesSmall)==true
+                or common.getCellType(cell, common.cellTypesTent)==true then
+                    debugLog("Found small interior cell. Playing interior loops.")
+                    playWind(nil, useLast, 0.4*windVol, 0.8)
+                else
+                    debugLog("Found big interior cell. Playing interior loops.")
+                    windoors=nil
+                    windoors=common.getWindoors(cell)
+                    if windoors ~= nil then
+                        local windoorVol = (0.4*windVol)-(0.005 * #windoors)
+                        for i, windoor in ipairs(windoors) do
+                            sounds.removeImmediate{module = moduleName, reference=windoor}
+                            if i == 1 then
+                                playWind(windoor, false, windoorVol, 0.8)
+                            else
+                                playWind(windoor, true, windoorVol, 0.8)
+                            end
+                        end
+                        interiorTimer:resume()
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -95,7 +162,7 @@ end
 
 -- Check every half an hour --
 local function runHourTimer()
-	timer.start({duration=0.5, callback=playWind, iterations=-1, type=timer.game})
+	timer.start({duration=0.5, callback=windCheck, iterations=-1, type=timer.game})
 end
 
 -- Waiting/travelling check --
@@ -105,7 +172,7 @@ local function waitCheck(e)
         timer.start{
             type=timer.game,
             duration = 0.01,
-            callback = playWind
+            callback = windCheck
         }
     end)
 end
@@ -115,19 +182,19 @@ local function transitionStartedWrapper()
     timer.start{
         duration = 0.1,
         type = timer.game,
-        callback = playWind()
+        callback = windCheck
     }
 end
 
 print("[AURA "..version.."] Wind sounds initialised.")
 WtC=tes3.worldController.weatherController
 
-event.register("weatherChangedImmediate", playWind, {priority=-100})
-event.register("weatherTransitionImmediate", playWind, {priority=-100})
+event.register("weatherChangedImmediate", windCheck, {priority=-100})
+event.register("weatherTransitionImmediate", windCheck, {priority=-100})
 event.register("weatherTransitionStarted", transitionStartedWrapper, {priority=-100})
-event.register("weatherTransitionFinished", playWind, {priority=-100})
+event.register("weatherTransitionFinished", windCheck, {priority=-100})
 event.register("load", onLoad)
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = 10})
 
-event.register("cellChanged", playWind, {priority=-100})
+event.register("cellChanged", windCheck, {priority=-100})

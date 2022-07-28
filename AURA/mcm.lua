@@ -92,7 +92,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("OAvol")
 	}
 	pageOA:createYesNoButton{
-		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each door leading to an exterior.",
+		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
 		variable = registerVariable("playInteriorAmbient"),
 		restartRequired=true
 	}
@@ -346,6 +346,11 @@ local template = mwse.mcm.createTemplate{
 	pageMisc:createYesNoButton{
 		label = "Enable variable wind sounds per clouds speed?\nNote: requires Watch the Skies.",
 		variable = registerVariable("windSounds"),
+	}
+	pageOA:createYesNoButton{
+		label = "Enable wind sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
+		variable = registerVariable("playInteriorWind"),
+		restartRequired=true
 	}
 	pageMisc:createSlider{
 		label = string.format("Changes %% volume for wind sounds. Default = %s%%.\nRequires restart. Volume %%", defaults.windVol),
