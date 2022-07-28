@@ -56,7 +56,6 @@ this.interior = {
 }
 
 this.interiorWeather = {
-
 	["big"] = {
 		[4] = nil,
 		[5] = nil,
@@ -262,26 +261,26 @@ function this.removeImmediate(options)
 	local ref = options.reference or tes3.mobilePlayer.reference
 
 	-- Remove old file if playing (for instance if fade out didn't quite finish yet) --
-	if
-		modules[options.module].old
-		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
-	then
-		tes3.removeSound{sound = modules[options.module].old, reference = ref}
-		debugLog(modules[options.module].old.id.." removed.")
-	else
-		debugLog("Old track not playing.")
+	if modules[options.module].old then
+		removeBlocked(modules[options.module].old)
+		if tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} then
+			tes3.removeSound{sound = modules[options.module].old, reference = ref}
+			debugLog(modules[options.module].old.id.." removed.")
+		else
+			debugLog("Old track not playing.")
+		end
 	end
 
 	-- Remove the new file as well --
-	if
-		modules[options.module].new
-		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
-	then
-		tes3.removeSound{sound = modules[options.module].new, reference = ref}
-		modules[options.module].old = modules[options.module].new
-		debugLog(modules[options.module].new.id.." removed.")
-	else
-		debugLog("New track not playing.")
+	if modules[options.module].new then
+		removeBlocked(modules[options.module].old)
+		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then
+			tes3.removeSound{sound = modules[options.module].new, reference = ref}
+			modules[options.module].old = modules[options.module].new
+			debugLog(modules[options.module].new.id.." removed.")
+		else
+			debugLog("New track not playing.")
+		end
 	end
 end
 
@@ -353,9 +352,16 @@ local function getTrack(options)
 		if options.type == "wind" then
 			return tes3.getSound("tew_wind_gust")
 		end
-		debugLog("Got interior weather module.")
+		debugLog("Got interior weather module. Weather: "..options.weather)
 		debugLog("Got interior type: "..options.type)
-		return this.interiorWeather[options.type][options.weather]
+		local intWTrack = this.interiorWeather[options.type][options.weather]
+		if intWTrack then
+			debugLog("Got track: "..intWTrack.id)
+			return intWTrack
+		else
+			debugLog("No track found.")
+			return
+		end
 	elseif options.module == "wind" then
 		if options.type == "quiet" then
 			debugLog("Got wind quiet type.")
@@ -451,11 +457,14 @@ function this.play(options)
 		pitch = options.pitch or MAX
 	}
 
-	-- Fade in if nothing is playing, otherwise crossfade --
-	if not modules[options.module].old or not tes3.getSoundPlaying{sound = newTrack} then
-		fadeIn(ref, volume, newTrack, options.module)
-	else
+	-- Crossfade if old track is playing and is different from new sound, otherwise fade in --
+	if
+		modules[options.module].old and
+		tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} and
+		(modules[options.module].old ~= newTrack) then
 		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
+	else
+		fadeIn(ref, volume, newTrack, options.module)
 	end
 end
 
