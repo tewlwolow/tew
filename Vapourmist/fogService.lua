@@ -372,7 +372,7 @@ end
 function this.removeAllExterior()
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
-		if node and string.startswith(node.name, "tew_") and not node.name == "tew_interior" then
+		if node and string.startswith(node.name, "tew_") and not (node.name == "tew_interior") then
 			vfxRoot:detachChild(node)
 		end
 	end
