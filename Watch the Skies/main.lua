@@ -181,7 +181,7 @@ local function changeParticleMesh(particleType)
 	-- Timer here to actually allow background data to be available --
 	timer.start{
 		type = timer.game,
-		duration = 0.01,
+		duration = 0.00001,
 		callback = function()
 
 			-- Get particle mesh from pre-filled array and load it --
@@ -305,6 +305,8 @@ end
 
 -- Main function controlling weather changes in interiors --
 local function changeInteriorWeather()
+	if WtC.nextWeather then return end
+
 	local currentWeather=WtC.currentWeather.index
 	local newWeather
 	debugLog("Weather before randomisation: "..currentWeather)
@@ -334,9 +336,10 @@ local function changeInteriorWeather()
 		end
 	end
 
+	if newWeather == currentWeather then changeInteriorWeather() return end
+
 	-- Switch to the new weather --
 	WtC:switchTransition(newWeather)
-
 	debugLog("Weather randomised. New weather: "..WtC.nextWeather.index)
 end
 
@@ -562,12 +565,12 @@ local function onCellChanged(e)
 	end
 
 	-- Pause the interior weather timer if the player is in exterior --
-	if not (cell.isInterior) or (cell.isInterior and cell.behavesAsExterior) then
+	if  (cell.isOrBehavesAsExterior) then
 		if intWeatherTimer then
 		intWeatherTimer:pause()
 		debugLog("Player in exterior. Pausing interior timer.") end
 	-- Refresh the timer in interiors --
-	elseif (cell.isInterior) and not (cell.behavesAsExterior) then
+	else
 		if intWeatherTimer then
 			intWeatherTimer:pause()
 			intWeatherTimer:cancel()
@@ -600,7 +603,7 @@ end
 
 -- Shuffle texture every two hours --
 local function skyChoiceTimer()
-	timer.start({duration=2, callback=skyChoice, iterations=-1, type=timer.game})
+	timer.start({duration=6, callback=skyChoice, iterations=-1, type=timer.game})
 end
 
 -- Check if we have the weather that warrants particle change --
@@ -613,7 +616,7 @@ local function particleMeshChecker()
 		local checked = weatherChecklist[weatherNow.name]
 		if checked ~= nil then
 			timer.start{
-				duration=0.65,
+				duration = 0.5 - (0.5 - WtC.transitionScalar),
 				callback=function()
 					changeParticleMesh(checked)
 				end,
