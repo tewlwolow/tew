@@ -80,13 +80,13 @@ local function conditionCheck()
 	debugLog("Game hour: "..gameHour)
 	debugLog("Fog colour: "..tostring(fromFogColour).." -> "..tostring(toFogColour))
 	debugLog("Region: "..fromRegion.id.." -> "..toRegion.id)
-		
+	
 	-- Iterate through fog types --
 	for _, fogType in pairs(data.fogTypes) do
 
 		-- Log fog type --
 		debugLog("Fog type: "..fogType.name)
-		
+	
 		-- Get type of fog and its pre-set height for later calcs --
 		local options = {
 			type = fogType.name,
