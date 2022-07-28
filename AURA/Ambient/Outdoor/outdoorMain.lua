@@ -61,14 +61,8 @@ end
 -- Play outdoor ambient on doors and windows --
 local function playInteriorBig(windoor, playOld)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
-	local bigVolume = (0.55*OAvol)-(0.005 * #windoors)
-	if playOld then
-		debugLog("Playing interior ambient sounds for big interiors using old track.")
-		weatherParser{reference = windoor, volume = bigVolume, pitch = 0.8, immediate = true, playLast = true}
-	else
-		debugLog("Playing interior ambient sounds for big interiors using new track.")
-		weatherParser{reference = windoor, volume = bigVolume, pitch = 0.8, immediate = true}
-	end
+	local bigVolume = (0.25*OAvol)-(0.005 * #windoors)
+	weatherParser{reference = windoor, volume = bigVolume, pitch = 0.8, immediate = false, playLast = playOld}
 end
 
 -- Because MW engine will otherwise scrap the sound and not put it up again. Dumb thing --
@@ -76,7 +70,7 @@ local function updateInteriorBig()
 	debugLog("Updating interior doors and windows.")
 	local playerPos=tes3.player.position
 	for _, windoor in ipairs(windoors) do
-		if playerPos:distance(windoor.position:copy()) > 1800 -- Less then cutoff, just to be sure. Shouldn't be too jarring --
+		if playerPos:distance(windoor.position:copy()) > 2000 -- A bit less then cutoff, just to be sure. Shouldn't be too jarring --
 		and windoor~=nil then
 			playInteriorBig(windoor, true)
 		end
@@ -84,14 +78,8 @@ local function updateInteriorBig()
 end
 
 -- Play on the whole thing for shacks etc. --
-local function playInteriorSmall()
-	if (cellLast) and (cellLast.isOrBehavesAsExterior) then
-		debugLog("Playing interior ambient sounds for small interiors using old track.")
-		sounds.playImmediate{module = moduleName, last = true, volume = 0.3*OAvol, pitch=0.9}
-	else
-		debugLog("Playing interior ambient sounds for small interiors using new track.")
-		weatherParser{volume = 0.3*OAvol, pitch = 0.9, immediate = true}
-	end
+local function playInteriorSmall(playOld)
+	weatherParser{volume = 0.2*OAvol, pitch = 0.9, immediate = false, playLast = playOld}
 end
 
 local function cellCheck()
@@ -104,11 +92,9 @@ local function cellCheck()
 		return
 	end
 
-	local region
-
-	OAvol = config.OAvol/200
-
 	debugLog("Cell changed or time check triggered. Running cell check.")
+	local region
+	OAvol = config.OAvol/200
 
 	-- Getting rid of timers on cell check --
 	if not interiorTimer then
@@ -119,14 +105,17 @@ local function cellCheck()
 	end
 
 	local cell = tes3.getPlayerCell()
-	if (not cell) then debugLog("No cell detected. Returning.") return end
+	if (not cell) then
+		debugLog("No cell detected. Returning.")
+		return
+	end
 	debugLog("Cell: "..cell.editorName)
 
 	-- Proper region resolution depending on whether we've just loaded the game or not --
 	-- Initially the game will not properly use region stuff unless you step outside --
 	if cell.isInterior then
 		local regionObject = tes3.getRegion({useDoors=true}) -- If we're inside we need to scan doors to get the proper region --
-		region = regionObject.name
+		region = regionObject.id
 		weatherNow = regionObject.weather.index
 	else
 		region = tes3.getRegion().name -- Otherwise we can just get the region from the cell --
@@ -138,7 +127,10 @@ local function cellCheck()
 	end
 
 	debugLog("Weather: "..weatherNow)
-	if region == nil then debugLog("No region detected. Returning.") return end
+	if region == nil then
+		debugLog("No region detected. Returning.")
+		return
+	end
 
 	-- Checking climate --
 	for kRegion, vClimate in pairs(climates.regions) do
@@ -147,7 +139,9 @@ local function cellCheck()
 		end
 	end
 
-	if not climateNow then debugLog ("Blacklisted region - no climate detected. Returning.") return end
+	if not climateNow then debugLog ("Blacklisted region - no climate detected. Returning.")
+		return
+	end
 	debugLog("Climate: "..climateNow)
 
 	-- Checking time --
@@ -184,8 +178,8 @@ local function cellCheck()
 
 	debugLog("Different conditions. Resetting sounds.")
 
-	-- In case someone dislikes my interior weather module --
-	if moduleInteriorWeather == false and windoors[1]~=nil and weatherNow<4 or weatherNow==8 then
+	-- In case someone dislikes my interior weather module - bah! --
+	if (moduleInteriorWeather == false) and (windoors[1]~=nil) and (weatherNow<4) or (weatherNow==8) then
 		for _, windoor in ipairs(windoors) do
 			sounds.removeImmediate{module=moduleName, reference=windoor}
 		end
@@ -202,9 +196,9 @@ local function cellCheck()
 			debugLog("Found same cell. Using last sound.")
 			useLast = true
 			sounds.removeImmediate{module = moduleName}
-			sounds.playImmediate{module = moduleName, last = useLast, volume = OAvol}
+			sounds.play{module = moduleName, last = useLast, volume = OAvol}
 		else
-			debugLog("Found exterior cell.")
+			debugLog("Found different exterior cell. Using new sound.")
 			sounds.remove{module = moduleName, volume=OAvol}
 			weatherParser{volume=OAvol}
 		end
@@ -212,7 +206,7 @@ local function cellCheck()
 	-- Remove main outdoor sound and play the same sound for interiors, either big or small --
 	elseif cell.isInterior then
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
-			debugLog("Found interior cell. Removing sounds.")
+			debugLog("Found interior cell and playInteriorAmbient off. Removing sounds.")
 			sounds.removeImmediate{module = moduleName}
 			return
 		end
@@ -227,10 +221,16 @@ local function cellCheck()
 			debugLog("Found big interior cell. Playing interior loops.")
 			windoors=nil
 			windoors=common.getWindoors(cell)
+			if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
+			and weatherNow==weatherLast and climateNow==climateLast
+			and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
+				useLast = true
+			else
+				useLast = false
+			end
 			if windoors ~= nil then
 				for _, windoor in ipairs(windoors) do
-					tes3.removeSound{reference=windoor}
-					useLast = true
+					sounds.removeImmediate{module = moduleName, reference=windoor}
 					playInteriorBig(windoor, useLast)
 				end
 				interiorTimer:resume()
