@@ -126,5 +126,5 @@ for k, _ in pairs(defaultMessages) do
 		this.messages[k] = defaultMessages[k]
 	end
 end
-return this.messages
+return this
 ------------------------
