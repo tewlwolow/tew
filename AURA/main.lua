@@ -6,8 +6,7 @@ local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
 local config = require("tew.AURA.config")
-local messages = require(config.messages)
-
+local messages = require(config.messages).messages
 
 -- Because MW sound engine is the worst --
 local function warning(e)

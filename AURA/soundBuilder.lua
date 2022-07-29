@@ -25,7 +25,7 @@ local warmDir = "w"
 local coldDir = "c"
 
 local config = require("tew.AURA.config")
-local messages = require(config.messages)
+local messages = require(config.messages).messages
 
 
 -- Create sound objects against manifest file

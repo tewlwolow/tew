@@ -1,11 +1,10 @@
 local configPath = "AURA"
 local config = require("tew.AURA.config")
 local defaults = require("tew.AURA.defaults")
-mwse.loadConfig("AURA")
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
-local messages = require(config.messages)
+local messages = require(config.messages).messages
 
 local function registerVariable(id)
 	return mwse.mcm.createTableVariable{
