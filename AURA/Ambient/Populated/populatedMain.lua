@@ -179,4 +179,3 @@ event.register("loaded", populatedTimer)
 event.register("load", runResetter)
 event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
 debugLog("Populated Sounds module initialised.")
-

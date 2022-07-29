@@ -24,6 +24,9 @@ local quietDir = "q"
 local warmDir = "w"
 local coldDir = "c"
 
+local config = require("tew.AURA.config")
+local messages = require(config.messages)
+
 
 -- Create sound objects against manifest file
 local function createSound(objectId, filename, soundTable, i)
@@ -305,13 +308,13 @@ end
 
 function this.flushManifestFile()
 	tes3.messageBox({
-		message = "Are you sure you want to flush manifest file?",
+		message = messages.manifestConfirm,
 		buttons = { tes3.findGMST(tes3.gmst.sYes).value, tes3.findGMST(tes3.gmst.sNo).value },
 		callback = function(e)
 			if (e.button == 0) then
 				local empty = {}
 				json.savefile(manifestPath, empty)
-				local message = "Manifest file flushed."
+				local message = messages.manifestRemoved
 				debugLog(message)
 				tes3.messageBox({ message = message })
 			end

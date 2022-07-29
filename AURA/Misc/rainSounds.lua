@@ -85,7 +85,7 @@ local function changeRainSounds()
 
 end
 
-print("[AURA "..version.."] Rain sounds initialised.")
+
 WtC=tes3.worldController.weatherController
 
 -- Also make sure we're setting these on loaded --

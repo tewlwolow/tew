@@ -186,7 +186,7 @@ local function transitionStartedWrapper()
     }
 end
 
-print("[AURA "..version.."] Wind sounds initialised.")
+
 WtC=tes3.worldController.weatherController
 
 event.register("weatherChangedImmediate", windCheck, {priority=-100})
@@ -196,5 +196,4 @@ event.register("weatherTransitionFinished", windCheck, {priority=-100})
 event.register("load", onLoad)
 event.register("loaded", runHourTimer, {priority=-160})
 event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = 10})
-
 event.register("cellChanged", windCheck, {priority=-100})

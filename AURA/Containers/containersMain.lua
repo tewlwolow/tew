@@ -90,8 +90,7 @@ local function playCloseSound(e)
     end}
 end
 
-debugLog("Containers module initialised.")
-
 buildContainerSounds()
 event.register("activate", playOpenSound)
 event.register("containerClosed", playCloseSound)
+debugLog("Containers module initialised.")

@@ -43,5 +43,5 @@ local function yurtFlap(e)
     end
 end
 
-print("[AURA "..version.."] Yurt/bear skin flap sound initialised.")
+
 event.register("activate", yurtFlap)

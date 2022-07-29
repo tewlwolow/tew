@@ -5,20 +5,22 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
+local config = require("tew.AURA.config")
+local messages = require(config.messages)
+
 
 -- Because MW sound engine is the worst --
 local function warning(e)
     if not e.newlyCreated then
         return
     end
-    tes3.messageBox("[AURA]: Master and effect channels should be set to max for the mod to work as intended.")
+    tes3.messageBox(string.format("[AURA]: %s", messages.audioWarning))
 end
 
 local function init()
 
-    mwse.log("[AURA] Version "..version.." initialised.")
+    mwse.log(string.format("[AURA] %s %s %s", messages.version, version, messages.initialised))
 
-    local config=require("tew.AURA.config")
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
     local moduleAmbientInterior = config.moduleAmbientInterior
     local moduleInteriorWeather = config.moduleInteriorWeather
@@ -31,63 +33,64 @@ local function init()
 
     event.register("uiActivated", warning, {filter="MenuAudio"})
 
-    mwse.log("\n\n[AURA "..version.."] Running file builder.\n")
+    mwse.log(string.format("\n\n[AURA %s] %s", version, messages.buildingSoundsStarted))
     soundBuilder.build()
-    mwse.log("\n[AURA "..version.."] File builder finished.\n\n")
+    mwse.log(string.format("[AURA %s] %s\n\n", version, messages.buildingSoundsFinished))
 
     if moduleAmbientOutdoor then
-        mwse.log("[AURA "..version.."] Loading file: outdoorMain.lua.")
+        mwse.log(string.format("[AURA %s] %s outdoorMain.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Outdoor\\outdoorMain.lua")
     end
 
     if moduleAmbientInterior then
-        mwse.log("[AURA "..version.."] Loading file: interiorMain.lua.")
+        mwse.log(string.format("[AURA %s] %s interiorMain.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Interior\\interiorMain.lua")
     end
 
     if moduleAmbientPopulated then
-        mwse.log("[AURA "..version.."] Loading file: populatedMain.lua.")
+        mwse.log(string.format("[AURA %s] %s populatedMain.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Ambient\\Populated\\populatedMain.lua")
     end
 
     if moduleInteriorWeather then
-        mwse.log("[AURA "..version.."] Loading file: interiorWeatherMain.lua.")
+        mwse.log(string.format("[AURA %s] %s interiorWeatherMain.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Interior Weather\\interiorWeatherMain.lua")
     end
 
     if moduleServiceVoices then
-        mwse.log("[AURA "..version.."] Loading file: serviceVoicesMain.lua.")
+        mwse.log(string.format("[AURA %s] %s serviceVoicesMain.lua.", version, messages.loadingFile))
+
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Service Voices\\serviceVoicesMain.lua")
     end
 
     if moduleMisc then
-        mwse.log("[AURA "..version.."] Loading file: miscMain.lua.")
+        mwse.log(string.format("[AURA %s] %s miscMain.lua", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\miscMain.lua")
     end
 
     if moduleUI then
-        mwse.log("[AURA "..version.."] Loading file: UIMain.lua.")
+        mwse.log(string.format("[AURA %s] %s UIMain.lua", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\UI\\UIMain.lua")
     end
 
     if moduleContainers then
-        mwse.log("[AURA "..version.."] Loading file: containersMain.lua.")
+        mwse.log(string.format("[AURA %s] %s containersMain.lua", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Containers\\containersMain.lua")
     end
 
     if modulePC then
-        mwse.log("[AURA "..version.."] Loading file: PCMain.lua")
+        mwse.log(string.format("[AURA %s] %s PCMain.lua", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\PC\\PCMain.lua")
     end
 
     -- Old version deleter --
     if lfs.directoryexists("Data Files\\MWSE\\mods\\AURA") then
         lfs.rmdir("Data Files\\MWSE\\mods\\AURA", true)
-        mwse.log("[AURA "..version.."]: Old mod folder found and deleted.")
+        mwse.log(string.format("[AURA %s] %s", version, messages.oldFolderDeleted))
     end
     if lfs.directoryexists("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua") then
         os.remove("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\travelFee.lua")
-        mwse.log("[AURA "..version.."]: Old 'travelFee.lua' file found and deleted.")
+        mwse.log(string.format("[AURA %s] %s: travelFee.lua.", version, messages.oldFileDeleted))
     end
 end
 

@@ -5,6 +5,7 @@ mwse.loadConfig("AURA")
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
+local messages = require(config.messages)
 
 local function registerVariable(id)
 	return mwse.mcm.createTableVariable{
@@ -17,74 +18,83 @@ local template = mwse.mcm.createTemplate{
 	name="AURA",
 	headerImagePath="\\Textures\\tew\\AURA\\AURA_logo.tga"}
 
-	local page = template:createPage{label="Main Settings", noScroll=true}
+	local page = template:createPage{label = messages.mainSettings, noScroll=true}
 	page:createCategory{
-		label = "AURA "..version.." by tewlwolow.\nLua-based sound overhaul.\n\nSettings:",
+		label = string.format("AURA %s %s \n\n%s:", version, messages.mainLabel, messages.settings)
+	}
+	page:createDropdown{
+		label = messages.modLanguage,
+		options = {
+			{ label = "EN", value = "tew.AURA.Messages.en"},
+			{ label = "FR", value = "tew.AURA.Messages.fr"}
+		},
+		restartRequired=true,
+		variable = registerVariable("messages")
 	}
 	page:createYesNoButton{
-		label = "Enable debug mode?",
+		label = messages.enableDebug,
 		variable = registerVariable("debugLogOn"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Outdoor Ambient module?",
+		label = messages.enableOutdoor,
 		variable = registerVariable("moduleAmbientOutdoor"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Interior Ambient module?",
+		label = messages.enableInterior,
 		variable = registerVariable("moduleAmbientInterior"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Populated Ambient module?",
+		label = messages.enablePopulated,
 		variable = registerVariable("moduleAmbientPopulated"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Interior Weather module?",
+		label = messages.enableInteriorWeather,
 		variable = registerVariable("moduleInteriorWeather"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Service Voices module?",
+		label = messages.enableServiceVoices,
 		variable = registerVariable("moduleServiceVoices"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable UI module?",
+		label = messages.enableUI,
 		variable = registerVariable("moduleUI"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Containers module?",
+		label = messages.enableContainers,
 		variable = registerVariable("moduleContainers"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable PC module?",
+		label = messages.enablePC,
 		variable = registerVariable("modulePC"),
 		restartRequired=true
 	}
 	page:createYesNoButton{
-		label = "Enable Misc module?",
+		label = messages.enableMisc,
 		variable = registerVariable("moduleMisc"),
 		restartRequired=true
 	}
 
 	local flushButton = page:createButton{
-		buttonText = "Flush manifest file",
+		buttonText = messages.refreshManifest,
 		callback = function()
 			soundBuilder.flushManifestFile()
 		end,
 	}
 
-	local pageOA = template:createPage{label="Outdoor Ambient"}
+	local pageOA = template:createPage{label=messages.OA}
 	pageOA:createCategory{
-		label = "Plays ambient sounds in accordance with local climate, weather, player position, and time.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.OADesc, messages.settings)
 	}
 	pageOA:createSlider{
-		label = string.format("Changes %% volume for Outdoor Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.OAvol),
+		label = string.format("%s %s = %s%%. %s %%", messages.OAVol, messages.default, defaults.OAvol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -92,17 +102,17 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("OAvol")
 	}
 	pageOA:createYesNoButton{
-		label = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
+		label = messages.playInteriorAmbient,
 		variable = registerVariable("playInteriorAmbient"),
 		restartRequired=true
 	}
 
-	local pageIA = template:createPage{label="Interior Ambient"}
+	local pageIA = template:createPage{label=messages.IA}
 	pageIA:createCategory{
-		label = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.IADesc, messages.settings)
 	}
 	pageIA:createSlider{
-		label = string.format("Changes %% volume for Interior Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.intVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.IAVol, messages.default, defaults.intVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -110,17 +120,17 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("intVol")
 	}
 	pageIA:createYesNoButton{
-		label = "Enable culture-specific music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod. Requires restart.",
+		label = messages.enableTaverns,
 		variable = registerVariable("interiorMusic"),
 		restartRequired=true
 	}
 
 	template:createExclusionsPage{
-		label = "Taverns Blacklist",
-		description = "Select which taverns the music is disabled in.",
-		toggleText = "Toggle",
-		leftListLabel = "Disabled taverns",
-		rightListLabel = "Enabled taverns",
+		label = messages.tavernsBlacklist,
+		description = messages.tavernsDesc,
+		toggleText = messages.toggle,
+		leftListLabel = messages.tavernsDisabled,
+		rightListLabel = messages.tavernsEnabled,
 		showAllBlocked = false,
 		variable = mwse.mcm.createTableVariable{
 			id = "disabledTaverns",
@@ -130,7 +140,7 @@ local template = mwse.mcm.createTemplate{
 		filters = {
 
 			{
-				label = "Enabled taverns",
+				label = messages.tavernsEnabled,
 				callback = (
 					function()
 						local enabledTaverns = {}
@@ -168,12 +178,12 @@ local template = mwse.mcm.createTemplate{
 		}
 	}
 
-	local pagePA = template:createPage{label="Populated Ambient"}
+	local pagePA = template:createPage{label=messages.PA}
 	pagePA:createCategory{
-		label = "Plays ambient sounds in populated areas, like towns and villages.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.PADesc, messages.settings)
 	}
 	pagePA:createSlider{
-		label = string.format("Changes %% volume for Populated Ambient module. Default = %s%%.\nRequires restart. Volume %%", defaults.popVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.PAVol, messages.default, defaults.popVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -181,12 +191,12 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("popVol")
 	}
 
-	local pageIW = template:createPage{label="Interior Weather"}
+	local pageIW = template:createPage{label=messages.IW}
 	pageIW:createCategory{
-		label = "Plays weather sounds in interiors.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.IWDesc, messages.settings)
 	}
 	pageIW:createSlider{
-		label = string.format("Changes %% volume for Interior Weather module. Default = %s%%.\nRequires restart. Volume %%", defaults.IWvol),
+		label = string.format("%s %s = %s%%. %s %%", messages.IWVol, messages.default, defaults.IWvol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -194,40 +204,40 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("IWvol")
 	}
 
-	local pageSV = template:createPage{label="Service Voices"}
+	local pageSV = template:createPage{label=messages.SV}
 	pageSV:createCategory{
-		label = "Plays appropriate voice comments on service usage.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.SVDesc, messages.settings)
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on repair service?",
+		label = messages.enableRepair,
 		variable = registerVariable("serviceRepair"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on spells vendor service?",
+		label = messages.enableSpells,
 		variable = registerVariable("serviceSpells"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on training service?",
+		label = messages.enableTraining,
 		variable = registerVariable("serviceTraining"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on spellmaking service?",
+		label = messages.enableSpellmaking,
 		variable = registerVariable("serviceSpellmaking"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on enchanting service?",
+		label = messages.enableEnchantment,
 		variable = registerVariable("serviceEnchantment"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on travel service?",
+		label = messages.enableTravel,
 		variable = registerVariable("serviceTravel"),
 	}
 	pageSV:createYesNoButton{
-		label = "Enable voice comments on barter service?",
+		label = messages.enableBarter,
 		variable = registerVariable("serviceBarter"),
 	}
 	pageSV:createSlider{
-		label = string.format("Changes %% volume for Service Voices module. Default = %s%%.\nRequires restart. Volume %%", defaults.SVvol),
+		label = string.format("%s %s = %s%%. %s %%", messages.SVVol, messages.default, defaults.SVvol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -235,36 +245,36 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("SVvol")
 	}
 
-	local pagePC = template:createPage{label="PC"}
+	local pagePC = template:createPage{label=messages.PC}
 	pagePC:createCategory{
-		label = "Plays sounds related to the player character.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.PCDesc, messages.settings)
 	}
 	pagePC:createYesNoButton{
-		label = "Enable low health sounds?",
+		label = messages.enableHealth,
 		variable = registerVariable("PChealth"),
 	}
 	pagePC:createYesNoButton{
-		label = "Enable low fatigue sounds?",
+		label = messages.enableFatigue,
 		variable = registerVariable("PCfatigue"),
 	}
 	pagePC:createYesNoButton{
-		label = "Enable low magicka sounds?",
+		label = messages.enableMagicka,
 		variable = registerVariable("PCmagicka"),
 	}
 	pagePC:createYesNoButton{
-		label = "Enable diseased sounds?",
+		label = messages.enableDisease,
 		variable = registerVariable("PCDisease"),
 	}
 	pagePC:createYesNoButton{
-		label = "Enable blighted sounds?",
+		label = messages.enableBlight,
 		variable = registerVariable("PCBlight"),
 	}
 	pagePC:createYesNoButton{
-		label = "Enable player combat taunts?",
+		label = messages.enableTaunts,
 		variable = registerVariable("PCtaunts"),
 	}
 	pagePC:createSlider{
-		label = string.format("Changes %% volume for for vital signs (health, fatigue, magicka, disease, blight). Default = %s%%.\nRequires restart. Volume %%", defaults.vsVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.vsVol, messages.default, defaults.vsVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -272,8 +282,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("vsVol")
 	}
 	pagePC:createSlider{
-
-		label = string.format("Changes %% chance for a battle taunt to play. Default = %s%%.\nRequires restart. Chance %%", defaults.tauntChance),
+		label = string.format("%s %s = %s%%. %s %%", messages.tauntChance, messages.default, defaults.tauntChance, messages.chance),
 		min = 0,
 		max = 100,
 		step = 1,
@@ -281,7 +290,7 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("tauntChance")
 	}
 	pagePC:createSlider{
-		label = string.format("Changes %% volume for player battle taunts. Default = %s%%.\nRequires restart. Volume %%", defaults.tVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.tVol, messages.default, defaults.tVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -289,12 +298,12 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("tVol")
 	}
 
-	local pageC = template:createPage{label="Containers"}
+	local pageC = template:createPage{label=messages.containers}
 	pageC:createCategory{
-		label = "Plays container sound on open/close.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.containersDesc, messages.settings)
 	}
 	pageC:createSlider{
-		label = string.format("Changes %% volume for Containers module. Default = %s%%.\nRequires restart. Volume %%", defaults.Cvol),
+		label = string.format("%s %s = %s%%. %s %%", messages.CVol, messages.default, defaults.Cvol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -302,32 +311,32 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("Cvol")
 	}
 
-	local pageUI = template:createPage{label="UI"}
+	local pageUI = template:createPage{label=messages.UI}
 	pageUI:createCategory{
-		label = "Additional immersive UI sounds.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.UIDesc, messages.settings)
 	}
 	pageUI:createYesNoButton{
-		label = "Enable training menu sounds?",
+		label = messages.UITraining,
 		variable = registerVariable("UITraining"),
 	}
 	pageUI:createYesNoButton{
-		label = "Enable travel menu sounds?",
+		label = messages.UITravel,
 		variable = registerVariable("UITravel"),
 	}
 	pageUI:createYesNoButton{
-		label = "Enable spell menu sounds?",
+		label = messages.UISpells,
 		variable = registerVariable("UISpells"),
 	}
 	pageUI:createYesNoButton{
-		label = "Enable barter menu sounds?",
+		label = messages.UIBarter,
 		variable = registerVariable("UIBarter"),
 	}
 	pageUI:createYesNoButton{
-		label = "Enable eating sound for ingredients in inventory menu?",
+		label = messages.UIEating,
 		variable = registerVariable("UIEating"),
 	}
 	pageUI:createSlider{
-		label = string.format("Changes %% volume for UI module. Default = %s%%.\nRequires restart. Volume %%", defaults.UIvol),
+		label = string.format("%s %s = %s%%. %s %%", messages.UIVol, messages.default, defaults.UIvol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -335,25 +344,25 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("UIvol")
 	}
 
-	local pageMisc = template:createPage{label="Misc", noScroll=true}
+	local pageMisc = template:createPage{label=messages.misc}
 	pageMisc:createCategory{
-		label = "Plays various miscellaneous sounds.\n\nSettings:"
+		label = string.format("%s\n\n%s:", messages.miscDesc, messages.settings)
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable variable rain sounds per max particles?\nNote: requires Watch the Skies.",
+		label = string.format("%s %s ", messages.rainSounds, messages.WtS),
 		variable = registerVariable("rainSounds"),
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable variable wind sounds per clouds speed?\nNote: requires Watch the Skies.",
+		label = string.format("%s %s", messages.windSounds, messages.WtS),
 		variable = registerVariable("windSounds"),
 	}
 	pageOA:createYesNoButton{
-		label = "Enable wind sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
+		label = messages.playInteriorWind,
 		variable = registerVariable("playInteriorWind"),
 		restartRequired=true
 	}
 	pageMisc:createSlider{
-		label = string.format("Changes %% volume for wind sounds. Default = %s%%.\nRequires restart. Volume %%", defaults.windVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.windVol, messages.default, defaults.windVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -361,11 +370,11 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("windVol")
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable splash sounds when going underwater and back to surface?",
+		label = messages.playSplash,
 		variable = registerVariable("playSplash"),
 	}
 	pageMisc:createSlider{
-		label = string.format("Changes %% volume for splash sounds. Default = %s%%.\nRequires restart. Volume %%", defaults.splashVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.splashVol, messages.default, defaults.splashVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,
@@ -373,11 +382,11 @@ local template = mwse.mcm.createTemplate{
 		variable=registerVariable("splashVol")
 	}
 	pageMisc:createYesNoButton{
-		label = "Enable door sounds for yurts and pelt entrances?",
+		label = messages.playYurtFlap,
 		variable = registerVariable("playYurtFlap"),
 	}
 	pageMisc:createSlider{
-		label = string.format("Changes %% volume for yurt and bear skins flaps. Default = %s%%.\nRequires restart. Volume %%", defaults.yurtVol),
+		label = string.format("%s %s = %s%%. %s %%", messages.yurtVol, messages.default, defaults.yurtVol, messages.volume),
 		min = 0,
 		max = 200,
 		step = 1,

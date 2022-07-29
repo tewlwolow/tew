@@ -393,7 +393,6 @@ local function repairGreet(e)
 
 end
 
-debugLog("Service voices module initialised.")
 
 if serviceTravel then event.register("uiActivated", travelGreet, {filter="MenuServiceTravel", priority=-10}) end
 if serviceBarter then event.register("uiActivated", serviceGreet, {filter="MenuBarter", priority=-10}) end

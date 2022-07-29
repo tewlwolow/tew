@@ -358,7 +358,6 @@ end
 
 
 WtC = tes3.worldController.weatherController
-debugLog("Interior Weather module initialised.")
 
 event.register("cellChanged", cellCheck, { priority = -165 })
 event.register("weatherTransitionFinished", cellCheck, { priority = -165 })
@@ -367,3 +366,4 @@ event.register("weatherChangedImmediate", cellCheck, { priority = -165 })
 event.register("weatherTransitionImmediate", cellCheck, { priority = -165 })
 event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -15})
 event.register("load", runResetter)
+debugLog("Interior Weather module initialised.")

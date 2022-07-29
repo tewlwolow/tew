@@ -1,6 +1,7 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local config=require("tew.AURA.config")
+local messages = require(config.messages)
 
 local function init()
     local moduleAmbientOutdoor = config.moduleAmbientOutdoor
@@ -10,30 +11,25 @@ local function init()
     local windSounds = config.windSounds
 
     if playSplash and not moduleAmbientOutdoor then
-        print("[AURA "..version.."] Loading file: waterSplash.lua")
+        mwse.log(string.format("[AURA %s] %s waterSplash.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\waterSplash.lua")
     end
 
-    if playSplash and moduleAmbientOutdoor then
-        print("[AURA "..version.."] OA module and Misc (Splash) option enabled. OA splash logic takes precedence.")
-    end
-
     if playYurtFlap then
-        print("[AURA "..version.."] Loading file: yurtFlap.lua")
+        mwse.log(string.format("[AURA %s] %s yurtFlap.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\yurtFlap.lua")
     end
 
     if rainSounds then
-        print("[AURA "..version.."] Loading file: rainSounds.lua")
+        mwse.log(string.format("[AURA %s] %s rainSounds.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\rainSounds.lua")
     end
 
     if windSounds then
-        print("[AURA "..version.."] Loading file: windSounds.lua")
+        mwse.log(string.format("[AURA %s] %s windSounds.lua.", version, messages.loadingFile))
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\windSounds.lua")
     end
 end
 
 
-print("[AURA "..version.."] Miscellaneous module initialised.")
 init()

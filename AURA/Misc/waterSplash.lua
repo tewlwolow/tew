@@ -12,5 +12,5 @@ local function splashPlay(e)
     end)
 end
 
-print("[AURA "..version.."] Splash sounds initialised.")
+
 event.register("uiActivated", splashPlay, {filter="MenuSwimFillBar"})
