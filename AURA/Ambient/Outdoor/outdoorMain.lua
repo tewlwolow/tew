@@ -118,7 +118,7 @@ local function cellCheck()
 		region = regionObject.id
 		weatherNow = regionObject.weather.index
 	else
-		region = tes3.getRegion().name -- Otherwise we can just get the region from the cell --
+		region = tes3.getRegion().id -- Otherwise we can just get the region from the cell --
 		if WtC.nextWeather then
 			weatherNow = WtC.nextWeather.index
 		else
