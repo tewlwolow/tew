@@ -93,7 +93,7 @@ function this.getWindoors(cell)
 			end
 		end
 	end
-	
+
 	if #windoors == 0 then
 		return nil
 	else
