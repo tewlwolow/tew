@@ -1,5 +1,5 @@
 return {
-    ["open"]={
+    ["open"] = {
         ["amphora"] = "Fx\\trans\\drstn_opn.wav",
         ["bale"] = "tew\\A\\N\\hay_o.wav",
         ["barrel"] = "tew\\A\\N\\barrel_o.wav",
@@ -36,10 +36,9 @@ return {
         ["table"] = "tew\\A\\N\\drawers_o.wav",
         ["urn"] = "Fx\\trans\\drstn_opn.wav",
         ["vase"] = "tew\\A\\N\\pot_o.wav",
-        ["wicker chest"] = "tew\\A\\N\\basket_o.wav",
-
+        ["wicker chest"] = "tew\\A\\N\\basket_o.wav"
     },
-    ["close"]={
+    ["close"] = {
         ["amphora"] = "Fx\\trans\\drstn_cls.wav",
         ["bale"] = "tew\\A\\N\\hay_c.wav",
         ["barrel"] = "tew\\A\\N\\barrel_c.wav",
@@ -76,10 +75,9 @@ return {
         ["table"] = "tew\\A\\N\\drawers_c.wav",
         ["urn"] = "Fx\\trans\\drstn_cls.wav",
         ["vase"] = "tew\\A\\N\\pot_c.wav",
-        ["wicker chest"] = "tew\\A\\N\\basket_c.wav",
-
+        ["wicker chest"] = "tew\\A\\N\\basket_c.wav"
     },
-    ["volume"]={
+    ["volume"] = {
         ["barrel"] = 1.0,
         ["basket"] = 0.9,
         ["chest of drawers"] = 0.8,
@@ -96,6 +94,6 @@ return {
         ["vase"] = 1.5,
         ["culdem"] = 1.5,
         ["clay jar"] = 1.5,
-        ["amphora"] = 1.5,
-    },
+        ["amphora"] = 1.5
+    }
 }
