@@ -4,7 +4,7 @@ local defaults = require("tew.AURA.defaults")
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
-local messages = require(config.messages).messages
+local messages = require(config.language).messages
 
 local function registerVariable(id)
 	return mwse.mcm.createTableVariable{
@@ -24,11 +24,11 @@ local template = mwse.mcm.createTemplate{
 	page:createDropdown{
 		label = messages.modLanguage,
 		options = {
-			{ label = "EN", value = "tew.AURA.Messages.en"},
-			{ label = "FR", value = "tew.AURA.Messages.fr"}
+			{ label = "EN", value = "tew.AURA.i18n.en"},
+			{ label = "FR", value = "tew.AURA.i18n.fr"}
 		},
 		restartRequired=true,
-		variable = registerVariable("messages")
+		variable = registerVariable("language")
 	}
 	page:createYesNoButton{
 		label = messages.enableDebug,

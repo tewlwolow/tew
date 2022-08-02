@@ -50,5 +50,5 @@ return {
     disabledTaverns={},
     windVol=125,
     playInteriorWind=true,
-    messages="tew.AURA.Messages.en",
+    language="tew.AURA.i18n.en",
 }

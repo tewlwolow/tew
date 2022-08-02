@@ -1,12 +1,11 @@
--- Flags to custom events
--- Unify condition check in one script
--- Diff between sound building/logic
+-- Make sure we have all i18n data beforehand
+dofile("tew.AURA.i18n.init")
 
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local soundBuilder = require("tew\\AURA\\soundBuilder")
 local config = require("tew.AURA.config")
-local messages = require(config.messages).messages
+local messages = require(config.language).messages
 
 -- Because MW sound engine is the worst --
 local function warning(e)
