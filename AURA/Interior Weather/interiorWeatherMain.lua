@@ -141,8 +141,6 @@ end
 -- For bigger interiors, proper buildings and that --
 local function playInteriorBig(windoor, updateImmediate)
 	if windoor==nil then debugLog("Dodging an empty ref.") return end
-	debug.log((soundData[interiorType][weather].volume*IWvol)-(0.005 * #windoors))
-
 	immediateParser{
 		weather = weather,
 		module = moduleName,
