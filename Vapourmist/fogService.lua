@@ -197,42 +197,41 @@ function this.reColour()
 	local angle = output.angle
 	for _, fogType in pairs(currentFogs) do
 		if not fogType or not currentFogs then return end
-		if fogType == currentFogs["interior"] then goto continue_1 end
-		for fog, _ in pairs(fogType) do
-			if not fog or fogType == "interior" then goto continue_2 end
-			local particleSystem = fog:getObjectByName("MistEffect")
-			local controller = particleSystem.controller
-			local colorModifier = controller.particleModifiers
+		if fogType ~= currentFogs["interior"] then
+			for fog, _ in pairs(fogType) do
+				if fog and fogType ~= "interior" then
+					local particleSystem = fog:getObjectByName("MistEffect")
+					local controller = particleSystem.controller
+					local colorModifier = controller.particleModifiers
 
-			-- Only alter speed and angle for clouds, per current weather settings --
-			if fogType == currentFogs["cloud"] then
-				controller.speed = speed
-				controller.planarAngle = angle
+					-- Only alter speed and angle for clouds, per current weather settings --
+					if fogType == currentFogs["cloud"] then
+						controller.speed = speed
+						controller.planarAngle = angle
+					end
+
+					for _, key in pairs(colorModifier.colorData.keys) do
+						key.color.r = fogColour.r
+						key.color.g = fogColour.g
+						key.color.b = fogColour.b
+					end
+
+					local materialProperty = particleSystem.materialProperty
+					materialProperty.emissive = fogColour
+					materialProperty.specular = fogColour
+					materialProperty.diffuse = fogColour
+					materialProperty.ambient = fogColour
+
+					particleSystem:update()
+					particleSystem:updateProperties()
+					particleSystem:updateNodeEffects()
+					fog:update()
+					fog:update()
+					fog:updateProperties()
+					fog:updateNodeEffects()
+				end
 			end
-
-			for _, key in pairs(colorModifier.colorData.keys) do
-				key.color.r = fogColour.r
-				key.color.g = fogColour.g
-				key.color.b = fogColour.b
-			end
-
-			local materialProperty = particleSystem.materialProperty
-			materialProperty.emissive = fogColour
-			materialProperty.specular = fogColour
-			materialProperty.diffuse = fogColour
-			materialProperty.ambient = fogColour
-
-			particleSystem:update()
-			particleSystem:updateProperties()
-			particleSystem:updateNodeEffects()
-			fog:update()
-			fog:update()
-			fog:updateProperties()
-			fog:updateNodeEffects()
-
-			::continue_2::
 		end
-		::continue_1::
 	end
 end
 
@@ -250,32 +249,38 @@ function this.addFog(options)
 		if (not (this.isCellFogged(activeCell, type)) and not (activeCell.isInterior)) then
 			this.debugLog("Cell is not fogged. Adding " .. type .. ".")
 
-			local fogMesh = this.meshes[options.type]:clone()
-
-			fogMesh:clearTransforms()
-			-- Position just at the centre of the cell --
-			fogMesh.translation = tes3vector3.new(
+			local fogPosition = tes3vector3.new(
 				8192 * activeCell.gridX + 4096,
 				8192 * activeCell.gridY + 4096,
 				getFogPosition(activeCell, height)
 			)
 
-			vfxRoot:attachChild(fogMesh, true)
+			debug.log(tes3.player.position:copy():distance(fogPosition:copy()))
 
-			for _, vfx in pairs(vfxRoot.children) do
-				if vfx then
-					if vfx.name == "tew_" .. options.type then
-						local particleSystem = vfx:getObjectByName("MistEffect")
-						local controller = particleSystem.controller
-						controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
-						this.updateCurrentFogs(options.type, vfx, activeCell)
+			if (tes3.player.position:copy():distance(fogPosition:copy()) <= data.fogDistance) then
+
+				local fogMesh = this.meshes[options.type]:clone()
+				fogMesh:clearTransforms()
+				-- Position just at the centre of the cell --
+				fogMesh.translation = fogPosition
+
+				vfxRoot:attachChild(fogMesh, true)
+
+				for _, vfx in pairs(vfxRoot.children) do
+					if vfx then
+						if vfx.name == "tew_" .. options.type then
+							local particleSystem = vfx:getObjectByName("MistEffect")
+							local controller = particleSystem.controller
+							controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
+							this.updateCurrentFogs(options.type, vfx, activeCell)
+						end
 					end
 				end
-			end
 
-			fogMesh:update()
-			fogMesh:updateProperties()
-			fogMesh:updateNodeEffects()
+				fogMesh:update()
+				fogMesh:updateProperties()
+				fogMesh:updateNodeEffects()
+			end
 		end
 	end
 
