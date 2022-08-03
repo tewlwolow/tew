@@ -148,8 +148,6 @@ local function buildWeatherSounds()
 	filename = soundDir .. wDir .. "\\big\\rm.wav"
 	objectId = "tew_b_rainmedium"
 	createSound(objectId, filename, sounds.interiorWeather["big"], 4)
-	filename = soundDir .. wDir .. "\\big\\rm.wav"
-	objectId = "tew_b_thundermedium"
 	createSound(objectId, filename, sounds.interiorWeather["big"], 5)
 
 	filename = soundDir .. wDir .. "\\big\\rh.wav"
@@ -163,8 +161,6 @@ local function buildWeatherSounds()
 	filename = soundDir .. wDir .. "\\sma\\rm.wav"
 	objectId = "tew_s_rainmedium"
 	createSound(objectId, filename, sounds.interiorWeather["sma"], 4)
-	filename = soundDir .. wDir .. "\\sma\\rm.wav"
-	objectId = "tew_s_thundermedium"
 	createSound(objectId, filename, sounds.interiorWeather["sma"], 5)
 
 	filename = soundDir .. wDir .. "\\sma\\rh.wav"
@@ -178,8 +174,6 @@ local function buildWeatherSounds()
 	filename = soundDir .. wDir .. "\\ten\\rm.wav"
 	objectId = "tew_t_rainmedium"
 	createSound(objectId, filename, sounds.interiorWeather["ten"], 4)
-	filename = soundDir .. wDir .. "\\ten\\rm.wav"
-	objectId = "tew_t_thundermedium"
 	createSound(objectId, filename, sounds.interiorWeather["ten"], 5)
 
 	filename = soundDir .. wDir .. "\\ten\\rh.wav"
