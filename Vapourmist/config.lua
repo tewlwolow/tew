@@ -1,7 +1,7 @@
 return mwse.loadConfig(
     "Vapourmist",
     {
-        speedCoefficient = 55,
+        speedCoefficient = 45,
         debugLogOn = false,
         interiorFog = true,
         cloudyWeathers = {

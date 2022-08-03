@@ -3,7 +3,6 @@ local this = {}
 local config = require("tew.Vapourmist.config")
 
 this.baseTimerDuration = 0.5
-this.speedCoefficient = config.speedCoefficient
 this.minimumSpeed = 15
 this.minStaticCount = 5
 this.fogDistance = 15000

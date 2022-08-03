@@ -185,7 +185,7 @@ function this.getOutputValues()
 			b = math.clamp(weatherColour.b + 0.03, 0.1, 0.85)
 		},
 		angle = WtC.windVelocityCurrWeather:normalized():copy().y * math.pi * 0.5,
-		speed = math.max(WtC.currentWeather.cloudsSpeed * data.speedCoefficient, data.minimumSpeed)
+		speed = math.max(WtC.currentWeather.cloudsSpeed * config.speedCoefficient, data.minimumSpeed)
 	}
 end
 
@@ -222,7 +222,14 @@ function this.reColour()
 			materialProperty.diffuse = fogColour
 			materialProperty.ambient = fogColour
 
+			particleSystem:update()
+			particleSystem:updateProperties()
 			particleSystem:updateNodeEffects()
+			fog:update()
+			fog:update()
+			fog:updateProperties()
+			fog:updateNodeEffects()
+
 			:: continue_2 ::
 		end
 		:: continue_1 ::

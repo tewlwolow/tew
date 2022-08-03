@@ -32,7 +32,7 @@ local template = mwse.mcm.createTemplate{
     }
 
     mainPage:createSlider{
-        label = "Controls how fast clouds move across the sky.\nDefault - 55.\nSpeed coefficient",
+        label = "Controls how fast clouds move across the sky.\nDefault - 45.\nSpeed coefficient",
         min = 0,
         max = 100,
         step = 1,
