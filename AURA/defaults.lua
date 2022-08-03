@@ -1,5 +1,5 @@
 return {
-    OAvol=100,
+    OAvol=110,
     IWvol=130,
     yurtVol=200,
     splashVol=200,
@@ -48,7 +48,7 @@ return {
     windSounds=true,
     rainSounds=true,
     disabledTaverns={},
-    windVol=125,
+    windVol=110,
     playInteriorWind=true,
     language="tew.AURA.i18n.en",
 }
