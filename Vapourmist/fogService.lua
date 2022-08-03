@@ -255,8 +255,6 @@ function this.addFog(options)
 				getFogPosition(activeCell, height)
 			)
 
-			debug.log(tes3.player.position:copy():distance(fogPosition:copy()))
-
 			if (tes3.player.position:copy():distance(fogPosition:copy()) <= data.fogDistance) then
 
 				local fogMesh = this.meshes[options.type]:clone()
