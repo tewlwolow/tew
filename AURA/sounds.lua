@@ -438,33 +438,46 @@ function this.play(options)
 	-- Need this for fader calcs --
 	local volume = options.volume or MAX
 
-	-- Get the new track, if nothing is returned then bugger off (shouldn't really happen at all, but oh well) --
-	local newTrack = getTrack(options)
-	if not newTrack then debugLog("No track selected. Returning.") return end
-
-	-- Move the queue forward --
-	modules[options.module].old = modules[options.module].new
-	modules[options.module].new = newTrack
-
-	debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
-
-	-- Play the sound with 0 volume, decide the fader method later --
-	tes3.playSound {
-		sound = newTrack,
-		loop = true,
-		reference = ref,
-		volume = MIN,
-		pitch = options.pitch or MAX
-	}
-
-	-- Crossfade if old track is playing and is different from new sound, otherwise fade in --
-	if
-		modules[options.module].old and
-		tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} and
-		(modules[options.module].old ~= newTrack) then
-		crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
+	if options.last and modules[options.module].new then
+		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
+		debugLog("Immediately restaring: "..modules[options.module].new.id)
+		tes3.playSound {
+			sound = modules[options.module].new,
+			loop = true,
+			reference = ref,
+			volume = volume,
+			pitch = options.pitch or MAX
+		}
+		modules[options.module].old = modules[options.module].new
 	else
-		fadeIn(ref, volume, newTrack, options.module)
+		-- Get the new track, if nothing is returned then bugger off (shouldn't really happen at all, but oh well) --
+		local newTrack = getTrack(options)
+		if not newTrack then debugLog("No track selected. Returning.") return end
+
+		-- Move the queue forward --
+		modules[options.module].old = modules[options.module].new
+		modules[options.module].new = newTrack
+
+		debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
+
+		-- Play the sound with 0 volume, decide the fader method later --
+		tes3.playSound {
+			sound = newTrack,
+			loop = true,
+			reference = ref,
+			volume = MIN,
+			pitch = options.pitch or MAX
+		}
+
+		-- Crossfade if old track is playing and is different from new sound, otherwise fade in --
+		if
+			modules[options.module].old and
+			tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} and
+			(modules[options.module].old ~= newTrack) then
+			crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
+		else
+			fadeIn(ref, volume, newTrack, options.module)
+		end
 	end
 end
 

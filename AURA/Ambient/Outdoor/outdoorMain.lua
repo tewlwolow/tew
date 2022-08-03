@@ -49,7 +49,7 @@ local function weatherParser(options)
 		if immediate then
 			sounds.playImmediate{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref, last = playLast}
 		else
-			sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref}
+			sounds.play{module = moduleName, climate = climateNow, time = timeNow, volume = volume, pitch = pitch, reference = ref, last = playLast}
 		end
 	elseif weatherNow == 6 or weatherNow == 7 or weatherNow == 9 then
 		debugLog("Extreme weather detected.")
@@ -79,7 +79,7 @@ end
 
 -- Play on the whole thing for shacks etc. --
 local function playInteriorSmall(playOld)
-	weatherParser{volume = 0.2*OAvol, pitch = 0.9, immediate = false, playLast = playOld}
+	weatherParser{volume = 0.2*OAvol, pitch = 0.85, immediate = false, playLast = playOld}
 end
 
 local function cellCheck()
@@ -195,7 +195,6 @@ local function cellCheck()
 			-- Using the same track when entering int/ext in same area; time/weather change will randomise it again --
 			debugLog("Found same cell. Using last sound.")
 			useLast = true
-			sounds.removeImmediate{module = moduleName}
 			sounds.play{module = moduleName, last = useLast, volume = OAvol}
 		else
 			debugLog("Found different exterior cell. Using new sound.")
@@ -205,32 +204,30 @@ local function cellCheck()
 	-- Interior cells --
 	-- Remove main outdoor sound and play the same sound for interiors, either big or small --
 	elseif cell.isInterior then
+		if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
+		and weatherNow==weatherLast and climateNow==climateLast
+		and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
+			useLast = true
+		else
+			useLast = false
+		end
 		if (not playInteriorAmbient) or (playInteriorAmbient and isOpenPlaza(cell) and weatherNow==3) then
 			debugLog("Found interior cell and playInteriorAmbient off. Removing sounds.")
 			sounds.removeImmediate{module = moduleName}
 			return
 		end
 		debugLog("Found interior cell.")
-		sounds.removeImmediate{module = moduleName}
 		if common.getCellType(cell, common.cellTypesSmall)==true
 		or common.getCellType(cell, common.cellTypesTent)==true then
 			debugLog("Found small interior cell. Playing interior loops.")
-			sounds.removeImmediate{module = moduleName}
-			playInteriorSmall()
+			playInteriorSmall(useLast)
 		else
 			debugLog("Found big interior cell. Playing interior loops.")
+			sounds.removeImmediate{module = moduleName} -- Needed to catch previous OA refs --
 			windoors=nil
 			windoors=common.getWindoors(cell)
-			if cellLast and common.checkCellDiff(cell, cellLast)==true and timeNow==timeLast
-			and weatherNow==weatherLast and climateNow==climateLast
-			and not ((weatherNow >= 4 and weatherNow <= 6) or (weatherNow == 8)) then
-				useLast = true
-			else
-				useLast = false
-			end
 			if windoors ~= nil then
 				for _, windoor in ipairs(windoors) do
-					sounds.removeImmediate{module = moduleName, reference=windoor}
 					playInteriorBig(windoor, useLast)
 				end
 				interiorTimer:resume()
