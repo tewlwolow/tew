@@ -347,9 +347,6 @@ local function getTrack(options)
 			table = this.interior[options.type]
 		end
 	elseif options.module == "interiorWeather" then
-		if options.type == "wind" then
-			return tes3.getSound("tew_wind_gust")
-		end
 		debugLog("Got interior weather module. Weather: " .. options.weather)
 		debugLog("Got interior type: " .. options.type)
 		local intWTrack = this.interiorWeather[options.type][options.weather]
