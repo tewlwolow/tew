@@ -114,78 +114,78 @@ this.messages = {
 
 this.interiorNames = {
 	["alc"] = {
-        "Alchemist",
-        "Apothecary",
-        "Tel Uvirith, Omavel's House",
-        "Healer",
-    },
-    ["cou"] = {
-        "Telvanni Council House",
-        "Redoran Council Hall",
-        "Manor District",
-        "Guildhall",
-        "Morag Tong",
-        "Arena Hidden Area",
-        "Grand Council",
-        "Plaza",
-        "Waistworks"
-    },
-    ["mag"] = {
-        "Mages Guild",
-        "Mage's Guild",
-        "Guild of Mages"
-    },
-    ["fig"] = {
-        "Fighters Guild",
-        "Fighter's Guild",
-        "Guild of Fighters",
-    },
-    ["tem"] = {
-        "Temple",
-        "Maar Gan, Shrine",
-        "Vos Chapel",
-        "High Fane",
-        "Fane of the Ancestors",
-        "Tiriramannu",
-    },
-    ["lib"] = {
-        "Library",
-        "Bookseller",
-        "Books"
-    },
-    ["smi"] = {
-        "Smith",
-        "Armorer",
-        "Weapons",
-        "Armor",
-        "Smithy",
-        "Weapon",
-        "Armors",
-        "Blacksmith",
-    },
-    ["tra"] = {
-        "Trader",
-        "Pawnbroker",
-        "Merchandise",
-        "Merchant",
-        "Goods",
-        "Outfitter",
-        "Laborers",
-        "Brewers",
-        "Tradehouse",
-        "Hostel",
-    },
-    ["clo"] = {
-        "Clothier",
-        "Tailors",
-    },
-    ["tom"]= {
-        "Tomb",
-        "Burial",
-        "Crypt",
-        "Barrow",
-        "Catacomb",
-    }
+		"Alchemist",
+		"Apothecary",
+		"Tel Uvirith, Omavel's House",
+		"Healer",
+	},
+	["cou"] = {
+		"Telvanni Council House",
+		"Redoran Council Hall",
+		"Manor District",
+		"Guildhall",
+		"Morag Tong",
+		"Arena Hidden Area",
+		"Grand Council",
+		"Plaza",
+		"Waistworks"
+	},
+	["mag"] = {
+		"Mages Guild",
+		"Mage's Guild",
+		"Guild of Mages"
+	},
+	["fig"] = {
+		"Fighters Guild",
+		"Fighter's Guild",
+		"Guild of Fighters",
+	},
+	["tem"] = {
+		"Temple",
+		"Maar Gan, Shrine",
+		"Vos Chapel",
+		"High Fane",
+		"Fane of the Ancestors",
+		"Tiriramannu",
+	},
+	["lib"] = {
+		"Library",
+		"Bookseller",
+		"Books"
+	},
+	["smi"] = {
+		"Smith",
+		"Armorer",
+		"Weapons",
+		"Armor",
+		"Smithy",
+		"Weapon",
+		"Armors",
+		"Blacksmith",
+	},
+	["tra"] = {
+		"Trader",
+		"Pawnbroker",
+		"Merchandise",
+		"Merchant",
+		"Goods",
+		"Outfitter",
+		"Laborers",
+		"Brewers",
+		"Tradehouse",
+		"Hostel",
+	},
+	["clo"] = {
+		"Clothier",
+		"Tailors",
+	},
+	["tom"] = {
+		"Tomb",
+		"Burial",
+		"Crypt",
+		"Barrow",
+		"Catacomb",
+	}
 }
 
 this.tavernNames = {

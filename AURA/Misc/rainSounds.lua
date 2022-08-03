@@ -1,8 +1,8 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
 local config = require("tew.AURA.config")
-local sounds=require("tew.AURA.sounds")
-local common=require("tew.AURA.common")
+local sounds = require("tew.AURA.sounds")
+local common = require("tew.AURA.common")
 
 local debugLog = common.debugLog
 
@@ -63,8 +63,8 @@ local function changeRainSounds()
     local stormy = WtC.weathers[6]
     local stormyType = getRainType(stormy.maxParticles)
 
-    debugLog("Rain type: "..rainyType)
-    debugLog("Storm type: "..stormyType)
+    debugLog("Rain type: " .. rainyType)
+    debugLog("Storm type: " .. stormyType)
 
     -- Remove vanilla sound if present, the next step will add the new sound --
     if WtC.currentWeather.rainLoopSound then
@@ -85,10 +85,9 @@ local function changeRainSounds()
 
 end
 
-
-WtC=tes3.worldController.weatherController
+WtC = tes3.worldController.weatherController
 
 -- Also make sure we're setting these on loaded --
-event.register("loaded", changeRainSounds, {priority=-233})
+event.register("loaded", changeRainSounds, { priority = -233 })
 -- Use custom event from Watch the Skies - no much sense otherwise, who else changes these? :-) --
-event.register("WtS:maxParticlesChanged", changeRainSounds, {priority=-233})
+event.register("WtS:maxParticlesChanged", changeRainSounds, { priority = -233 })

@@ -1,4 +1,4 @@
-local this={}
+local this = {}
 
 local config = require("tew.AURA.config")
 local debugLogOn = config.debugLogOn
@@ -7,17 +7,17 @@ local version = modversion.version
 
 -- Centralised debug message printer --
 function this.debugLog(message)
-    if debugLogOn then
-        local info = debug.getinfo(2, "Sl")
-        local module = info.short_src:match("^.+\\(.+).lua$")
-        local prepend = ("[AURA.%s.%s:%s]:"):format(version, module, info.currentline)
-        local aligned = ("%-36s"):format(prepend)
-        mwse.log(aligned.." -- "..string.format("%s", message))
-    end
+	if debugLogOn then
+		local info = debug.getinfo(2, "Sl")
+		local module = info.short_src:match("^.+\\(.+).lua$")
+		local prepend = ("[AURA.%s.%s:%s]:"):format(version, module, info.currentline)
+		local aligned = ("%-36s"):format(prepend)
+		mwse.log(aligned .. " -- " .. string.format("%s", message))
+	end
 end
 
 -- Thunder sound IDs (as seen in the CS) --
-this.thunArray={
+this.thunArray = {
 	"Thunder0",
 	"Thunder1",
 	"Thunder2",
@@ -26,7 +26,7 @@ this.thunArray={
 }
 
 -- Small types of interiors --
-this.cellTypesSmall={
+this.cellTypesSmall = {
 	"in_de_shack_",
 	"s12_v_plaza",
 	"rp_v_arena",
@@ -36,13 +36,13 @@ this.cellTypesSmall={
 }
 
 -- Tent interiors --
-this.cellTypesTent={
+this.cellTypesTent = {
 	"in_ashl_tent_0",
 	"drs_tnt",
 }
 
 -- String bit to match against window object ids --
-this.windows={
+this.windows = {
 	"_win_",
 	"window",
 	"cwin",
@@ -55,10 +55,10 @@ this.windows={
 
 -- Check if transitioning int/ext or the other way around --
 function this.checkCellDiff(cell, cellLast)
-	if (cellLast==nil) then return true end
+	if (cellLast == nil) then return true end
 
 	if (cell.isInterior) and (cellLast.isOrBehavesAsExterior)
-	or (cell.isOrBehavesAsExterior) and (cellLast.isInterior) then
+		or (cell.isOrBehavesAsExterior) and (cellLast.isInterior) then
 		return true
 	end
 
@@ -85,10 +85,10 @@ function this.getWindoors(cell)
 	for door in cell:iterateReferences(tes3.objectType.door) do
 		if door.destination then
 			if (not door.destination.cell.isInterior)
-			or (door.destination.cell.behavesAsExterior and
-			(not string.find(cell.name:lower(), "plaza") and
-			(not string.find(cell.name:lower(), "vivec") and
-			(not string.find(cell.name:lower(), "arena pit"))))) then
+				or (door.destination.cell.behavesAsExterior and
+					(not string.find(cell.name:lower(), "plaza") and
+						(not string.find(cell.name:lower(), "vivec") and
+							(not string.find(cell.name:lower(), "arena pit"))))) then
 				table.insert(windoors, door)
 			end
 		end

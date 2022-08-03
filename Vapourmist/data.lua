@@ -43,7 +43,7 @@ this.fogTypes = {
         name = "cloud",
         mesh = "tew\\Vapourmist\\vapourcloud.nif",
         height = 5100,
-        initialSize = {650, 700, 780, 800, 900, 980, 1000, 1100},
+        initialSize = { 650, 700, 780, 800, 900, 980, 1000, 1100 },
         isAvailable = function(_, weather)
 
             if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then
@@ -62,8 +62,8 @@ this.fogTypes = {
         name = "mist",
         mesh = "tew\\Vapourmist\\vapourmist.nif",
         height = 550,
-        initialSize = {400, 420, 450, 500, 520, 550},
-        wetWeathers = {["Rain"] = true, ["Thunderstorm"] = true},
+        initialSize = { 400, 420, 450, 500, 520, 550 },
+        wetWeathers = { ["Rain"] = true, ["Thunderstorm"] = true },
         isAvailable = function(gameHour, weather)
 
             if config.blockedMist[weather.name] and config.blockedMist[weather.name] ~= nil then
@@ -73,9 +73,9 @@ this.fogTypes = {
             local WtC = tes3.worldController.weatherController
             if (
                 (
-                (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 1.5)
-                or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
-                and not (this.fogTypes["mist"].wetWeathers[weather.name])
+                    (gameHour > WtC.sunriseHour - 1 and gameHour < WtC.sunriseHour + 1.5)
+                        or (gameHour >= WtC.sunsetHour - 0.4 and gameHour < WtC.sunsetHour + 2))
+                    and not (this.fogTypes["mist"].wetWeathers[weather.name])
                 ) then
                 return true
             end
@@ -93,7 +93,7 @@ this.interiorFog = {
     name = "interior",
     mesh = "tew\\Vapourmist\\vapourint.nif",
     height = -1300,
-    initialSize = {300, 400, 450, 500, 510, 550},
+    initialSize = { 300, 400, 450, 500, 510, 550 },
     isAvailable = function(cell)
 
         for _, namePattern in ipairs(interiorNames) do
@@ -116,7 +116,7 @@ this.interiorFog = {
 
         if count == 0 then return false end
 
-    return false
+        return false
     end
 }
 

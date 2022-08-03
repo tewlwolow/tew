@@ -4,7 +4,7 @@ local sounds = require("tew.AURA.sounds")
 local common = require("tew.AURA.common")
 local tewLib = require("tew.tewLib.tewLib")
 local findWholeWords = tewLib.findWholeWords
-local intVol = config.intVol/200
+local intVol = config.intVol / 200
 local interiorMusic = config.interiorMusic
 
 local played = false
@@ -31,12 +31,12 @@ local function getTypeCell(maxCount, cell)
                 if string.startswith(stat.object.id:lower(), statName) then
                     count = count + 1
                     typeCell = cellType
-                    if count >= maxCount then debugLog("Enough statics. Cell type: "..typeCell) return typeCell end
+                    if count >= maxCount then debugLog("Enough statics. Cell type: " .. typeCell) return typeCell end
                 end
             end
         end
     end
-    if count == 0 then debugLog("Too few statics. Count: "..count) return nil end
+    if count == 0 then debugLog("Too few statics. Count: " .. count) return nil end
 end
 
 -- See if the cell warrants populated sounds - or whether you killed them all, you bastard --
@@ -61,19 +61,20 @@ local function playMusic()
     if not interiorMusic then return end
     lastMusicPath = musicPath
     --debugLog("Playing music track: "..musicPath)
-    tes3.streamMusic{
+    tes3.streamMusic {
         path = musicPath,
         --crossfade = 0,
     }
     played = true
 end
+
 -- Get music tracks from folders --
 for folder in lfs.dir("Data Files\\Music\\tew\\AURA") do
     if folder ~= "Special" then
-        for soundfile in lfs.dir("Data Files\\Music\\tew\\AURA\\"..folder) do
+        for soundfile in lfs.dir("Data Files\\Music\\tew\\AURA\\" .. folder) do
             if soundfile and soundfile ~= ".." and soundfile ~= "." and string.endswith(soundfile, ".mp3") then
                 table.insert(musicArrays[folder], soundfile)
-                debugLog("Adding music file: "..soundfile)
+                debugLog("Adding music file: " .. soundfile)
             end
         end
     end
@@ -85,7 +86,7 @@ local function onMusicSelection()
 
     if not (cell) or not (cell.isInterior) or not (cell.name) or (cell.behavesAsExterior) then return end
 
-    if not isEnabled(cell.name) then debugLog("Tavern blacklisted: "..cell.name..". Returning.") return end
+    if not isEnabled(cell.name) then debugLog("Tavern blacklisted: " .. cell.name .. ". Returning.") return end
 
     if getPopulatedCell(3, cell) == false then return end
 
@@ -93,7 +94,7 @@ local function onMusicSelection()
         for _, pattern in ipairs(data.tavernNames[race]) do
             if string.find(cell.name, pattern) then
                 while musicPath == lastMusicPath do
-                    musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
+                    musicPath = "tew\\AURA\\" .. race .. "\\" .. musicArrays[race][math.random(1, #musicArrays[race])]
                 end
                 playMusic()
                 return
@@ -103,21 +104,21 @@ local function onMusicSelection()
 
     for npc in cell:iterateReferences(tes3.objectType.npc) do
         if (npc.object.class.id == "Publican"
-        or npc.object.class.id == "T_Sky_Publican"
-        or npc.object.class.id == "T_Cyr_Publican")
-        and (npc.object.mobile and not npc.object.mobile.isDead) then
+            or npc.object.class.id == "T_Sky_Publican"
+            or npc.object.class.id == "T_Cyr_Publican")
+            and (npc.object.mobile and not npc.object.mobile.isDead) then
 
             local race = npc.object.race.id
             if race ~= "Imperial"
-            and race ~= "Nord"
-            and race ~= "Dark Elf" then
+                and race ~= "Nord"
+                and race ~= "Dark Elf" then
                 race = "Dark Elf"
             end
 
             race = string.sub(race, 1, 3):lower()
 
             while musicPath == lastMusicPath do
-                musicPath = "tew\\AURA\\"..race.."\\"..musicArrays[race][math.random(1, #musicArrays[race])]
+                musicPath = "tew\\AURA\\" .. race .. "\\" .. musicArrays[race][math.random(1, #musicArrays[race])]
             end
 
             playMusic()
@@ -130,10 +131,10 @@ end
 local function cellCheck()
 
     -- Gets messy otherwise
-	local mp = tes3.mobilePlayer
-	if (not mp) or (mp and (mp.waiting or mp.traveling)) then
-		return
-	end
+    local mp = tes3.mobilePlayer
+    if (not mp) or (mp and (mp.waiting or mp.traveling)) then
+        return
+    end
 
     if interiorMusic then
         onMusicSelection()
@@ -144,7 +145,7 @@ local function cellCheck()
     -- Bugger off if we're not inside --
     if not (cell) or (cell.isOrBehavesAsExterior) then
         debugLog("Exterior cell. Removing sound.")
-        sounds.removeImmediate{module = moduleName}
+        sounds.removeImmediate { module = moduleName }
         if interiorMusic and played == true then
             debugLog("Removing music.")
             tes3.streamMusic {
@@ -156,37 +157,37 @@ local function cellCheck()
     end
 
     -- If we got this far let's recycle whatever might have been playing before for that module (useful for guild service travel etc.) --
-    sounds.removeImmediate{module = moduleName}
+    sounds.removeImmediate { module = moduleName }
 
     -- First check if the cell type can be determined by architecture --
     local typeCell = getTypeCell(5, cell)
     if typeCell ~= nil then
         debugLog("Found appropriate cell. Playing interior ambient sound.")
-        sounds.playImmediate{module = moduleName, type = typeCell, volume = intVol}
+        sounds.playImmediate { module = moduleName, type = typeCell, volume = intVol }
         return
     end
 
     -- A little override to ensure that taverns with non-native publicans get covered too --
-    if getPopulatedCell(2, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+    if getPopulatedCell(2, cell) == false then debugLog("Too few people in a cell. Returning.") return end
     for race, taverns in pairs(data.tavernNames) do
         for _, pattern in ipairs(taverns) do
             if string.find(cell.name, pattern) then
-                debugLog("Found appropriate tavern. Playing interior ambient sound for race type: "..race)
-                sounds.playImmediate{module = moduleName, race = race, volume = intVol}
+                debugLog("Found appropriate tavern. Playing interior ambient sound for race type: " .. race)
+                sounds.playImmediate { module = moduleName, race = race, volume = intVol }
                 return
             end
         end
     end
 
     -- If at this point there's no-one inside, let's bail out --
-    if getPopulatedCell(1, cell) == false then debugLog ("Too few people in a cell. Returning.") return end
+    if getPopulatedCell(1, cell) == false then debugLog("Too few people in a cell. Returning.") return end
 
     -- Now performing pattern match for cell names --
     for cellType, nameTable in pairs(data.names) do
         for _, pattern in pairs(nameTable) do
             if findWholeWords(cell.name, pattern) then
-                debugLog("Found appropriate cell. Playing interior ambient sound for interior type: "..cellType)
-                sounds.playImmediate{module = moduleName, type = cellType, volume = intVol}
+                debugLog("Found appropriate cell. Playing interior ambient sound for interior type: " .. cellType)
+                sounds.playImmediate { module = moduleName, type = cellType, volume = intVol }
                 return
             end
         end
@@ -195,35 +196,35 @@ local function cellCheck()
     -- Determine tavern type per race --
     for npc in cell:iterateReferences(tes3.objectType.npc) do
         if (npc.object.class.id == "Publican"
-        or npc.object.class.id == "T_Sky_Publican"
-        or npc.object.class.id == "T_Cyr_Publican")
-        and (npc.object.mobile and not npc.object.mobile.isDead) then
+            or npc.object.class.id == "T_Sky_Publican"
+            or npc.object.class.id == "T_Cyr_Publican")
+            and (npc.object.mobile and not npc.object.mobile.isDead) then
 
             local race = npc.object.race.id
             if race ~= "Imperial"
-            and race ~= "Nord"
-            and race ~= "Dark Elf" then
+                and race ~= "Nord"
+                and race ~= "Dark Elf" then
                 race = "Dark Elf"
             end
             race = string.sub(race, 1, 3):lower()
-            debugLog("Found appropriate tavern. Playing interior ambient sound for race type: "..race)
+            debugLog("Found appropriate tavern. Playing interior ambient sound for race type: " .. race)
 
-            sounds.playImmediate{module = moduleName, race = race, volume = intVol}
+            sounds.playImmediate { module = moduleName, race = race, volume = intVol }
             return
         end
     end
 
     debugLog("No appropriate cell detected. Removing sounds.")
-    sounds.removeImmediate{module = moduleName}
+    sounds.removeImmediate { module = moduleName }
 end
 
 -- Make sure any law-breakers, murderes and maniacs are covered --
 -- Meaning the death of a publican means we recheck conditions --
 local function deathCheck(e)
     if e.reference and e.reference.baseObject == tes3.objectType.npc
-    and (e.reference.object.class.id == "Publican"
-    or  e.reference.object.class.id == "T_Sky_Publican"
-    or  e.reference.object.class.id == "T_Cyr_Publican") then
+        and (e.reference.object.class.id == "Publican"
+            or e.reference.object.class.id == "T_Sky_Publican"
+            or e.reference.object.class.id == "T_Cyr_Publican") then
         cellCheck()
         if interiorMusic then
             onMusicSelection()
@@ -236,8 +237,8 @@ local function onCOC()
 end
 
 event.register("cellChanged", cellCheck, { priority = -200 })
-event.register("weatherTransitionImmediate", onCOC, {priority=-160})
-event.register("weatherChangedImmediate", onCOC, {priority=-160})
+event.register("weatherTransitionImmediate", onCOC, { priority = -160 })
+event.register("weatherChangedImmediate", onCOC, { priority = -160 })
 event.register("death", deathCheck)
 if interiorMusic then
     event.register("musicSelectTrack", onMusicSelection)

@@ -40,7 +40,7 @@ this.statics = {
         "in_dae_pillar",
         "t_dae_dngruin"
     },
-    ["dwe"]= {
+    ["dwe"] = {
         "in_dwrv_hall",
         "in_dwrv_corr",
         "in_dwe_corr",

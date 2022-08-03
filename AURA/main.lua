@@ -29,7 +29,7 @@ local function init()
     local moduleMisc = config.moduleMisc
     local modulePC = config.modulePC
 
-    event.register("uiActivated", warning, {filter="MenuAudio"})
+    event.register("uiActivated", warning, { filter = "MenuAudio" })
 
     mwse.log(string.format("\n\n[AURA %s] %s", version, messages.buildingSoundsStarted))
     soundBuilder.build()

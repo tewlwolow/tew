@@ -1,3 +1,3 @@
-local this={
-version="4.2.0"}
+local this = {
+	version = "4.2.0" }
 return this

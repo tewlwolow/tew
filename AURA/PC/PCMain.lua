@@ -1,6 +1,6 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
-local config=require("tew.AURA.config")
+local config = require("tew.AURA.config")
 local messages = require(config.language).messages
 
 local function init()
@@ -18,6 +18,5 @@ local function init()
     end
 
 end
-
 
 init()

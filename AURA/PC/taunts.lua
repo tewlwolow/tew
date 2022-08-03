@@ -1,13 +1,13 @@
 local config = require("tew.AURA.config")
 local playerRace, playerSex
 local serviceVoicesData = require("tew.AURA.Service Voices.serviceVoicesData")
-local raceNames=serviceVoicesData.raceNames
+local raceNames = serviceVoicesData.raceNames
 local tauntsData = require("tew.AURA.PC.tauntsData")
 local tVol = config.tVol
 local tauntChance = config.tauntChance
 local common = require("tew.AURA.common")
 local playedTaunt = 0
-local werewolfSounds = {"were moan", "were roar", "were scream", "weregrowl", "werehowl"}
+local werewolfSounds = { "were moan", "were roar", "were scream", "weregrowl", "werehowl" }
 
 local debugLog = common.debugLog
 
@@ -82,8 +82,8 @@ local function playerCheck()
         end
     end
 
-    debugLog("Determined player race: "..playerRace)
-    debugLog("Determined player sex: "..playerSex)
+    debugLog("Determined player race: " .. playerRace)
+    debugLog("Determined player sex: " .. playerSex)
     event.unregister("cellChanged", playerCheck)
 end
 
@@ -94,30 +94,30 @@ local function combatCheck(e)
     local player = tes3.mobilePlayer
     if tes3.mobilePlayer.werewolf then
         local taunt = werewolfSounds[math.random(1, #werewolfSounds)]
-        tes3.playSound{
-            sound=taunt,
-            volume=0.9*tVol,
-            reference=player.reference
+        tes3.playSound {
+            sound = taunt,
+            volume = 0.9 * tVol,
+            reference = player.reference
         }
         playedTaunt = 1
-        debugLog("Played werewolf battle taunt: "..taunt)
+        debugLog("Played werewolf battle taunt: " .. taunt)
 
-        timer.start{type=timer.real, duration=7, callback=function()
+        timer.start { type = timer.real, duration = 7, callback = function()
             playedTaunt = 0
-        end}
+        end }
     end
 
     if e.target == player or e.actor == player
-    and playerRace~=nil
-    and playerSex ~= nil
-    and playedTaunt == 0 then
+        and playerRace ~= nil
+        and playerSex ~= nil
+        and playedTaunt == 0 then
 
-        if tauntChance<math.random() then debugLog("Dice roll failed. Returning.") return end
+        if tauntChance < math.random() then debugLog("Dice roll failed. Returning.") return end
 
         local taunt
 
         if e.target.object.objectType ~= tes3.objectType.creature
-        and e.actor.object.objectType ~= tes3.objectType.creature then
+            and e.actor.object.objectType ~= tes3.objectType.creature then
             local foe, foeRace
             if e.target ~= player then
                 foe = e.target
@@ -125,40 +125,40 @@ local function combatCheck(e)
                 foe = e.actor
             end
             foeRace = foe.object.race.id
-            debugLog("Foe race: "..foe.object.race.id)
+            debugLog("Foe race: " .. foe.object.race.id)
             local raceTaunts = tauntsData.raceTaunts
             if raceTaunts[playerRace]
-            and raceTaunts[playerRace][playerSex]
-            and raceTaunts[playerRace][playerSex][foeRace] then
+                and raceTaunts[playerRace][playerSex]
+                and raceTaunts[playerRace][playerSex][foeRace] then
                 taunt = raceTaunts[playerRace][playerSex][foeRace]
             end
             if taunt ~= nil then
-                debugLog("Race-based taunt: "..taunt)
+                debugLog("Race-based taunt: " .. taunt)
             end
             if taunt == nil then
                 local taunts = tauntsData.NPCtaunts
                 taunt = taunts[playerRace][playerSex][math.random(1, #taunts[playerRace][playerSex])]
-                debugLog("NPC taunt: "..taunt)
+                debugLog("NPC taunt: " .. taunt)
             end
         else
             local taunts = tauntsData.Crtaunts
             taunt = taunts[playerRace][playerSex][math.random(1, #taunts[playerRace][playerSex])]
-            debugLog("Creature taunt: "..taunt)
+            debugLog("Creature taunt: " .. taunt)
         end
 
 
-        tes3.say{
-            volume=0.9*tVol,
-            soundPath="Vo\\"..playerRace.."\\"..playerSex.."\\".. taunt,
-            reference=player.reference
+        tes3.say {
+            volume = 0.9 * tVol,
+            soundPath = "Vo\\" .. playerRace .. "\\" .. playerSex .. "\\" .. taunt,
+            reference = player.reference
         }
 
         playedTaunt = 1
-        debugLog("Played battle taunt: "..taunt)
+        debugLog("Played battle taunt: " .. taunt)
 
-        timer.start{type=timer.real, duration=5, callback=function()
+        timer.start { type = timer.real, duration = 5, callback = function()
             playedTaunt = 0
-        end}
+        end }
 
     else
         debugLog("Could not determine battle situation.")

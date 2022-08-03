@@ -37,7 +37,7 @@ local function conditionCheck()
 		-- Nuke fog after waiting/travelling if conditions changed --
 		for _, fogType in pairs(data.fogTypes) do
 			if not (fogType.isAvailable(gameHour, toWeather)) then
-				debugLog("Player waiting or travelling and fog: "..fogType.name.." not available.")
+				debugLog("Player waiting or travelling and fog: " .. fogType.name .. " not available.")
 				fogService.removeFogImmediate(fogType.name)
 			end
 		end
@@ -76,17 +76,17 @@ local function conditionCheck()
 	fromRegion = fromRegion or toRegion
 
 	-- Print values so we're sure we're not insane --
-	debugLog("Weather: "..fromWeather.name.." -> "..toWeather.name)
-	debugLog("Game hour: "..gameHour)
-	debugLog("Fog colour: "..tostring(fromFogColour).." -> "..tostring(toFogColour))
-	debugLog("Region: "..fromRegion.id.." -> "..toRegion.id)
-	
+	debugLog("Weather: " .. fromWeather.name .. " -> " .. toWeather.name)
+	debugLog("Game hour: " .. gameHour)
+	debugLog("Fog colour: " .. tostring(fromFogColour) .. " -> " .. tostring(toFogColour))
+	debugLog("Region: " .. fromRegion.id .. " -> " .. toRegion.id)
+
 	-- Iterate through fog types --
 	for _, fogType in pairs(data.fogTypes) do
 
 		-- Log fog type --
-		debugLog("Fog type: "..fogType.name)
-	
+		debugLog("Fog type: " .. fogType.name)
+
 		-- Get type of fog and its pre-set height for later calcs --
 		local options = {
 			type = fogType.name,
@@ -95,7 +95,7 @@ local function conditionCheck()
 
 		-- Check whether we can add the fog at this time, remove and skip to another fog type if not --
 		if not (fogType.isAvailable(gameHour, toWeather)) then
-			debugLog("Fog: "..fogType.name.." not available.")
+			debugLog("Fog: " .. fogType.name .. " not available.")
 			fogService.removeFog(fogType.name)
 			goto continue
 		end
@@ -116,7 +116,7 @@ local function conditionCheck()
 			fogService.addFog(options)
 		end
 
-		:: continue ::
+		::continue::
 	end
 
 	-- Write off values for later comparison --
@@ -153,8 +153,8 @@ local function onLoaded()
 		event.register("enterFrame", fogService.reColour)
 		recolourRegistered = true
 	end
-	timer.start({duration = data.baseTimerDuration, callback = function() debugLog("================== timer ==================") conditionCheck() end, iterations = -1, type = timer.game})
-	debugLog("Timer started. Duration: "..data.baseTimerDuration)
+	timer.start({ duration = data.baseTimerDuration, callback = function() debugLog("================== timer ==================") conditionCheck() end, iterations = -1, type = timer.game })
+	debugLog("Timer started. Duration: " .. data.baseTimerDuration)
 	fromWeather = nil
 	fromFogColour = nil
 	fromRegion = nil
@@ -163,14 +163,14 @@ end
 
 -- The check to be run after waiting/travelling --
 local function waitCheck(e)
-	local element=e.element
+	local element = e.element
 	element:registerAfter("destroy", function() -- registerAfter ensure we can register across projects --
-        timer.start{
-            type=timer.game,
-            duration = 0.01,
-            callback = conditionCheck
-        }
-    end)
+		timer.start {
+			type = timer.game,
+			duration = 0.01,
+			callback = conditionCheck
+		}
+	end)
 end
 
 -- Register events
@@ -184,13 +184,13 @@ local function init()
 	fogService.meshes[data.interiorFog.name] = tes3.loadMesh(data.interiorFog.mesh)
 
 	event.register("loaded", function() debugLog("================== loaded ==================") onLoaded() end)
-	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, {priority = 500})
-	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") conditionCheck() end, {priority = 500})
-	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") conditionCheck() end, {priority = 500})
-	event.register("weatherTransitionStarted", function() debugLog("================== weatherTransitionStarted ==================") conditionCheck() end, {priority = 500})
-	event.register("weatherTransitionStarted", function(e) debugLog("================== weatherTransitionStarted ==================") onWeatherChanged(e) end, {priority = 500})
-	event.register("weatherTransitionFinished", function() debugLog("================== weatherTransitionFinished ==================") conditionCheck() end, {priority = 500})
-	event.register("uiActivated", waitCheck, {filter="MenuTimePass", priority = -5})
+	event.register("cellChanged", function() debugLog("================== cellChanged ==================") conditionCheck() end, { priority = 500 })
+	event.register("weatherChangedImmediate", function() debugLog("================== weatherChangedImmediate ==================") conditionCheck() end, { priority = 500 })
+	event.register("weatherTransitionImmediate", function() debugLog("================== weatherTransitionImmediate ==================") conditionCheck() end, { priority = 500 })
+	event.register("weatherTransitionStarted", function() debugLog("================== weatherTransitionStarted ==================") conditionCheck() end, { priority = 500 })
+	event.register("weatherTransitionStarted", function(e) debugLog("================== weatherTransitionStarted ==================") onWeatherChanged(e) end, { priority = 500 })
+	event.register("weatherTransitionFinished", function() debugLog("================== weatherTransitionFinished ==================") conditionCheck() end, { priority = 500 })
+	event.register("uiActivated", waitCheck, { filter = "MenuTimePass", priority = -5 })
 end
 
 init()

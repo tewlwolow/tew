@@ -1,17 +1,17 @@
-local weathers=require("tew\\Watch the Skies\\weathers")
-local config=require("tew\\Watch the Skies\\config")
-local seasonalChances=require("tew\\Watch the Skies\\seasonalChances")
-local debugLogOn=config.debugLogOn
-local WtSdir="Data Files\\Textures\\tew\\Watch the Skies\\"
+local weathers = require("tew\\Watch the Skies\\weathers")
+local config = require("tew\\Watch the Skies\\config")
+local seasonalChances = require("tew\\Watch the Skies\\seasonalChances")
+local debugLogOn = config.debugLogOn
+local WtSdir = "Data Files\\Textures\\tew\\Watch the Skies\\"
 local modversion = require("tew\\Watch the Skies\\version")
 local version = modversion.version
 local WtC, intWeatherTimer, monthLast, regionLast
 local tewLib = require("tew\\tewLib\\tewLib")
-local isOpenPlaza=tewLib.isOpenPlaza
+local isOpenPlaza = tewLib.isOpenPlaza
 
 local function debugLog(message)
 	if debugLogOn then
-	   mwse.log("[Watch the Skies "..version.."] "..string.format("%s", message))
+		mwse.log("[Watch the Skies " .. version .. "] " .. string.format("%s", message))
 	end
 end
 
@@ -30,7 +30,7 @@ local weatherChecklist = {
 }
 
 -- Define regions affected by the Blight --
-local vvRegions = {"Bitter Coast Region", "Azura's Coast Region", "Molag Mar Region", "Ashlands Region", "West Gash Region", "Ascadian Isles Region", "Grazelands Region", "Sheogorad"}
+local vvRegions = { "Bitter Coast Region", "Azura's Coast Region", "Molag Mar Region", "Ashlands Region", "West Gash Region", "Ascadian Isles Region", "Grazelands Region", "Sheogorad" }
 
 -- Check if the region passed is the Vvardenfel region--
 local function checkVv(region)
@@ -44,9 +44,9 @@ end
 -- Define particle and clouds values for randomisation --
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
-	["rain"] = {300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300},
-	["thunder"] = {350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700},
-	["snow"] = {300, 320, 400, 460, 500, 600}
+	["rain"] = { 300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300 },
+	["thunder"] = { 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700 },
+	["snow"] = { 300, 320, 400, 460, 500, 600 }
 }
 
 local cloudSpeed = {
@@ -77,13 +77,13 @@ local cloudSpeed = {
 		160, 180, 200, 230, 260, 300,
 		360, 380, 450, 500
 	},
-	[7] = {600, 700, 800, 900, 1000, 1200, 1500},
-	[8] = {750, 800, 900, 1000, 1250, 2360, 1470, 1600, 1800},
+	[7] = { 600, 700, 800, 900, 1000, 1200, 1500 },
+	[8] = { 750, 800, 900, 1000, 1250, 2360, 1470, 1600, 1800 },
 	[9] = {
 		80, 100, 110, 125, 145,
 		185, 196, 200, 270
 	},
-	[10] = {600, 760, 850, 920, 1100, 1250}
+	[10] = { 600, 760, 850, 920, 1100, 1250 }
 
 }
 
@@ -93,26 +93,26 @@ local cloudSpeed = {
 local function getMQState()
 
 	-- Receiving index 20 for this quest changes the weather at Red Mountain. Also resets questStage to 0.
-	local endGameIndex = tes3.getJournalIndex{ id = "C3_DestroyDagoth" }
+	local endGameIndex = tes3.getJournalIndex { id = "C3_DestroyDagoth" }
 
 	-- Give the Dwemer Puzzle Box to Hasphat Antabolis. Triggers questStage 1.
-	local antabolisIndex = tes3.getJournalIndex{ id = "A1_2_AntabolisInformant" }
+	local antabolisIndex = tes3.getJournalIndex { id = "A1_2_AntabolisInformant" }
 
 	-- Receive notes on the Ashlanders from Hassour Zainsubani. Triggers questStage 2.
-	local zainsubaniIndex = tes3.getJournalIndex{ id = "A1_11_ZainsubaniInformant" }
+	local zainsubaniIndex = tes3.getJournalIndex { id = "A1_11_ZainsubaniInformant" }
 
 	-- Defeat Dagoth Gares. Triggers questStage 3.
-	local garesIndex = tes3.getJournalIndex{ id = "A2_2_6thHouse" }
+	local garesIndex = tes3.getJournalIndex { id = "A2_2_6thHouse" }
 
 	-- Take the cure from Divayth Fyr. Triggers questStage 4.
-	local cureIndex = tes3.getJournalIndex{ id = "A2_3_CorprusCure" }
+	local cureIndex = tes3.getJournalIndex { id = "A2_3_CorprusCure" }
 
 	-- Receive Moon-and-Star from Azura. Triggers questStage 5.
-	local incarnateIndex = tes3.getJournalIndex{ id = "A2_6_Incarnate" }
+	local incarnateIndex = tes3.getJournalIndex { id = "A2_6_Incarnate" }
 
 	-- Receive a working Wraithguard from Vivec or Yagrum Bagarn. Triggers questStage 6.
-	local vivecIndex = tes3.getJournalIndex{ id = "B8_MeetVivec" }
-	local backPathIndex = tes3.getJournalIndex{ id = "CX_BackPath" }
+	local vivecIndex = tes3.getJournalIndex { id = "B8_MeetVivec" }
+	local backPathIndex = tes3.getJournalIndex { id = "CX_BackPath" }
 
 	local questStage
 
@@ -142,13 +142,13 @@ local function reColourParticleMesh()
 
 	-- Bugger off if we don't have all the data needed --
 	if not (WtC.currentWeather.name == "Rain" or WtC.currentWeather.name == "Thunderstorm" or WtC.currentWeather.name == "Snow")
-	or ((WtC.nextWeather) and not (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm" or WtC.nextWeather.name == "Snow"))
-	or not newParticleMesh then
+		or ((WtC.nextWeather) and not (WtC.nextWeather.name == "Rain" or WtC.nextWeather.name == "Thunderstorm" or WtC.nextWeather.name == "Snow"))
+		or not newParticleMesh then
 		return
 	end
 
 	-- Get fog colour to make the particles match the scene look --
-	local weatherColour	 = WtC.currentFogColor
+	local weatherColour = WtC.currentFogColor
 
 	-- Preprocess colours a bit, snow should be lighter, rain should look a bit colder --
 	local colours
@@ -178,14 +178,14 @@ end
 local function changeParticleMesh(particleType)
 
 	-- Timer here to actually allow background data to be available --
-	timer.start{
+	timer.start {
 		type = timer.game,
 		duration = 0.00001,
 		callback = function()
 
 			-- Get particle mesh from pre-filled array and load it --
 			local randomParticleMesh = table.choice(particles[particleType])
-			newParticleMesh = tes3.loadMesh("tew\\Watch the Skies\\particles\\"..particleType.."\\"..randomParticleMesh):clone()
+			newParticleMesh = tes3.loadMesh("tew\\Watch the Skies\\particles\\" .. particleType .. "\\" .. randomParticleMesh):clone()
 
 			-- Simple inline function to swap the nodes, preserving visibility --
 			local function swapNode(particle)
@@ -209,11 +209,10 @@ local function changeParticleMesh(particleType)
 
 			-- Update the root node to reflect the changes made --
 			WtC.sceneRainRoot:updateEffects()
-			debugLog("Rain mesh changed to "..randomParticleMesh)
+			debugLog("Rain mesh changed to " .. randomParticleMesh)
 		end
 	}
 end
-
 
 -- Randomise particle amount --
 local function changeMaxParticles()
@@ -221,18 +220,18 @@ local function changeMaxParticles()
 
 	-- Match the weather index with lua array index --
 	if currentWeather ~= 4 then
-		WtC.weathers[5].maxParticles=table.choice(particleAmount["rain"])
+		WtC.weathers[5].maxParticles = table.choice(particleAmount["rain"])
 	end
 	if currentWeather ~= 5 then
-		WtC.weathers[6].maxParticles=table.choice(particleAmount["thunder"])
+		WtC.weathers[6].maxParticles = table.choice(particleAmount["thunder"])
 	end
 	if currentWeather ~= 8 then
-		WtC.weathers[9].maxParticles=table.choice(particleAmount["snow"])
+		WtC.weathers[9].maxParticles = table.choice(particleAmount["snow"])
 	end
 	debugLog("Particles amount randomised.")
-	debugLog("Rain particles: "..WtC.weathers[5].maxParticles)
-	debugLog("Thunderstorm particles: "..WtC.weathers[6].maxParticles)
-	debugLog("Snow particles: "..WtC.weathers[9].maxParticles)
+	debugLog("Rain particles: " .. WtC.weathers[5].maxParticles)
+	debugLog("Thunderstorm particles: " .. WtC.weathers[6].maxParticles)
+	debugLog("Snow particles: " .. WtC.weathers[9].maxParticles)
 	event.trigger("WtS:maxParticlesChanged")
 end
 
@@ -241,8 +240,8 @@ local function changeCloudsSpeed()
 	local currentWeather = WtC.currentWeather.index
 	for i, w in pairs(WtC.weathers) do
 		if i == currentWeather then goto continue end
-		w.cloudsSpeed = table.choice(cloudSpeed[i])/100
-		:: continue ::
+		w.cloudsSpeed = table.choice(cloudSpeed[i]) / 100
+		::continue::
 	end
 	debugLog("Clouds speed randomised.")
 end
@@ -257,45 +256,45 @@ local function skyChoice()
 	local texPath, sArray
 	for _, weather in pairs(WtC.weathers) do
 		if (weatherNow.index == weather.index) then goto continue end
-		if config.vanChance<math.random() then
+		if config.vanChance < math.random() then
 			for index, _ in pairs(weathers.customWeathers) do
-				if weather.index==index then
+				if weather.index == index then
 					for w, i in pairs(tes3.weather) do
-						if index==i then
-							sArray=weathers.customWeathers[weather.index]
-							texPath=w
+						if index == i then
+							sArray = weathers.customWeathers[weather.index]
+							texPath = w
 							break
 						end
 					end
 				end
 			end
-			if texPath~=nil and sArray[1]~=nil then
-				weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-				debugLog("Cloud texture path set to: "..weather.cloudTexture)
+			if texPath ~= nil and sArray[1] ~= nil then
+				weather.cloudTexture = WtSdir .. texPath .. "\\" .. sArray[math.random(1, #sArray)]
+				debugLog("Cloud texture path set to: " .. weather.cloudTexture)
 			end
 		else
 			texPath = weathers.vanillaWeathers[weather.index]
-			weather.cloudTexture = "Data Files\\Textures\\"..texPath
-			debugLog("Using vanilla texture: "..weather.cloudTexture)
+			weather.cloudTexture = "Data Files\\Textures\\" .. texPath
+			debugLog("Using vanilla texture: " .. weather.cloudTexture)
 		end
 		::continue::
 	end
 
 	-- Change hours between weather changes --
-	local alterChanges=config.alterChanges
+	local alterChanges = config.alterChanges
 	if alterChanges then
-		WtC.hoursBetweenWeatherChanges=math.random(3,10)
-		debugLog("Current time between weather changes: "..WtC.hoursBetweenWeatherChanges)
+		WtC.hoursBetweenWeatherChanges = math.random(3, 10)
+		debugLog("Current time between weather changes: " .. WtC.hoursBetweenWeatherChanges)
 	end
 
 	-- Randomise particles --
-	local randomiseParticles=config.randomiseParticles
+	local randomiseParticles = config.randomiseParticles
 	if randomiseParticles then
 		changeMaxParticles()
 	end
 
 	-- Randomise cloud speed --
-	local randomiseCloudsSpeed=config.randomiseCloudsSpeed
+	local randomiseCloudsSpeed = config.randomiseCloudsSpeed
 	if randomiseCloudsSpeed then
 		changeCloudsSpeed()
 	end
@@ -306,29 +305,29 @@ end
 local function changeInteriorWeather()
 	if WtC.nextWeather then return end
 
-	local currentWeather=WtC.currentWeather.index
+	local currentWeather = WtC.currentWeather.index
 	local newWeather
-	debugLog("Weather before randomisation: "..currentWeather)
+	debugLog("Weather before randomisation: " .. currentWeather)
 
 	-- Use regional weather chances --
-	local region = tes3.getRegion({useDoors=true})
-	local regionChances={
-	[0] = region.weatherChanceClear,
-	[1] = region.weatherChanceCloudy,
-	[2] = region.weatherChanceFoggy,
-	[3] = region.weatherChanceOvercast,
-	[4] = region.weatherChanceRain,
-	[5] = region.weatherChanceThunder,
-	[6] = region.weatherChanceAsh,
-	[7] = region.weatherChanceBlight,
-	[8] = region.weatherChanceSnow,
-	[9] = region.weatherChanceBlizzard
+	local region = tes3.getRegion({ useDoors = true })
+	local regionChances = {
+		[0] = region.weatherChanceClear,
+		[1] = region.weatherChanceCloudy,
+		[2] = region.weatherChanceFoggy,
+		[3] = region.weatherChanceOvercast,
+		[4] = region.weatherChanceRain,
+		[5] = region.weatherChanceThunder,
+		[6] = region.weatherChanceAsh,
+		[7] = region.weatherChanceBlight,
+		[8] = region.weatherChanceSnow,
+		[9] = region.weatherChanceBlizzard
 	}
 
 	-- Get the new weather --
 	while newWeather == nil do
 		for weather, chance in pairs(regionChances) do
-			if chance/100 > math.random() then
+			if chance / 100 > math.random() then
 				newWeather = weather
 				break
 			end
@@ -339,7 +338,7 @@ local function changeInteriorWeather()
 
 	-- Switch to the new weather --
 	WtC:switchTransition(newWeather)
-	debugLog("Weather randomised. New weather: "..WtC.nextWeather.index)
+	debugLog("Weather randomised. New weather: " .. WtC.nextWeather.index)
 end
 
 -- Main function controlling seasonal weather chances --
@@ -347,19 +346,19 @@ local function changeSeasonal()
 
 	-- Get month and region and buzz off if there's no change --
 	local month = tes3.worldController.month.value + 1
-	local regionNow = tes3.getRegion({useDoors=true})
+	local regionNow = tes3.getRegion({ useDoors = true })
 	if (month == monthLast) and (regionNow == regionLast) then debugLog("Same month and region. Returning.") return end
 
 	-- If either month or region has changes, we need to reapply values--
 	-- Get the current MQ state to use in Blight calculations --
 	local questStage = getMQState()
-	debugLog("Main quest stage: "..questStage)
+	debugLog("Main quest stage: " .. questStage)
 
 	-- Iterate over all current regions and amend values if we get a much against our table --
 	for region in tes3.iterate(tes3.dataHandler.nonDynamicData.regions) do
 		-- Special handling for Red Mountain - use eithre full Blight or normal regional weather after MQ --
 		if region.id == "Red Mountain Region" then
-			if tes3.getJournalIndex{id = "C3_DestroyDagoth"} < 20 then
+			if tes3.getJournalIndex { id = "C3_DestroyDagoth" } < 20 then
 				debugLog("Dagoth Ur is alive. Using full blight values for Red Mountain.")
 				region.weatherChanceClear = 0
 				region.weatherChanceCloudy = 0
@@ -383,20 +382,20 @@ local function changeSeasonal()
 				region.weatherChanceBlight = seasonalChances[region.id][month][8]
 				region.weatherChanceSnow = seasonalChances[region.id][month][9]
 				region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
-				
+
 				-- Disable the blight cloud object from Dagoth Ur volcano --
-				mwscript.disable{reference="blight cloud"}
+				mwscript.disable { reference = "blight cloud" }
 			end
-		-- Special handling of Mournhold weather machine --
+			-- Special handling of Mournhold weather machine --
 		elseif region.id == "Mournhold Region"
-		and tes3.findGlobal("MournWeather").value == 1
-		or tes3.findGlobal("MournWeather").value == 2
-		or tes3.findGlobal("MournWeather").value == 3
-		or tes3.findGlobal("MournWeather").value == 4
-		or tes3.findGlobal("MournWeather").value == 5
-		or tes3.findGlobal("MournWeather").value == 6
-		or tes3.findGlobal("MournWeather").value == 7 then
-			debugLog("Weather machine running: "..tes3.findGlobal("MournWeather").value)
+			and tes3.findGlobal("MournWeather").value == 1
+			or tes3.findGlobal("MournWeather").value == 2
+			or tes3.findGlobal("MournWeather").value == 3
+			or tes3.findGlobal("MournWeather").value == 4
+			or tes3.findGlobal("MournWeather").value == 5
+			or tes3.findGlobal("MournWeather").value == 6
+			or tes3.findGlobal("MournWeather").value == 7 then
+			debugLog("Weather machine running: " .. tes3.findGlobal("MournWeather").value)
 			region.weatherChanceClear = 0
 			region.weatherChanceCloudy = 0
 			region.weatherChanceFoggy = 0
@@ -436,7 +435,7 @@ local function changeSeasonal()
 				region.weatherChanceSnow = seasonalChances[region.id][month][9]
 				region.weatherChanceBlizzard = seasonalChances[region.id][month][10]
 			elseif seasonalChances[region.id] then
-			-- Otherwise just use regular stored values --
+				-- Otherwise just use regular stored values --
 				region.weatherChanceClear = seasonalChances[region.id][month][1]
 				region.weatherChanceCloudy = seasonalChances[region.id][month][2]
 				region.weatherChanceFoggy = seasonalChances[region.id][month][3]
@@ -455,7 +454,7 @@ local function changeSeasonal()
 	monthLast = month
 	regionLast = regionNow
 
-	debugLog("Current chances for region: "..regionNow.name..": "..regionNow.weatherChanceClear..", "..regionNow.weatherChanceCloudy..", "..regionNow.weatherChanceFoggy..", "..regionNow.weatherChanceOvercast..", "..regionNow.weatherChanceRain..", "..regionNow.weatherChanceThunder..", "..regionNow.weatherChanceAsh..", "..regionNow.weatherChanceBlight..", "..regionNow.weatherChanceSnow..", "..regionNow.weatherChanceBlizzard)
+	debugLog("Current chances for region: " .. regionNow.name .. ": " .. regionNow.weatherChanceClear .. ", " .. regionNow.weatherChanceCloudy .. ", " .. regionNow.weatherChanceFoggy .. ", " .. regionNow.weatherChanceOvercast .. ", " .. regionNow.weatherChanceRain .. ", " .. regionNow.weatherChanceThunder .. ", " .. regionNow.weatherChanceAsh .. ", " .. regionNow.weatherChanceBlight .. ", " .. regionNow.weatherChanceSnow .. ", " .. regionNow.weatherChanceBlizzard)
 
 end
 
@@ -467,18 +466,18 @@ local function changeDaytime()
 	local day = tes3.worldController.day.value
 
 	---
-	local southY=-400000 -- Max "south pole" value - default -400000 (approximately Old Morrowind-Argonia border) --
-	local northY=225000 -- Max "north pole" value - 225000 is slightly north of Castle Karstaag
-	local minDaytime=4.0 -- Minimum daytime duration
-	local solsticeSunrise=6.0 -- Sunrise hours at 0 world position for solstice
-	local solsticeSunset=18.0 -- Sunset hour at 0 world position for solstice
-	local durSunrise=2.0 -- Sunrise duration
-	local durSunset=2.0 -- Sunset duration
+	local southY = -400000 -- Max "south pole" value - default -400000 (approximately Old Morrowind-Argonia border) --
+	local northY = 225000 -- Max "north pole" value - 225000 is slightly north of Castle Karstaag
+	local minDaytime = 4.0 -- Minimum daytime duration
+	local solsticeSunrise = 6.0 -- Sunrise hours at 0 world position for solstice
+	local solsticeSunset = 18.0 -- Sunset hour at 0 world position for solstice
+	local durSunrise = 2.0 -- Sunrise duration
+	local durSunset = 2.0 -- Sunset duration
 	local playerY = tes3.player.position.y -- Player y (latitude) position
 	local adjustedSunrise, adjustedSunset, l1, f1, f2, f3 -- Adjusted values and coefficients
 
 	-- sveng's smart equation to determine applicable values --
-	l1 =  (((( month * 3042) / 100) + day) + 9)
+	l1 = ((((month * 3042) / 100) + day) + 9)
 	if (l1 > 365) then
 		l1 = (l1 - 365)
 	end
@@ -487,7 +486,7 @@ local function changeDaytime()
 		l1 = (0 - l1)
 	end
 
-	f1 = ((l1 - 91.0 ) / 91.0)
+	f1 = ((l1 - 91.0) / 91.0)
 	if (f1 < -1.0) then
 		f1 = -1.0
 	elseif (f1 > 1.0) then
@@ -501,14 +500,14 @@ local function changeDaytime()
 		f2 = 1.0
 	end
 
-	f3 = ((solsticeSunset - solsticeSunrise )) -- -0.0 [???]
+	f3 = ((solsticeSunset - solsticeSunrise)) -- -0.0 [???]
 	if (minDaytime > f3) then
 		minDaytime = f3
 	end
 
-	f3 = ( 0.0 - (f1 * f2 ))
+	f3 = (0.0 - (f1 * f2))
 	f1 = ((solsticeSunset - solsticeSunrise) - minDaytime)
-	f1 = ((( f1  * f3) + solsticeSunset) - solsticeSunrise)
+	f1 = (((f1 * f3) + solsticeSunset) - solsticeSunrise)
 	if (f1 < minDaytime) then
 		f1 = minDaytime
 	end
@@ -524,33 +523,33 @@ local function changeDaytime()
 	adjustedSunset = (adjustedSunset - durSunset)
 
 	-- Adjust values only if we need to, i.e. if different from current values --
-	if  WtC.sunriseHour == math.ceil(adjustedSunrise) and
+	if WtC.sunriseHour == math.ceil(adjustedSunrise) and
 		WtC.sunsetHour == math.ceil(adjustedSunset) and
 		WtC.sunriseDuration == math.ceil(durSunrise) and
 		WtC.sunsetDuration == math.ceil(durSunset) then
 		debugLog("No change in daytime hours. Returning.")
 	else
-		debugLog("Previous values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
+		debugLog("Previous values: " .. WtC.sunriseHour .. " " .. WtC.sunriseDuration .. " " .. WtC.sunsetHour .. " " .. WtC.sunsetDuration)
 		WtC.sunriseHour = math.ceil(adjustedSunrise)
 		WtC.sunsetHour = math.ceil(adjustedSunset)
 		WtC.sunriseDuration = math.ceil(durSunrise)
 		WtC.sunsetDuration = math.ceil(durSunset)
-		debugLog("Current values: "..WtC.sunriseHour.." "..WtC.sunriseDuration.." "..WtC.sunsetHour.." "..WtC.sunsetDuration)
+		debugLog("Current values: " .. WtC.sunriseHour .. " " .. WtC.sunriseDuration .. " " .. WtC.sunsetHour .. " " .. WtC.sunsetDuration)
 	end
 end
 
 -- We need to change stuff on cell change --
 local function onCellChanged(e)
 	debugLog("Cell changed.")
-	local cell=e.cell or tes3.getPlayerCell()
+	local cell = e.cell or tes3.getPlayerCell()
 	if not cell then return end
 
 	-- To ensure Glass Domes don't get rain particles inside --
-	if isOpenPlaza(cell)==true then
-		WtC.weathers[5].maxParticles=1500
-		WtC.weathers[6].maxParticles=3000
-		WtC.weathers[5].particleRadius=1200
-		WtC.weathers[6].particleRadius=1200
+	if isOpenPlaza(cell) == true then
+		WtC.weathers[5].maxParticles = 1500
+		WtC.weathers[6].maxParticles = 3000
+		WtC.weathers[5].particleRadius = 1200
+		WtC.weathers[6].particleRadius = 1200
 	end
 
 	-- Run seasonal weather check --
@@ -564,24 +563,25 @@ local function onCellChanged(e)
 	end
 
 	-- Pause the interior weather timer if the player is in exterior --
-	if  (cell.isOrBehavesAsExterior) then
+	if (cell.isOrBehavesAsExterior) then
 		if intWeatherTimer then
-		intWeatherTimer:pause()
-		debugLog("Player in exterior. Pausing interior timer.") end
-	-- Refresh the timer in interiors --
+			intWeatherTimer:pause()
+			debugLog("Player in exterior. Pausing interior timer.")
+		end
+		-- Refresh the timer in interiors --
 	else
 		if intWeatherTimer then
 			intWeatherTimer:pause()
 			intWeatherTimer:cancel()
-			intWeatherTimer=nil
+			intWeatherTimer = nil
 		end
-		intWeatherTimer=timer.start{
-			duration=WtC.hoursBetweenWeatherChanges,
-			callback=changeInteriorWeather,
-			type=timer.game,
-			iterations=-1
+		intWeatherTimer = timer.start {
+			duration = WtC.hoursBetweenWeatherChanges,
+			callback = changeInteriorWeather,
+			type = timer.game,
+			iterations = -1
 		}
-		debugLog("Player in interior. Resuming interior timer. Hours to weather change: "..WtC.hoursBetweenWeatherChanges)
+		debugLog("Player in interior. Resuming interior timer. Hours to weather change: " .. WtC.hoursBetweenWeatherChanges)
 	end
 end
 
@@ -590,19 +590,19 @@ end
 local function seasonalTimer()
 	monthLast = nil
 	changeSeasonal()
-	timer.start({duration=7, callback=changeSeasonal, iterations=-1, type=timer.game})
+	timer.start({ duration = 7, callback = changeSeasonal, iterations = -1, type = timer.game })
 end
 
 -- Run daytime timer on loaded --
 local function daytimeTimer()
 	monthLast = nil
 	changeDaytime()
-	timer.start({duration=6, callback=changeDaytime, iterations=-1, type=timer.game})
+	timer.start({ duration = 6, callback = changeDaytime, iterations = -1, type = timer.game })
 end
 
 -- Shuffle texture every two hours --
 local function skyChoiceTimer()
-	timer.start({duration=6, callback=skyChoice, iterations=-1, type=timer.game})
+	timer.start({ duration = 6, callback = skyChoice, iterations = -1, type = timer.game })
 end
 
 -- Check if we have the weather that warrants particle change --
@@ -614,12 +614,12 @@ local function particleMeshChecker()
 		-- Match rain and thunderstorm with rain particles, and snow with snow particles --
 		local checked = weatherChecklist[weatherNow.name]
 		if checked ~= nil then
-			timer.start{
+			timer.start {
 				duration = 0.5 - (0.5 - WtC.transitionScalar),
-				callback=function()
+				callback = function()
 					changeParticleMesh(checked)
 				end,
-				type=timer.game,
+				type = timer.game,
 			}
 		end
 	else
@@ -634,13 +634,13 @@ end
 -- Change values also on initialised to ensure we won't end up with vanilla on load --
 local function init()
 
-	WtC=tes3.worldController.weatherController
+	WtC = tes3.worldController.weatherController
 
 	-- Get available raindrops --
 	if config.randomiseParticleMeshes then
 		for particleType in lfs.dir(particlesPath) do
 			if particleType and particleType ~= ".." and particleType ~= "." then
-				for particle in lfs.dir(particlesPath.."\\"..particleType) do
+				for particle in lfs.dir(particlesPath .. "\\" .. particleType) do
 					if particle and particle ~= ".." and particle ~= "." and string.endswith(particle:lower(), ".nif") then
 						table.insert(particles[particleType], particle)
 					end
@@ -649,53 +649,53 @@ local function init()
 		end
 
 		-- Register events to change particle meshes in --
-		event.register("weatherTransitionStarted", particleMeshChecker, {priority = -250})
-		event.register("weatherTransitionFinished", particleMeshChecker, {priority = -250})
-		event.register("weatherTransitionImmediate", particleMeshChecker, {priority = -250})
-		event.register("weatherChangedImmediate", particleMeshChecker, {priority = -250})
-		event.register("loaded", particleMeshChecker, {priority = -250})
+		event.register("weatherTransitionStarted", particleMeshChecker, { priority = -250 })
+		event.register("weatherTransitionFinished", particleMeshChecker, { priority = -250 })
+		event.register("weatherTransitionImmediate", particleMeshChecker, { priority = -250 })
+		event.register("weatherChangedImmediate", particleMeshChecker, { priority = -250 })
+		event.register("loaded", particleMeshChecker, { priority = -250 })
 		event.register("enterFrame", reColourParticleMesh)
 	end
 
 	-- Populate data tables with cloud textures --
 	if config.alterClouds then
 		for weather, index in pairs(tes3.weather) do
-			debugLog("Weather: "..weather)
-			for sky in lfs.dir(WtSdir..weather) do
+			debugLog("Weather: " .. weather)
+			for sky in lfs.dir(WtSdir .. weather) do
 				if sky ~= ".." and sky ~= "." then
 					if string.endswith(sky, ".dds") or string.endswith(sky, ".tga") then
 						table.insert(weathers.customWeathers[index], sky)
-						debugLog("File added: "..sky)
+						debugLog("File added: " .. sky)
 					end
 				end
 			end
 		end
 
 		-- Initially shuffle the cloud textures --
-		local vanChance=config.vanChance/100
+		local vanChance = config.vanChance / 100
 		local texPath, sArray
 		debugLog("Initially shuffling textures.")
 		for _, weather in pairs(WtC.weathers) do
-			if vanChance<math.random() then
+			if vanChance < math.random() then
 				for index, _ in pairs(weathers.customWeathers) do
-					if weather.index==index then
+					if weather.index == index then
 						for w, i in pairs(tes3.weather) do
-							if index==i then
-								sArray=weathers.customWeathers[weather.index]
-								texPath=w
+							if index == i then
+								sArray = weathers.customWeathers[weather.index]
+								texPath = w
 								break
 							end
 						end
 					end
 				end
-				if texPath~=nil and sArray[1]~=nil then
-					weather.cloudTexture=WtSdir..texPath.."\\"..sArray[math.random(1, #sArray)]
-					debugLog("Cloud texture path set to: "..weather.cloudTexture)
+				if texPath ~= nil and sArray[1] ~= nil then
+					weather.cloudTexture = WtSdir .. texPath .. "\\" .. sArray[math.random(1, #sArray)]
+					debugLog("Cloud texture path set to: " .. weather.cloudTexture)
 				end
 			else
 				texPath = weathers.vanillaWeathers[weather.index]
-				weather.cloudTexture = "Data Files\\Textures\\"..texPath
-				debugLog("Using vanilla texture: "..weather.cloudTexture)
+				weather.cloudTexture = "Data Files\\Textures\\" .. texPath
+				debugLog("Using vanilla texture: " .. weather.cloudTexture)
 			end
 		end
 
@@ -705,7 +705,7 @@ local function init()
 
 	-- Initially shuffle hours between weather changes --
 	if config.alterChanges then
-		WtC.hoursBetweenWeatherChanges=math.random(3,10)
+		WtC.hoursBetweenWeatherChanges = math.random(3, 10)
 	end
 
 	-- Initially shuffle particle amounts --
@@ -726,13 +726,13 @@ local function init()
 		event.register("loaded", daytimeTimer)
 	end
 	if config.interiorTransitions then
-		event.register("cellChanged", onCellChanged, {priority=-150})
+		event.register("cellChanged", onCellChanged, { priority = -150 })
 	end
 
-	mwse.log("[Watch the Skies] Version "..version.." initialised.")
+	mwse.log("[Watch the Skies] Version " .. version .. " initialised.")
 end
 
-event.register("initialized", init, {priority=-150})
+event.register("initialized", init, { priority = -150 })
 
 -- Registers MCM menu --
 event.register("modConfigReady", function()

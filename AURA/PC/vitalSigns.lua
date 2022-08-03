@@ -10,7 +10,7 @@ local PCfatigue = config.PCfatigue
 local PCmagicka = config.PCmagicka
 local PCDisease = config.PCDisease
 local PCBlight = config.PCBlight
-local vsVol = config.vsVol/200
+local vsVol = config.vsVol / 200
 
 -- People don't cough underwater I guess --
 local function isPlayerUnderWater()
@@ -68,9 +68,9 @@ end
 local function playDisease()
     if diseaseFlag == 1 then return end
     if not diseaseTimer then
-        diseaseTimer = timer.start{type=timer.real, duration=20, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\A\\PC\\"..genderDisease, volume=0.7*vsVol, reference=player}
-        end}
+        diseaseTimer = timer.start { type = timer.real, duration = 20, iterations = -1, callback = function()
+            tes3.playSound { soundPath = "tew\\A\\PC\\" .. genderDisease, volume = 0.7 * vsVol, reference = player }
+        end }
     else
         diseaseTimer:resume()
     end
@@ -81,9 +81,9 @@ end
 local function playBlight()
     if blightFlag == 1 then return end
     if not blightTimer then
-        blightTimer = timer.start{type=timer.real, duration=35, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\A\\PC\\blight.wav", volume=0.9*vsVol, reference=player}
-        end}
+        blightTimer = timer.start { type = timer.real, duration = 35, iterations = -1, callback = function()
+            tes3.playSound { soundPath = "tew\\A\\PC\\blight.wav", volume = 0.9 * vsVol, reference = player }
+        end }
     else
         blightTimer:resume()
     end
@@ -95,9 +95,9 @@ end
 local function playHealth()
     if healthFlag == 1 then return end
     if not healthTimer then
-        healthTimer = timer.start{type=timer.real, duration=1.2, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\A\\PC\\health.wav", volume=0.7*vsVol, reference=player}
-        end}
+        healthTimer = timer.start { type = timer.real, duration = 1.2, iterations = -1, callback = function()
+            tes3.playSound { soundPath = "tew\\A\\PC\\health.wav", volume = 0.7 * vsVol, reference = player }
+        end }
     else
         healthTimer:resume()
     end
@@ -108,12 +108,12 @@ end
 local function playFatigue()
     if fatigueFlag == 1 then return end
     if not fatigueTimer then
-        fatigueTimer = timer.start{type=timer.real, duration=10, iterations=-1, callback=function()
-            tes3.say{
-                volume=0.9*vsVol,
-                soundPath="Vo\\tew\\A\\PC\\"..genderFatigue, reference=player
+        fatigueTimer = timer.start { type = timer.real, duration = 10, iterations = -1, callback = function()
+            tes3.say {
+                volume = 0.9 * vsVol,
+                soundPath = "Vo\\tew\\A\\PC\\" .. genderFatigue, reference = player
             }
-        end}
+        end }
     else
         fatigueTimer:resume()
     end
@@ -124,9 +124,9 @@ end
 local function playMagicka()
     if magickaFlag == 1 then return end
     if not magickaTimer then
-        magickaTimer = timer.start{type=timer.real, duration=12, iterations=-1, callback=function()
-            tes3.playSound{soundPath="tew\\A\\PC\\magicka.wav", volume=0.6*vsVol, pitch=0.8, reference=player}
-        end}
+        magickaTimer = timer.start { type = timer.real, duration = 12, iterations = -1, callback = function()
+            tes3.playSound { soundPath = "tew\\A\\PC\\magicka.wav", volume = 0.6 * vsVol, pitch = 0.8, reference = player }
+        end }
     else
         magickaTimer:resume()
     end
@@ -141,7 +141,7 @@ local function playVitals()
         local maxHealth = player.health.base
         local currentHealth = player.health.current
 
-        if currentHealth < maxHealth/3 then
+        if currentHealth < maxHealth / 3 then
             playHealth()
         else
             if healthTimer then
@@ -164,7 +164,7 @@ local function playVitals()
         local maxFatigue = player.fatigue.base
         local currentFatigue = player.fatigue.current
 
-        if currentFatigue < maxFatigue/3 then
+        if currentFatigue < maxFatigue / 3 then
             playFatigue()
         else
             if fatigueTimer then
@@ -179,7 +179,7 @@ local function playVitals()
         local maxMagicka = player.magicka.base
         local currentMagicka = player.magicka.current
 
-        if currentMagicka < maxMagicka/3 then
+        if currentMagicka < maxMagicka / 3 then
             playMagicka()
         else
             if magickaTimer then
@@ -239,6 +239,6 @@ local function positionCheck()
     end
 end
 
-event.register("uiActivated", positionCheck, {filter="MenuSwimFillBar"})
+event.register("uiActivated", positionCheck, { filter = "MenuSwimFillBar" })
 event.register("loaded", onLoaded)
 event.register("simulate", playVitals)

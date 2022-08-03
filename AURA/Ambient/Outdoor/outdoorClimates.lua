@@ -1,4 +1,4 @@
-local this={}
+local this = {}
 this.regions = {
     ["Aanthirin Region"] = "lus",
     ["Abecean Sea Region"] = "lus",

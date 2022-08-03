@@ -135,73 +135,73 @@ this.messages = {
 
 this.interiorNames = {
 	["alc"] = {
-        "alchimiste", -- [[There is often less capital letters in the French version, this is not an oversight]]
-        "apothicaire",
-        "Tel Uvirith, maison d'Omavel",
-        "guérisseur",
-    },
-    ["cou"] = {
-        "palais du Conseil telvanni",
-        "palais du Conseil rédoran",
-        "quartier des Manoirs",
-        "siège",
-        "Morag Tong",
-        "zone dissimulée",
-        "Grand conseil",
-        "place",
-        "complexes"
-    },
-    ["mag"] = {
-        "guilde des Mages" -- [[The names are the same in every city in the French version]]
-    },
-    ["fig"] = {
-        "guilde des Guerriers", -- [[Same here]]
-    },
-    ["tem"] = {
-        "Temple",
-        "Maar Gan, sanctuaire",
-        "chapelle de Vos",
-        "Grand Sanctuaire",
-        "Fane of the Ancestors", -- [[Doesn't exist in the base French version for some reason, maybe it's from a mod]]
-        "Tiriramannu", -- [[Same here]]
-    },
-    ["lib"] = {
-        "bibliothèque",
-        "bouquiniste",
-        "livres"
-    },
-    ["smi"] = {
-        "forgeron", 
-        "armurier",
-	"Weapons", -- [['weaponsmith' has the same translation as 'smith' in the French version]]
-        "armurerie",
-        "Smithy", -- [['smithy', 'armors' and 'blacksmith' don't appear in the base French version]]
-	"Weapon",
-        "Armors",
-        "Blacksmith",
-    },
-    ["tra"] = {
-        "marchand",
-        "prêteur sur gages",
-        "quincailler",
-        "Merchant", -- [[Doesn't appear in the base French version]]
-	"Goods", -- [[Same translation for 'general goods' and 'general merchandise']]
-        "ouvriers",
-        "brasseurs",
-        "auberge",
-	"hôtel",
-        "hostellerie", -- [[Two different translations for 'hostel' in the French version]]
-    },
-    ["clo"] = {
-        "tailleur", -- [['outfitter' has the same translation as 'clothier' and 'tailor' in the French version]]
-    },
-    ["tom"]= {
-        "tombeau",
-        "sépulture",
-        "crypte",
-        "tertre",
-        "catacombes",
-    }
+		"alchimiste", -- [[There is often less capital letters in the French version, this is not an oversight]]
+		"apothicaire",
+		"Tel Uvirith, maison d'Omavel",
+		"guérisseur",
+	},
+	["cou"] = {
+		"palais du Conseil telvanni",
+		"palais du Conseil rédoran",
+		"quartier des Manoirs",
+		"siège",
+		"Morag Tong",
+		"zone dissimulée",
+		"Grand conseil",
+		"place",
+		"complexes"
+	},
+	["mag"] = {
+		"guilde des Mages" -- [[The names are the same in every city in the French version]]
+	},
+	["fig"] = {
+		"guilde des Guerriers", -- [[Same here]]
+	},
+	["tem"] = {
+		"Temple",
+		"Maar Gan, sanctuaire",
+		"chapelle de Vos",
+		"Grand Sanctuaire",
+		"Fane of the Ancestors", -- [[Doesn't exist in the base French version for some reason, maybe it's from a mod]]
+		"Tiriramannu", -- [[Same here]]
+	},
+	["lib"] = {
+		"bibliothèque",
+		"bouquiniste",
+		"livres"
+	},
+	["smi"] = {
+		"forgeron",
+		"armurier",
+		"Weapons", -- [['weaponsmith' has the same translation as 'smith' in the French version]]
+		"armurerie",
+		"Smithy", -- [['smithy', 'armors' and 'blacksmith' don't appear in the base French version]]
+		"Weapon",
+		"Armors",
+		"Blacksmith",
+	},
+	["tra"] = {
+		"marchand",
+		"prêteur sur gages",
+		"quincailler",
+		"Merchant", -- [[Doesn't appear in the base French version]]
+		"Goods", -- [[Same translation for 'general goods' and 'general merchandise']]
+		"ouvriers",
+		"brasseurs",
+		"auberge",
+		"hôtel",
+		"hostellerie", -- [[Two different translations for 'hostel' in the French version]]
+	},
+	["clo"] = {
+		"tailleur", -- [['outfitter' has the same translation as 'clothier' and 'tailor' in the French version]]
+	},
+	["tom"] = {
+		"tombeau",
+		"sépulture",
+		"crypte",
+		"tertre",
+		"catacombes",
+	}
 }
 
 ------------------------------------------------------------------------------------------------

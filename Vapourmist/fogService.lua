@@ -22,15 +22,15 @@ this.meshes = {
 
 -- Print debug messages --
 function this.debugLog(message)
-    if config.debugLogOn then
+	if config.debugLogOn then
 		if not message then message = "n/a" end
 		message = tostring(message)
 		local info = debug.getinfo(2, "Sl")
-        local module = info.short_src:match("^.+\\(.+).lua$")
-        local prepend = ("[Vapourmist.%s.%s:%s]:"):format(VERSION, module, info.currentline)
-        local aligned = ("%-36s"):format(prepend)
-        mwse.log(aligned.." -- "..string.format("%s", message))
-    end
+		local module = info.short_src:match("^.+\\(.+).lua$")
+		local prepend = ("[Vapourmist.%s.%s:%s]:"):format(VERSION, module, info.currentline)
+		local aligned = ("%-36s"):format(prepend)
+		mwse.log(aligned .. " -- " .. string.format("%s", message))
+	end
 end
 
 -- Remove all cached fog data for particular fog type --
@@ -48,7 +48,7 @@ function this.isCellFogged(activeCell, fogType)
 	if not currentFogs or not currentFogs[fogType] then return false end
 	for _, cell in pairs(currentFogs[fogType]) do
 		if cell == activeCell then
-			this.debugLog("Cell: "..cell.editorName.." is fogged.")
+			this.debugLog("Cell: " .. cell.editorName .. " is fogged.")
 			return true
 		end
 	end
@@ -61,7 +61,7 @@ local function removeSelected(fog)
 	if not emitter.appCulled then
 		emitter.appCulled = true
 		emitter:update()
-		this.debugLog("Appculling fog: "..fog.name)
+		this.debugLog("Appculling fog: " .. fog.name)
 	end
 end
 
@@ -81,7 +81,7 @@ function this.cleanInactiveFog()
 					for f, _ in pairs(fogType) do
 						if node == f then
 							fogType[f] = nil
-							this.debugLog("Removed fog: "..f.name)
+							this.debugLog("Removed fog: " .. f.name)
 						end
 					end
 				end
@@ -107,7 +107,7 @@ end
 function this.isFogAppculled(fogType)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
-		if node and node.name == "tew_"..fogType then
+		if node and node.name == "tew_" .. fogType then
 			for _, fog in pairs(node.children) do
 				if fog.name == "Mist Emitter" then
 					if fog.appCulled == true then
@@ -132,19 +132,19 @@ local function getFogPosition(activeCell, height)
 	if average == 0 or denom == 0 then
 		return height
 	else
-		if ((average/denom) + height) <= 0 then
+		if ((average / denom) + height) <= 0 then
 			return height
-		elseif ((average/denom) + height) > height then
+		elseif ((average / denom) + height) > height then
 			return height + 100
 		end
 	end
 
-	return (average/denom) + height
+	return (average / denom) + height
 end
 
 -- Determine fog position for interiors --
 local function getInteriorCellPosition(cell)
-	local pos = {x = 0, y = 0, z = 0}
+	local pos = { x = 0, y = 0, z = 0 }
 	local denom = 0
 
 	for stat in cell:iterateReferences() do
@@ -154,20 +154,20 @@ local function getInteriorCellPosition(cell)
 		denom = denom + 1
 	end
 
-	return {x = pos.x/denom, y = pos.y/denom, z = pos.z/denom}
+	return { x = pos.x / denom, y = pos.y / denom, z = pos.z / denom }
 end
 
 -- Appculling switch --
 function this.cullFog(bool, type)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
-		if node and node.name == "tew_"..type then
+		if node and node.name == "tew_" .. type then
 			for _, fog in pairs(node.children) do
 				if fog.name == "Mist Emitter" then
 					if fog.appCulled ~= bool then
 						fog.appCulled = bool
 						fog:update()
-						this.debugLog("Appculling switched to "..tostring(bool).." for "..type.." fogs.")
+						this.debugLog("Appculling switched to " .. tostring(bool) .. " for " .. type .. " fogs.")
 					end
 				end
 			end
@@ -230,9 +230,9 @@ function this.reColour()
 			fog:updateProperties()
 			fog:updateNodeEffects()
 
-			:: continue_2 ::
+			::continue_2::
 		end
-		:: continue_1 ::
+		::continue_1::
 	end
 end
 
@@ -244,11 +244,11 @@ function this.addFog(options)
 
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 
-	this.debugLog("Checking if we can add fog: "..type)
+	this.debugLog("Checking if we can add fog: " .. type)
 
 	for _, activeCell in pairs(tes3.getActiveCells()) do
 		if (not (this.isCellFogged(activeCell, type)) and not (activeCell.isInterior)) then
-			this.debugLog("Cell is not fogged. Adding "..type..".")
+			this.debugLog("Cell is not fogged. Adding " .. type .. ".")
 
 			local fogMesh = this.meshes[options.type]:clone()
 
@@ -264,7 +264,7 @@ function this.addFog(options)
 
 			for _, vfx in pairs(vfxRoot.children) do
 				if vfx then
-					if vfx.name == "tew_"..options.type then
+					if vfx.name == "tew_" .. options.type then
 						local particleSystem = vfx:getObjectByName("MistEffect")
 						local controller = particleSystem.controller
 						controller.initialSize = table.choice(data.fogTypes[options.type].initialSize)
@@ -283,16 +283,16 @@ end
 
 -- Removes fog from view by appculling - with fade out
 function this.removeFog(fogType)
-    this.debugLog("Removing fog of type: "..fogType)
+	this.debugLog("Removing fog of type: " .. fogType)
 	this.cullFog(true, fogType)
 end
 
 -- Removes fog from view by detaching - without fade out
 function this.removeFogImmediate(fogType)
-    this.debugLog("Immediately removing fog of type: "..fogType)
+	this.debugLog("Immediately removing fog of type: " .. fogType)
 	local vfxRoot = tes3.game.worldSceneGraphRoot.children[9]
 	for _, node in pairs(vfxRoot.children) do
-		if node and node.name == "tew_"..fogType then
+		if node and node.name == "tew_" .. fogType then
 			vfxRoot:detachChild(node)
 		end
 	end
@@ -311,7 +311,7 @@ function this.addInteriorFog(options)
 	local cell = options.cell
 
 	if not (this.isCellFogged(cell, fogType)) then
-		this.debugLog("Interior cell is not fogged. Adding "..fogType..".")
+		this.debugLog("Interior cell is not fogged. Adding " .. fogType .. ".")
 		local fogMesh = this.meshes["interior"]:clone()
 		local pos = getInteriorCellPosition(cell)
 

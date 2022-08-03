@@ -2,7 +2,7 @@
 local this = {}
 
 -- Imports
-local common=require("tew.AURA.common")
+local common = require("tew.AURA.common")
 
 -- Logger
 local debugLog = common.debugLog
@@ -115,7 +115,7 @@ end
 -- Check if the sound is not being faded in/out, block if yes --
 local function isBlocked(track)
 	for _, v in pairs(blocked) do
-		if v == track then debugLog("Track blocked: "..track.id) return true end
+		if v == track then debugLog("Track blocked: " .. track.id) return true end
 	end
 end
 
@@ -123,11 +123,11 @@ end
 local function fadeIn(ref, volume, track, module)
 
 	-- We can sometimes get calls where no sound is actually playing, get out if it is so --
-	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade in. Returning.") return end
+	if not track or not tes3.getSoundPlaying { sound = track, reference = ref } then debugLog("No track to fade in. Returning.") return end
 
 	-- If the track is already fading in, block it and check later --
 	if isBlocked(track) then
-		timer.start{
+		timer.start {
 			callback = function()
 				fadeIn(ref, volume, track, module)
 			end,
@@ -138,48 +138,48 @@ local function fadeIn(ref, volume, track, module)
 		return
 	end
 
-	debugLog("Running fade in for: "..track.id)
+	debugLog("Running fade in for: " .. track.id)
 	table.insert(blocked, track)
 
 	-- Magic maths --
-	local TIME = TICK*volume/STEP
-	local ITERS = math.ceil(volume/STEP)
+	local TIME = TICK * volume / STEP
+	local ITERS = math.ceil(volume / STEP)
 	local runs = 1
 
 	-- Inline function to ensure we can register different iterations of this on different sounds --
 	local function fader()
-		local incremented = STEP*runs
+		local incremented = STEP * runs
 
-		if not tes3.getSoundPlaying{sound = track, reference = ref} then
-			debugLog("In not playing: "..track.id)
+		if not tes3.getSoundPlaying { sound = track, reference = ref } then
+			debugLog("In not playing: " .. track.id)
 			return
 		end
 
-		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
-		debugLog("Adjusting volume in: "..track.id.." | "..tostring(incremented))
+		tes3.adjustSoundVolume { sound = track, volume = incremented, reference = ref }
+		debugLog("Adjusting volume in: " .. track.id .. " | " .. tostring(incremented))
 		runs = runs + 1
-		debugLog("In runs for track: "..track.id.." : "..runs)
+		debugLog("In runs for track: " .. track.id .. " : " .. runs)
 	end
 
 	-- Remove from blocked once we're done --
 	local function queuer()
 		modules[module].old = track
 		removeBlocked(track)
-		debugLog("Fade in for "..track.id.." finished in: "..tostring(TIME).." s.")
+		debugLog("Fade in for " .. track.id .. " finished in: " .. tostring(TIME) .. " s.")
 	end
 
-	debugLog("Iterations: "..tostring(ITERS))
-	debugLog("Time: "..tostring(TIME))
+	debugLog("Iterations: " .. tostring(ITERS))
+	debugLog("Time: " .. tostring(TIME))
 
 	-- Start fading --
-	timer.start{
+	timer.start {
 		iterations = ITERS,
 		duration = TICK,
 		callback = fader
 	}
 
 	-- Clean up afterwards --
-	timer.start{
+	timer.start {
 		iterations = 1,
 		duration = TIME + 0.1, -- Ridiculous but required --
 		callback = queuer
@@ -189,10 +189,10 @@ end
 -- Same as above, just backwards --
 local function fadeOut(ref, volume, track, module)
 
-	if not track or not tes3.getSoundPlaying{sound = track, reference = ref} then debugLog("No track to fade out. Returning.") return end
+	if not track or not tes3.getSoundPlaying { sound = track, reference = ref } then debugLog("No track to fade out. Returning.") return end
 
 	if isBlocked(track) then
-		timer.start{
+		timer.start {
 			callback = function()
 				fadeOut(ref, volume, track, module)
 			end,
@@ -203,43 +203,43 @@ local function fadeOut(ref, volume, track, module)
 		return
 	end
 
-	debugLog("Running fade out for: "..track.id)
+	debugLog("Running fade out for: " .. track.id)
 	table.insert(blocked, track)
 
-	local TIME = TICK*volume/STEP
-	local ITERS = math.ceil(volume/STEP)
+	local TIME = TICK * volume / STEP
+	local ITERS = math.ceil(volume / STEP)
 	local runs = ITERS
 
 	local function fader()
-		local incremented = STEP*runs
-		if not tes3.getSoundPlaying{sound = track, reference = ref} then
-			debugLog("Out not playing: "..track.id)
+		local incremented = STEP * runs
+		if not tes3.getSoundPlaying { sound = track, reference = ref } then
+			debugLog("Out not playing: " .. track.id)
 			return
 		end
 
-		tes3.adjustSoundVolume{sound = track, volume = incremented, reference = ref}
-		debugLog("Adjusting volume out: "..track.id.." | "..tostring(incremented))
+		tes3.adjustSoundVolume { sound = track, volume = incremented, reference = ref }
+		debugLog("Adjusting volume out: " .. track.id .. " | " .. tostring(incremented))
 		runs = runs - 1
-		debugLog("Out runs for track: "..track.id.." : "..runs)
+		debugLog("Out runs for track: " .. track.id .. " : " .. runs)
 	end
 
 	local function queuer()
 		modules[module].old = track
 		removeBlocked(track)
-		if tes3.getSoundPlaying{sound = track, reference = ref} then tes3.removeSound{sound = track, reference = ref} end
-		debugLog("Fade out for "..track.id.." finished in: "..tostring(TIME).." s.")
+		if tes3.getSoundPlaying { sound = track, reference = ref } then tes3.removeSound { sound = track, reference = ref } end
+		debugLog("Fade out for " .. track.id .. " finished in: " .. tostring(TIME) .. " s.")
 	end
 
-	debugLog("Iterations: "..tostring(ITERS))
-	debugLog("Time: "..tostring(TIME))
+	debugLog("Iterations: " .. tostring(ITERS))
+	debugLog("Time: " .. tostring(TIME))
 
-	timer.start{
+	timer.start {
 		iterations = ITERS,
 		duration = TICK,
 		callback = fader
 	}
 
-	timer.start{
+	timer.start {
 		iterations = 1,
 		duration = TIME + 0.1,
 		callback = queuer
@@ -249,23 +249,23 @@ end
 -- Simple crossfade using available faders --
 local function crossFade(ref, volume, trackOld, trackNew, module)
 	if not trackOld or not trackNew then return end
-	debugLog("Running crossfade for: "..trackOld.id..", "..trackNew.id)
+	debugLog("Running crossfade for: " .. trackOld.id .. ", " .. trackNew.id)
 	fadeOut(ref, volume, trackOld, module)
 	fadeIn(ref, volume, trackNew, module)
 end
 
 -- Sometimes we need to just remove the sounds without fading --
 function this.removeImmediate(options)
-	debugLog("Immediately removing sounds for module: "..options.module)
+	debugLog("Immediately removing sounds for module: " .. options.module)
 
 	local ref = options.reference or tes3.mobilePlayer.reference
 
 	-- Remove old file if playing (for instance if fade out didn't quite finish yet) --
 	if modules[options.module].old then
 		removeBlocked(modules[options.module].old)
-		if tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} then
-			tes3.removeSound{sound = modules[options.module].old, reference = ref}
-			debugLog(modules[options.module].old.id.." removed.")
+		if tes3.getSoundPlaying { sound = modules[options.module].old, reference = ref } then
+			tes3.removeSound { sound = modules[options.module].old, reference = ref }
+			debugLog(modules[options.module].old.id .. " removed.")
 		else
 			debugLog("Old track not playing.")
 		end
@@ -274,10 +274,10 @@ function this.removeImmediate(options)
 	-- Remove the new file as well --
 	if modules[options.module].new then
 		removeBlocked(modules[options.module].old)
-		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then
-			tes3.removeSound{sound = modules[options.module].new, reference = ref}
+		if tes3.getSoundPlaying { sound = modules[options.module].new, reference = ref } then
+			tes3.removeSound { sound = modules[options.module].new, reference = ref }
 			modules[options.module].old = modules[options.module].new
-			debugLog(modules[options.module].new.id.." removed.")
+			debugLog(modules[options.module].new.id .. " removed.")
 		else
 			debugLog("New track not playing.")
 		end
@@ -286,22 +286,20 @@ end
 
 -- Remove the sound for a given module, but with fade out --
 function this.remove(options)
-	debugLog("Removing sounds for module: "..options.module)
+	debugLog("Removing sounds for module: " .. options.module)
 	local ref = options.reference or tes3.mobilePlayer.reference
 	local volume = options.volume or MAX
 
-	if
-		modules[options.module].old
-		and tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref}
+	if modules[options.module].old
+		and tes3.getSoundPlaying { sound = modules[options.module].old, reference = ref }
 	then
 		fadeOut(ref, volume, modules[options.module].old, options.module)
 	else
 		debugLog("Old track not playing.")
 	end
 
-	if
-		modules[options.module].new
-		and tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref}
+	if modules[options.module].new
+		and tes3.getSoundPlaying { sound = modules[options.module].new, reference = ref }
 	then
 		fadeOut(ref, volume, modules[options.module].new, options.module)
 	else
@@ -327,7 +325,7 @@ local function getTrack(options)
 		else
 			local climate = options.climate
 			local time = options.time
-			debugLog("Got "..climate.." climate and "..time.." time.")
+			debugLog("Got " .. climate .. " climate and " .. time .. " time.")
 			table = this.clear[climate][time]
 		end
 	elseif options.module == "populated" then
@@ -342,21 +340,21 @@ local function getTrack(options)
 	elseif options.module == "interior" then
 		debugLog("Got interior module.")
 		if options.race then
-			debugLog("Got tavern for "..options.race.." race.")
+			debugLog("Got tavern for " .. options.race .. " race.")
 			table = this.interior["tav"][options.race]
 		else
-			debugLog("Got interior "..options.type.." type.")
+			debugLog("Got interior " .. options.type .. " type.")
 			table = this.interior[options.type]
 		end
 	elseif options.module == "interiorWeather" then
 		if options.type == "wind" then
 			return tes3.getSound("tew_wind_gust")
 		end
-		debugLog("Got interior weather module. Weather: "..options.weather)
-		debugLog("Got interior type: "..options.type)
+		debugLog("Got interior weather module. Weather: " .. options.weather)
+		debugLog("Got interior type: " .. options.type)
 		local intWTrack = this.interiorWeather[options.type][options.weather]
 		if intWTrack then
-			debugLog("Got track: "..intWTrack.id)
+			debugLog("Got track: " .. intWTrack.id)
 			return intWTrack
 		else
 			debugLog("No track found.")
@@ -388,7 +386,7 @@ local function getTrack(options)
 		end
 	end
 
-	debugLog("Selected track: "..newTrack.id)
+	debugLog("Selected track: " .. newTrack.id)
 
 	return newTrack
 end
@@ -400,8 +398,8 @@ function this.playImmediate(options)
 
 	-- Get the last track so that we're not randomising each time we change int/ext cells within same conditions --
 	if options.last and modules[options.module].new then
-		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
-		debugLog("Immediately restaring: "..modules[options.module].new.id)
+		if tes3.getSoundPlaying { sound = modules[options.module].new, reference = ref } then tes3.removeSound { sound = modules[options.module].new, reference = ref } end
+		debugLog("Immediately restaring: " .. modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
 			loop = true,
@@ -416,7 +414,7 @@ function this.playImmediate(options)
 		modules[options.module].new = newTrack
 
 		if newTrack then
-			debugLog("Immediately playing new track: "..newTrack.id.." for module: "..options.module)
+			debugLog("Immediately playing new track: " .. newTrack.id .. " for module: " .. options.module)
 
 			tes3.playSound {
 				sound = newTrack,
@@ -439,8 +437,8 @@ function this.play(options)
 	local volume = options.volume or MAX
 
 	if options.last and modules[options.module].new then
-		if tes3.getSoundPlaying{sound = modules[options.module].new, reference = ref} then tes3.removeSound{sound = modules[options.module].new, reference = ref} end
-		debugLog("Immediately restaring: "..modules[options.module].new.id)
+		if tes3.getSoundPlaying { sound = modules[options.module].new, reference = ref } then tes3.removeSound { sound = modules[options.module].new, reference = ref } end
+		debugLog("Immediately restaring: " .. modules[options.module].new.id)
 		tes3.playSound {
 			sound = modules[options.module].new,
 			loop = true,
@@ -458,7 +456,7 @@ function this.play(options)
 		modules[options.module].old = modules[options.module].new
 		modules[options.module].new = newTrack
 
-		debugLog("Playing new track: "..newTrack.id.." for module: "..options.module)
+		debugLog("Playing new track: " .. newTrack.id .. " for module: " .. options.module)
 
 		-- Play the sound with 0 volume, decide the fader method later --
 		tes3.playSound {
@@ -470,9 +468,8 @@ function this.play(options)
 		}
 
 		-- Crossfade if old track is playing and is different from new sound, otherwise fade in --
-		if
-			modules[options.module].old and
-			tes3.getSoundPlaying{sound = modules[options.module].old, reference = ref} and
+		if modules[options.module].old and
+			tes3.getSoundPlaying { sound = modules[options.module].old, reference = ref } and
 			(modules[options.module].old ~= newTrack) then
 			crossFade(ref, volume, modules[options.module].old, newTrack, options.module)
 		else
@@ -480,6 +477,5 @@ function this.play(options)
 		end
 	end
 end
-
 
 return this

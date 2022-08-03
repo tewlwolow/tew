@@ -1,21 +1,21 @@
-local this={}
+local this = {}
 
-this.raceNames={
-    ["Argonian"]="a",
-    ["Breton"]="b",
-    ["Dark Elf"]="d",
-    ["High Elf"]="h",
-    ["Imperial"]="i",
-    ["Khajiit"]="k",
-    ["Orc"]="o",
-    ["Nord"]="n",
-    ["Redguard"]="r",
-    ["Wood Elf"]="w"
+this.raceNames = {
+    ["Argonian"] = "a",
+    ["Breton"] = "b",
+    ["Dark Elf"] = "d",
+    ["High Elf"] = "h",
+    ["Imperial"] = "i",
+    ["Khajiit"] = "k",
+    ["Orc"] = "o",
+    ["Nord"] = "n",
+    ["Redguard"] = "r",
+    ["Wood Elf"] = "w"
 }
 
-this.commonVoices={
-    ["a"]={
-        ["f"]={
+this.commonVoices = {
+    ["a"] = {
+        ["f"] = {
             "Srv_AF001",
             "Srv_AF006",
             "Hlo_AF081",
@@ -32,7 +32,7 @@ this.commonVoices={
             "Hlo_AF116",
             "Hlo_AF117",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_AM001",
             "Srv_AM002",
             "Srv_AM005",
@@ -51,8 +51,8 @@ this.commonVoices={
             "Hlo_AM117",
         },
     },
-    ["b"]={
-        ["f"]={
+    ["b"] = {
+        ["f"] = {
             "Srv_BF002",
             "Srv_BF004",
             "Srv_BF005",
@@ -63,7 +63,7 @@ this.commonVoices={
             "Srv_BF025",
             "Srv_BF026",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_BM002",
             "Srv_BM010",
             "Srv_BM011",
@@ -71,8 +71,8 @@ this.commonVoices={
             "Srv_BM014",
         },
     },
-    ["d"]={
-        ["f"]={
+    ["d"] = {
+        ["f"] = {
             "Srv_DF002",
             "Srv_DF014",
             "Srv_DF025",
@@ -95,7 +95,7 @@ this.commonVoices={
             "tHlo_DF164",
             "tHlo_DF169"
         },
-        ["m"]={
+        ["m"] = {
             "Srv_DM025",
             "Srv_DM032",
             "Srv_DM035",
@@ -132,8 +132,8 @@ this.commonVoices={
             "tHlo_DM198",
         },
     },
-    ["h"]={
-        ["f"]={
+    ["h"] = {
+        ["f"] = {
             "Srv_HF001",
             "Srv_HF008",
             "Srv_HF010",
@@ -142,7 +142,7 @@ this.commonVoices={
             "Srv_HF016",
             "Srv_HF017",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_HM001",
             "Srv_HM004",
             "Srv_HM005",
@@ -160,8 +160,8 @@ this.commonVoices={
             "Srv_HM025",
         },
     },
-    ["i"]={
-        ["f"]={
+    ["i"] = {
+        ["f"] = {
             "Hlo_IF060",
             "Hlo_IF061",
             "Hlo_IF062",
@@ -200,7 +200,7 @@ this.commonVoices={
             "tHlo_IF109",
             "tHlo_IF110",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_IM004",
             "Srv_IM005",
             "Srv_IM010",
@@ -219,8 +219,8 @@ this.commonVoices={
             "tHlo_IM100",
         },
     },
-    ["k"]={
-        ["f"]={
+    ["k"] = {
+        ["f"] = {
             "Srv_KF010",
             "Hlo_KF000a",
             "Hlo_KF081",
@@ -237,7 +237,7 @@ this.commonVoices={
             "Hlo_KF115",
             "Hlo_KF117",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_KM005",
             "Srv_KM007",
             "Idl_KM003",
@@ -255,8 +255,8 @@ this.commonVoices={
             "Hlo_KM117",
         },
     },
-    ["o"]={
-        ["f"]={
+    ["o"] = {
+        ["f"] = {
             "Srv_OF001",
             "Srv_OF002",
             "Hlo_OF057",
@@ -265,33 +265,33 @@ this.commonVoices={
             "Hlo_OF060",
             "Hlo_OF090",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_OM001",
             "Srv_OM007",
             "Srv_OM008",
             "Srv_OM010",
         },
     },
-    ["n"]={
-        ["f"]={
+    ["n"] = {
+        ["f"] = {
             "Srv_NF001",
             "Srv_NF002",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_NM001",
             "Srv_NM004",
             "Srv_NM005",
             "Hlo_NM136",
         },
     },
-    ["r"]={
-        ["f"]={
+    ["r"] = {
+        ["f"] = {
             "Srv_RF001",
             "Srv_RF002",
             "Srv_RF004",
             "Srv_RF005",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_RM001",
             "Srv_RM002",
             "Srv_RM007",
@@ -300,8 +300,8 @@ this.commonVoices={
             "Srv_RM011",
         },
     },
-    ["w"]={
-        ["f"]={
+    ["w"] = {
+        ["f"] = {
             "Srv_WF005",
             "Srv_WF007",
             "Srv_WF008",
@@ -312,7 +312,7 @@ this.commonVoices={
             "Hlo_WF088",
             "Hlo_WF091",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_WM002",
             "Hlo_WM087",
             "Hlo_WM088",
@@ -322,32 +322,32 @@ this.commonVoices={
     }
 }
 
-this.travelVoices={
-    ["a"]={
-        ["f"]={
+this.travelVoices = {
+    ["a"] = {
+        ["f"] = {
             "Flw_AF001",
             "Srv_AF001",
             "Srv_AF001"
         },
-        ["m"]={
+        ["m"] = {
             "Flw_AM001",
             "Srv_AM001",
             "Srv_AM001"
         },
     },
-    ["b"]={
-        ["f"]={
+    ["b"] = {
+        ["f"] = {
             "Srv_BF010",
             "Srv_BF011",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_BM010",
             "Srv_BM013",
             "Srv_BM014",
         },
     },
-    ["d"]={
-        ["f"]={
+    ["d"] = {
+        ["f"] = {
             "Srv_DF037",
             "Srv_DF038",
             "Srv_DF002",
@@ -361,7 +361,7 @@ this.travelVoices={
             "Srv_DF047",
             "Hlo_DF227",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_DM037",
             "Srv_DM038",
             "Srv_DM025",
@@ -371,26 +371,26 @@ this.travelVoices={
             "Hlo_DM228",
         },
     },
-    ["h"]={
-        ["f"]={
+    ["h"] = {
+        ["f"] = {
             "Srv_HF001",
             "Srv_HF014",
             "Hlo_HF089",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_HM005",
             "Srv_HM017",
             "Hlo_HM089",
         },
     },
-    ["i"]={
-        ["f"]={
+    ["i"] = {
+        ["f"] = {
             "Srv_IF013",
             "Srv_IF014",
             "Hlo_IF087",
             "Hlo_IF088",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_IM010",
             "Srv_IM016",
             "Srv_IM017",
@@ -398,15 +398,15 @@ this.travelVoices={
             "Srv_IM031",
         },
     },
-    ["k"]={
-        ["f"]={
+    ["k"] = {
+        ["f"] = {
             "Srv_KF008",
             "Srv_KF010",
             "Hlo_KF085",
             "Hlo_KF088",
             "Hlo_KF089"
         },
-        ["m"]={
+        ["m"] = {
             "Srv_KM007",
             "Srv_KM005",
             "Hlo_KM085",
@@ -417,8 +417,8 @@ this.travelVoices={
             "Hlo_KM091",
         },
     },
-    ["o"]={
-        ["f"]={
+    ["o"] = {
+        ["f"] = {
             "Hlo_OF057",
             "Srv_OF002",
             "Hlo_OF085",
@@ -427,7 +427,7 @@ this.travelVoices={
             "Hlo_OF061",
             "Hlo_OF062",
         },
-        ["m"]={
+        ["m"] = {
             "Hlo_OM085",
             "Hlo_OM086",
             "Hlo_OM090",
@@ -435,32 +435,32 @@ this.travelVoices={
             "Hlo_OM092"
         },
     },
-    ["n"]={
-        ["f"]={
+    ["n"] = {
+        ["f"] = {
             "Srv_NF004",
             "Srv_NF005",
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["r"]={
-        ["f"]={
+    ["r"] = {
+        ["f"] = {
 
 
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["w"]={
-        ["f"]={
+    ["w"] = {
+        ["f"] = {
 
 
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
@@ -468,17 +468,17 @@ this.travelVoices={
 
 }
 
-this.spellVoices={
-    ["a"]={
-        ["f"]={
+this.spellVoices = {
+    ["a"] = {
+        ["f"] = {
 
         },
-        ["m"]={
+        ["m"] = {
 
         },
     },
-    ["b"]={
-        ["f"]={
+    ["b"] = {
+        ["f"] = {
             "Srv_BF010",
             "Srv_BF019",
             "Srv_BF002",
@@ -491,45 +491,45 @@ this.spellVoices={
             "Srv_BF025",
             "Srv_BF026",
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["d"]={
-        ["f"]={
+    ["d"] = {
+        ["f"] = {
 
 
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["h"]={
-        ["f"]={
+    ["h"] = {
+        ["f"] = {
             "Srv_HF001",
             "Srv_HF005",
             "Srv_HF006",
             "Srv_HF008",
             "Srv_HF011",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_HM007",
             "Srv_HM008",
             "Srv_HM011",
             "Srv_HM025",
         },
     },
-    ["i"]={
-        ["f"]={
+    ["i"] = {
+        ["f"] = {
             "Srv_IF004",
             "Srv_IF013",
             "Srv_IF014",
             "Hlo_IF087",
             "Hlo_IF088",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_IM004",
             "Srv_IM010",
             "Srv_IM011",
@@ -542,18 +542,18 @@ this.spellVoices={
             "Srv_IM034",
         },
     },
-    ["k"]={
-        ["f"]={
+    ["k"] = {
+        ["f"] = {
 
 
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["o"]={
-        ["f"]={
+    ["o"] = {
+        ["f"] = {
             "Srv_OF001",
             "Srv_OF002",
             "Hlo_OF057",
@@ -561,37 +561,37 @@ this.spellVoices={
             "Hlo_OF059",
             "Hlo_OF060"
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["n"]={
-        ["f"]={
+    ["n"] = {
+        ["f"] = {
 
 
         },
-        ["m"]={
-
-
-        },
-    },
-    ["r"]={
-        ["f"]={
-
-
-        },
-        ["m"]={
+        ["m"] = {
 
 
         },
     },
-    ["w"]={
-        ["f"]={
+    ["r"] = {
+        ["f"] = {
+
+
+        },
+        ["m"] = {
+
+
+        },
+    },
+    ["w"] = {
+        ["f"] = {
             "Srv_WF004",
             "Srv_WF005",
         },
-        ["m"]={
+        ["m"] = {
 
 
         },
@@ -600,62 +600,62 @@ this.spellVoices={
 }
 
 
-this.trainingVoices={
-    ["a"]={
-        ["f"]={
+this.trainingVoices = {
+    ["a"] = {
+        ["f"] = {
             "Srv_AF001",
             "Srv_AF009",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_AM001",
             "Srv_AM010",
         },
     },
-    ["b"]={
-        ["f"]={
+    ["b"] = {
+        ["f"] = {
             "Srv_BF010",
             "Srv_BF011",
             "Srv_BF016",
             "Srv_BF017",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_BM007",
             "Srv_BM008",
             "Srv_BM010",
             "Srv_BM011",
         },
     },
-    ["d"]={
-        ["f"]={
+    ["d"] = {
+        ["f"] = {
             "Srv_DF002",
             "Srv_DF016",
             "Srv_DF017",
             "Srv_DF020",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_DM002",
             "Srv_DM013",
             "Srv_DM014",
             "Srv_DM020",
         },
     },
-    ["h"]={
-        ["f"]={
+    ["h"] = {
+        ["f"] = {
             "Srv_HF001",
             "Srv_HF005",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_HM020",
             "Srv_HM025",
         },
     },
-    ["i"]={
-        ["f"]={
+    ["i"] = {
+        ["f"] = {
             "Srv_IF013",
             "Srv_IF014",
             "Srv_IF020",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_IM007",
             "Srv_IM008",
             "Srv_IM010",
@@ -666,21 +666,21 @@ this.trainingVoices={
             "Srv_IM034",
         },
     },
-    ["k"]={
-        ["f"]={
+    ["k"] = {
+        ["f"] = {
             "Srv_KF004",
             "Srv_KF005",
             "Srv_KF008",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_KM005",
             "Hlo_KM109",
             "Hlo_KM115",
             "Hlo_KM120",
         },
     },
-    ["o"]={
-        ["f"]={
+    ["o"] = {
+        ["f"] = {
             "Srv_OF002",
             "Hlo_OF057",
             "Hlo_OF058",
@@ -690,22 +690,22 @@ this.trainingVoices={
             "Hlo_OF089",
             "Hlo_OF088",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_OM002",
             "Srv_OM004",
             "Srv_OM005",
             "Srv_OM011",
         },
     },
-    ["n"]={
-        ["f"]={
+    ["n"] = {
+        ["f"] = {
             "Srv_NF001",
             "Hlo_NF114",
             "Hlo_NF136",
             "Hlo_NF085",
             "Hlo_NF082",
         },
-        ["m"]={
+        ["m"] = {
             "Hlo_NM136",
             "Hlo_NM111",
             "Hlo_NM110",
@@ -716,21 +716,21 @@ this.trainingVoices={
             "Hlo_NM085",
         },
     },
-    ["r"]={
-        ["f"]={
+    ["r"] = {
+        ["f"] = {
             "Hlo_RF086",
             "Hlo_RF087",
             "Hlo_RF088",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_RM001",
             "Srv_RM002",
             "Srv_RM004",
             "Srv_RM005",
         },
     },
-    ["w"]={
-        ["f"]={
+    ["w"] = {
+        ["f"] = {
             "Srv_WF005",
             "Srv_WF008",
             "Hlo_WF083",
@@ -740,7 +740,7 @@ this.trainingVoices={
             "Hlo_WF088",
             "Hlo_WF091",
         },
-        ["m"]={
+        ["m"] = {
             "Srv_WM004",
             "Srv_WM005",
             "Hlo_WM091",

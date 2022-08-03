@@ -1,6 +1,6 @@
 local modversion = require("tew.AURA.version")
 local version = modversion.version
-local config=require("tew.AURA.config")
+local config = require("tew.AURA.config")
 local messages = require(config.language).messages
 
 local function init()
@@ -30,6 +30,5 @@ local function init()
         dofile("Data Files\\MWSE\\mods\\tew\\AURA\\Misc\\windSounds.lua")
     end
 end
-
 
 init()

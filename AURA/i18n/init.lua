@@ -13,8 +13,8 @@ for i, cat in pairs(defaultLanguage) do
 	else
 		for ii, _ in pairs(cat) do
 			if (not language[i][ii])
-			or (language[i][ii] == "")
-			or (language[i][ii] == {}) then
+				or (language[i][ii] == "")
+				or (language[i][ii] == {}) then
 				language[i][ii] = defaultLanguage[i][ii]
 			end
 		end
