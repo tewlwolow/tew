@@ -16,113 +16,113 @@ local this = {}
 -- Translate ONLY the values on the right hand side of the = signs. --
 
 this.messages = {
-	audioWarning = "Master and effect channels should be set to max for the mod to work as intended.",
-	buildingSoundsStarted = "Running sound object builder.",
-	buildingSoundsFinished = "Sound objects builder finished.",
-	loadingFile = "Loading file:",
-	oldFolderDeleted = "Old mod folder found and deleted.",
-	oldFileDeleted = "Old file found and deleted",
+	audioWarning = "Le volume général et celui des effets sonores doit être à son maximum pour que le mod fonctionne correctement.",
+	buildingSoundsStarted = "Construction d'objet sonore en cours.",
+	buildingSoundsFinished = "Construction d'objet sonore terminée.",
+	loadingFile = "Chargement du fichier :",
+	oldFolderDeleted = "Ancienne version du mod détectée et supprimée.",
+	oldFileDeleted = "Ancienne version d'un fichier du mod détecté et supprimé.",
 
-	manifestConfirm = "Are you sure you want to remove the manifest file?",
-	manifestRemoved = "Manifest file has been removed.",
+	manifestConfirm = "Etes-vous sûr de vouloir retirer le fichier manifeste ?",
+	manifestRemoved = "Fichier manifeste retiré.",
 
-	initialised = "initialised.",
-	mainSettings = "Main Settings",
-	mainLabel = "by tewlwolow.\nLua-based sound overhaul.",
+	initialised = "initialisé.",
+	mainSettings = "Paramètres généraux",
+	mainLabel = "par tewlwolow.\nAmélioration audio utilisant MWSE.",
 
-	WtS = "Requires Watch the Skies.",
+	WtS = "Nécessite Watch the Skies.",
 
-	settings = "Settings",
-	default = "Default",
+	settings = "Paramètres",
+	default = "Par défaut",
 	volume = "Volume",
-	toggle = "Toggle",
-	chance = "Chance",
+	toggle = "Changer",
+	chance = "Chances",
 	version = "Version",
 
-	modLanguage = "Mod language.",
+	modLanguage = "Langue du mod.",
 
-	enableDebug = "Enable debug mode?",
-	enableOutdoor = "Enable Outdoor Ambient module?",
-	enableInterior = "Enable Interior Ambient module?",
-	enablePopulated = "Enable Populated Ambient module?",
-	enableInteriorWeather = "Enable Interior Weather module?",
-	enableServiceVoices = "Enable Service Voices module?",
-	enableUI = "Enable UI module?",
-	enableContainers = "Enable Containers module?",
-	enablePC = "Enable PC module?",
-	enableMisc = "Enable Misc module?",
+	enableDebug = "Activer le mode débug ?",
+	enableOutdoor = "Activer le module Ambiance Extérieure ?",
+	enableInterior = "Activer le module Ambiance Intérieure ?",
+	enablePopulated = "Activer le module Ambiance Population ?",
+	enableInteriorWeather = "Activer le module Météo Intérieure ?",
+	enableServiceVoices = "Activer le module Commentaires Services ?",
+	enableUI = "Activer le module Interface ?",
+	enableContainers = "Activer le module Conteneurs ?",
+	enablePC = "Activer le module PJ ?",
+	enableMisc = "Activer le module Divers ?",
 
-	refreshManifest = "Refresh manifest file",
+	refreshManifest = "Actualiser le fichier manifeste",
 
-	OA = "Outdoor Ambient",
-	OADesc = "Plays ambient sounds in accordance with local climate, weather, player position, and time.",
-	OAVol = "Changes % volume for Outdoor Ambient module.",
-	playInteriorAmbient = "Enable exterior ambient sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
+	OA = "Ambiance Extérieure",
+	OADesc = "Joue des sons d'ambiance en fonction du climat, de la météo, de la position du joueur et de l'heure de la journée.",
+	OAVol = "Change le % de volume des sons du module Ambiance Extérieure.",
+	playInteriorAmbient = "Activer les sons ambiants extérieurs dans les intérieurs ? Cela signifie que la dernière boucle extérieure en date sera jouée au niveau de chaque porte ou fenêtre menant à l'extérieur.",
 
-	IA = "Interior Ambient",
-	IADesc = "Plays ambient sounds in accordance with interior type. Includes taverns, guilds, shops, libraries, tombs, caves, and ruins.",
-	IAVol = "Changes % volume for Interior Ambient module.",
+	IA = "Ambiance Intérieure",
+	IADesc = "Joue des sons d'ambiance en fonction du type d'intérieur. Inclut les tavernes, les guildes, les boutiques, les bibliothèques, les tombeaux, les grottes et les ruines.",
+	IAVol = "Change le % de volume des sons du module Ambiance Intérieure.",
 
-	enableTaverns = "Enable culture-specific music in taverns? Note that this works best if you have empty explore/battle folders and use no music mod.",
-	tavernsBlacklist = "Taverns blacklist",
-	tavernsDesc = "Select which taverns the music is disabled in.",
-	tavernsDisabled = "Disabled taverns",
-	tavernsEnabled = "Enabled taverns",
+	enableTaverns = "Activer les musiques de taverne dépendant de la culture ? Notez que vous profiterez davantage de cette option si vous désactivez vos sous-dossiers 'Battle' et 'Explore' dans votre dossier 'Music' et n'utilisez pas de mod de musique.",
+	tavernsBlacklist = "Liste noire des tavernes",
+	tavernsDesc = "Sélectionnez les tavernes où les musiques sont désactivées.",
+	tavernsDisabled = "Tavernes désactivées",
+	tavernsEnabled = "Tavernes activées",
 
-	PA = "Populated Ambient",
-	PADesc = "Plays ambient sounds in populated areas, like towns and villages.",
-	PAVol = "Changes % volume for Populated Ambient module.",
+	PA = "Ambiance Population",
+	PADesc = "Joue des sons d'ambiance dans les lieux peuplés commes les villes et les villages.",
+	PAVol = "Change le % de volume des sons du module Ambiance Population.",
 
-	IW = "Interior Weather",
-	IWDesc = "Plays weather sounds in interiors.",
-	IWVol = "Changes % volume for Interior Weather module.",
+	IW = "Météo Intérieure",
+	IWDesc = "Joue des sons liés à la météo dans les cellules intérieures.",
+	IWVol = "Change le % de volume des sons du module Météo Intérieure.",
 
-	SV = "Service Voices",
-	SVDesc = "Plays appropriate voice comments on service usage.",
-	SVVol = "Changes % volume for Service Voices module.",
-	enableRepair = "Enable voice comments on repair service?",
-	enableSpells = "Enable voice comments on spells vendor service?",
-	enableTraining = "Enable voice comments on training service?",
-	enableSpellmaking = "Enable voice comments on spellmaking service?",
-	enableEnchantment = "Enable voice comments on enchanting service?",
-	enableTravel = "Enable voice comments on travel service?",
-	enableBarter = "Enable voice comments on barter service?",
+	SV = "Commentaires Services",
+	SVDesc = "Joue des commentaires audio appropriés lorsqu'un PNJ vous rend un service.",
+	SVVol = "Change le % de volume des sons du module Commentaires Services.",
+	enableRepair = "Activer les commentaires audio sur les services de réparation ?",
+	enableSpells = "Activer les commentaires audio sur les services de vente de sorts ?",
+	enableTraining = "Activer les commentaires audio sur les services d'entraînement ?",
+	enableSpellmaking = "Activer les commentaires audio sur les services de création de sort ?",
+	enableEnchantment = "Activer les commentaires audio sur les services d'enchantement ?",
+	enableTravel = "Activer les commentaires audio sur les services de voyage ?",
+	enableBarter = "Activer les commentaires audio sur les services de marchandage ?",
 
-	PC = "PC",
-	PCDesc = "Plays sounds related to the player character.",
-	enableHealth = "Enable low health sounds?",
-	enableFatigue = "Enable low fatigue sounds?",
-	enableMagicka = "Enable low magicka sounds?",
-	enableDisease = "Enable diseased sounds?",
-	enableBlight = "Enable blighted sounds?",
-	vsVol = "Changes % volume for for vital signs (health, fatigue, magicka, disease, blight).",
-	enableTaunts = "Enable player combat taunts?",
-	tauntChance = "Changes % chance for a battle taunt to play.",
-	tVol = "Changes % volume for player battle taunts.",
+	PC = "PJ",
+	PCDesc = "Joue des sons en fonction du statut du PJ.",
+	enableHealth = "Activer les sons lorsque la santé est basse ?",
+	enableFatigue = "Activer les sons lorsque la fatigue est basse ?",
+	enableMagicka = "Activer les sons lorsque la magie est basse ?",
+	enableDisease = "Activer les sons lorsque le PJ souffre d'une maladie commune ?",
+	enableBlight = "Activer les sons lorsque le PJ souffre du Fléau ?",
+	vsVol = "Change le % de volume des sons des signes vitaux (santé, fatigue, magie, maladie, Fléau).",
+	enableTaunts = "Activer les sons de provocation lorsque le PJ est en combat ?",
+	tauntChance = "Change le % de chances qu'une provocation de combat soit lancée.",
+	tVol = "Change le % de volume des provocations du PJ.",
 
-	containers = "Containers",
-	containersDesc = "Plays container sound on open/close.",
-	CVol = "Changes % volume for Containers module.",
+	containers = "Conteneurs",
+	containersDesc = "Joue des sons à l'ouverture et à la fermeture des conteneurs.",
+	CVol = "Change le % de volume des sons du module Conteneurs.",
 
-	UI = "UI",
-	UIDesc = "Additional immersive UI sounds.",
-	UITraining = "Enable training menu sounds?",
-	UITravel = "Enable travel menu sounds?",
-	UISpells = "Enable spell menu sounds?",
-	UIBarter = "Enable barter menu sounds?",
-	UIEating = "Enable eating sound for ingredients in inventory menu?",
-	UIVol = "Changes % volume for UI module.",
+	UI = "Interface",
+	UIDesc = "Joue des sons immersifs additionnels lors de l'utilisation de l'interface.",
+	UITraining = "Activer les sons du menu d'entraînement ?",
+	UITravel = "Activer les sons du menu de voyage ?",
+	UISpells = "Activer les sons du menu des sorts ?",
+	UIBarter = "Activer les sons du menu de marchandage ?",
+	UIEating = "Activer les sons de restauration lors de la consommation de nourriture dans l'inventaire ?",
+	UIVol = "Change le % de volume des sons du module Interface.",
 
-	misc = "Misc",
-	miscDesc = "Plays various miscellaneous sounds.",
-	rainSounds = "Enable variable rain sounds per max particles?",
-	windSounds = "Enable variable wind sounds per clouds speed?",
-	playInteriorWind = "Enable wind sounds in interiors? This means the last exterior loop will play on each door and window leading to an exterior.",
-	windVol = "Changes % volume for wind sounds.",
-	playSplash = "Enable splash sounds when going underwater and back to surface?",
-	splashVol = "Changes % volume for splash sounds.",
-	playYurtFlap = "Enable sounds for yurts and pelt entrances?",
-	yurtVol = "Changes % volume for yurt and pelt entrances sounds."
+	misc = "Divers",
+	miscDesc = "Joue des sons additionnels divers.",
+	rainSounds = "Activer les sons variables de la pluie en fonction du nombre de particules ?",
+	windSounds = "Activer les sons variables du vent en fonction de la vitesse des nuages ?",
+	playInteriorWind = "Activer les sons de vent en intérieur ? Cela signifie que la dernière boucle extérieure en date sera jouée au niveau de chaque porte ou fenêtre menant à l'extérieur.",
+	windVol = "Change le % volume for wind sounds.",
+	playSplash = "Activer les sons d'éclaboussures en entrant et sortant de l'eau ?",
+	splashVol = "Change le % de volume des sons d'éclaboussures.",
+	playYurtFlap = "Activer les sons des portes de yourte ou en peau d'ours ?",
+	yurtVol = "Change le % de volume des sons des portes de yourte ou en peau d'ours."
 }
 
 ------------------------------------------------------------------------------------------------
@@ -135,77 +135,72 @@ this.messages = {
 
 this.interiorNames = {
 	["alc"] = {
-        "Alchemist",
-        "Apothecary",
-        "Tel Uvirith, Omavel's House",
-        "Healer",
+        "alchimiste", -- [[There is often less capital letters in the French version, this is not an oversight]]
+        "apothicaire",
+        "Tel Uvirith, maison d'Omavel",
+        "guérisseur",
     },
     ["cou"] = {
-        "Telvanni Council House",
-        "Redoran Council Hall",
-        "Manor District",
-        "Guildhall",
+        "palais du Conseil telvanni",
+        "palais du Conseil rédoran",
+        "quartier des Manoirs",
+        "siège",
         "Morag Tong",
-        "Arena Hidden Area",
-        "Grand Council",
-        "Plaza",
-        "Waistworks"
+        "zone dissimulée",
+        "Grand conseil",
+        "place",
+        "complexes"
     },
     ["mag"] = {
-        "Mages Guild",
-        "Mage's Guild",
-        "Guild of Mages"
+        "guilde des Mages" -- [[The names are the same in every city in the French version]]
     },
     ["fig"] = {
-        "Fighters Guild",
-        "Fighter's Guild",
-        "Guild of Fighters",
+        "guilde des Guerriers", -- [[Same here]]
     },
     ["tem"] = {
         "Temple",
-        "Maar Gan, Shrine",
-        "Vos Chapel",
-        "High Fane",
-        "Fane of the Ancestors",
-        "Tiriramannu",
+        "Maar Gan, sanctuaire",
+        "chapelle de Vos",
+        "Grand Sanctuaire",
+        "Fane of the Ancestors", -- [[Doesn't exist in the base French version for some reason, maybe it's from a mod]]
+        "Tiriramannu", -- [[Same here]]
     },
     ["lib"] = {
-        "Library",
-        "Bookseller",
-        "Books"
+        "bibliothèque",
+        "bouquiniste",
+        "livres"
     },
     ["smi"] = {
-        "Smith",
-        "Armorer",
-        "Weapons",
-        "Armor",
-        "Smithy",
-        "Weapon",
+        "forgeron", 
+        "armurier",
+	"Weapons", -- [['weaponsmith' has the same translation as 'smith' in the French version]]
+        "armurerie",
+        "Smithy", -- [['smithy', 'armors' and 'blacksmith' don't appear in the base French version]]
+	"Weapon",
         "Armors",
         "Blacksmith",
     },
     ["tra"] = {
-        "Trader",
-        "Pawnbroker",
-        "Merchandise",
-        "Merchant",
-        "Goods",
-        "Outfitter",
-        "Laborers",
-        "Brewers",
-        "Tradehouse",
-        "Hostel",
+        "marchand",
+        "prêteur sur gages",
+        "quincailler",
+        "Merchant", -- [[Doesn't appear in the base French version]]
+	"Goods", -- [[Same translation for 'general goods' and 'general merchandise']]
+        "ouvriers",
+        "brasseurs",
+        "auberge",
+	"hôtel",
+        "hostellerie", -- [[Two different translations for 'hostel' in the French version]]
     },
     ["clo"] = {
-        "Clothier",
-        "Tailors",
+        "tailleur", -- [['outfitter' has the same translation as 'clothier' and 'tailor' in the French version]]
     },
     ["tom"]= {
-        "Tomb",
-        "Burial",
-        "Crypt",
-        "Barrow",
-        "Catacomb",
+        "tombeau",
+        "sépulture",
+        "crypte",
+        "tertre",
+        "catacombes",
     }
 }
 
@@ -217,17 +212,17 @@ this.interiorNames = {
 -- Please see above for details about what and how to translate here --
 this.tavernNames = {
 	["dar"] = {
-		"Rat in the Pot",
-		"House of Earthly Delights",
-		"Elven Nations"
+		"Marmite du Rat",
+		"Maison des Plaisirs Terrestres",
+		"Nation elfique"
 	},
 	["imp"] = {
-		"Ebonheart, Six Fishes",
-		"Arrille"
+		"Coeurébène, les Six Poissons",
+		"Arrile"
 	},
 	["nor"] = {
-		"Skaal Village, The Greathall",
-		"Solstheim, Thirsk"
+		"Village Skaal, grande salle",
+		"Solstheim, Thirsk" -- [[actually the same name in the French version, for obvious reasons]]
 	}
 }
 
