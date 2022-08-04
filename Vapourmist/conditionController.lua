@@ -140,7 +140,7 @@ local function onWeatherChanged(e)
 		timer.start {
 			type = timer.game,
 			iterations = 1,
-			duration = 0.001,
+			duration = 0.3,
 			callback = function() fogService.addFog(options) end
 		}
 	end
