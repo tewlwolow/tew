@@ -1,6 +1,5 @@
 local configPath = "Heat Haze"
 local config = require("tew.Heat Haze.config")
-mwse.loadConfig("Heat Haze")
 local modversion = require("tew\\Heat Haze\\version")
 local version = modversion.version
 

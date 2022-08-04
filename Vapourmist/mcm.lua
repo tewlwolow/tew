@@ -1,6 +1,5 @@
 local configPath = "Vapourmist"
 local config = require("tew.Vapourmist.config")
-mwse.loadConfig("Vapourmist")
 local version = require("tew\\Vapourmist\\version")
 local VERSION = version.version
 
@@ -73,7 +72,7 @@ weathersPage:createExclusionsPage {
                     end
                     return weatherNames
                 end
-                )
+            )
         },
 
     }
