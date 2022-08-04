@@ -46,7 +46,7 @@ end
 local particleAmount = {
 	["rain"] = { 300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300 },
 	["thunder"] = { 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700 },
-	["snow"] = { 300, 320, 400, 460, 500, 600 }
+	["snow"] = { 400, 460, 500, 520, 548, 600 }
 }
 
 local cloudSpeed = {
@@ -607,28 +607,34 @@ end
 
 -- Check if we have the weather that warrants particle change --
 local function particleMeshChecker()
-	local weatherNow
-	-- Also check if we're transitioning to next weather --
-	if WtC.nextWeather then
-		weatherNow = WtC.nextWeather
-		-- Match rain and thunderstorm with rain particles, and snow with snow particles --
-		local checked = weatherChecklist[weatherNow.name]
-		if checked ~= nil then
-			timer.start {
-				duration = 0.5 - (0.5 - WtC.transitionScalar),
-				callback = function()
+	timer.start{
+		type=timer.game,
+		duration = 0.001,
+		callback = function()
+			local weatherNow
+			-- Also check if we're transitioning to next weather --
+			if WtC.nextWeather then
+				weatherNow = WtC.nextWeather
+				-- Match rain and thunderstorm with rain particles, and snow with snow particles --
+				local checked = weatherChecklist[weatherNow.name]
+				if checked ~= nil then
+					timer.start {
+						duration = 0.25,
+						callback = function()
+							changeParticleMesh(checked)
+						end,
+						type = timer.game,
+					}
+				end
+			else
+				weatherNow = WtC.currentWeather
+				local checked = weatherChecklist[weatherNow.name]
+				if checked ~= nil then
 					changeParticleMesh(checked)
-				end,
-				type = timer.game,
-			}
+				end
+			end
 		end
-	else
-		weatherNow = WtC.currentWeather
-		local checked = weatherChecklist[weatherNow.name]
-		if checked ~= nil then
-			changeParticleMesh(checked)
-		end
-	end
+	}
 end
 
 -- Change values also on initialised to ensure we won't end up with vanilla on load --
