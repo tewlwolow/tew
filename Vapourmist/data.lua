@@ -46,11 +46,6 @@ this.fogTypes = {
         initialSize = { 650, 700, 780, 800, 900, 980, 1000, 1100 },
         isAvailable = function(_, weather)
 
-            debug.log(weather.name)
-            for k, v in pairs(config.cloudyWeathers) do
-                debug.log(tostring(k) .. " " .. tostring(v))
-            end
-
             if config.blockedCloud[weather.name] and config.blockedCloud[weather.name] ~= nil then
                 return false
             end
