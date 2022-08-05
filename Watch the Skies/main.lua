@@ -44,9 +44,13 @@ end
 -- Define particle and clouds values for randomisation --
 -- Hard-coded values ensure better variety than range --
 local particleAmount = {
-	["rain"] = { 300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300 },
-	["thunder"] = { 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700 },
-	["snow"] = { 400, 460, 500, 520, 548, 600 }
+	-- ["rain"] = { 300, 360, 400, 450, 500, 550, 600, 650, 700, 740, 800, 900, 950, 1000, 1100, 1200, 1300 },
+	-- ["thunder"] = { 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1300, 1400, 1550, 1700 },
+	-- ["snow"] = { 500, 560, 600, 650, 700, 780, 800 }
+	["rain"] = { 1500, 1600, 1800, 1950, 2000, 2200, 2500, 2600, 2700, 2800, 2900, 3000 },
+	["thunder"] = { 1700, 1600, 1800, 1950, 2000, 2200, 2500, 2600, 2750, 2800, 3000, 3500, 4000, 4500, 5000 },
+	["snow"] = { 2000, 2200, 2500, 2600, 2800, 3000, 3200, 3400, 3600 }
+	
 }
 
 local cloudSpeed = {
@@ -715,7 +719,10 @@ local function init()
 	end
 
 	-- Initially shuffle particle amounts --
-	if config.randomiseParticles then
+	if config.randomiseParticles then		
+		WtC.weathers[5].particleRadius = 1400
+		WtC.weathers[6].particleRadius = 1400
+		WtC.weathers[9].particleRadius = 1800
 		changeMaxParticles()
 	end
 

@@ -43,11 +43,11 @@ local interiorRainLoops = {
 
 -- Resolve rain type per particle amount set in Watch the Skies --
 local function getRainType(particleAmount)
-    if particleAmount < 500 then
+    if particleAmount < 2000 then
         return "light"
-    elseif particleAmount < 950 then
+    elseif particleAmount < 2600 then
         return "medium"
-    elseif particleAmount <= 1700 then
+    elseif particleAmount <= 5000 then
         return "heavy"
     else
         return "light"
