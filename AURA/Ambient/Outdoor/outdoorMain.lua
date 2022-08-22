@@ -1,5 +1,3 @@
--- TODO: WIND MODULE PER CLOUD/WIND SPEED FROM WTS?
-
 local climates = require("tew.AURA.Ambient.Outdoor.outdoorClimates")
 local config = require("tew.AURA.config")
 local common = require("tew.AURA.common")
