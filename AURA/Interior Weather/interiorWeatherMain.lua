@@ -58,7 +58,29 @@ local soundData = {
 			volume = 0.4,
 			pitch = 0.75
 		}
-	}
+	},
+    ["ten"] = {
+        [4] = {
+            volume = 0.7,
+            pitch = 1.0
+        },
+        [5] = {
+            volume = 0.65,
+            pitch = 1.0
+        },
+        [6] = {
+            volume = 0.35,
+            pitch = 0.6
+        },
+        [7] = {
+            volume = 0.35,
+            pitch = 0.6
+        },
+        [9] = {
+            volume = 0.35,
+            pitch = 0.6
+        }
+    }
 }
 
 local debugLog = common.debugLog
