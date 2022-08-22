@@ -14,6 +14,8 @@ local blockedWeathers = {
 	[3] = true,
 	[8] = true,
 }
+
+-- TODO: Check tent values here
 local soundData = {
 	["sma"] = {
 		[4] = {
