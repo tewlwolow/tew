@@ -177,7 +177,7 @@ local function cellCheck()
 	debugLog("Different conditions. Resetting sounds.")
 
 	-- In case someone dislikes my interior weather module - bah! --
-	if (moduleInteriorWeather == false) and (windoors[1] ~= nil) and (weatherNow < 4) or (weatherNow == 8) then
+	if (moduleInteriorWeather == false) and (windoors) and (weatherNow < 4) or (weatherNow == 8) then
 		for _, windoor in ipairs(windoors) do
 			sounds.removeImmediate { module = moduleName, reference = windoor }
 		end
